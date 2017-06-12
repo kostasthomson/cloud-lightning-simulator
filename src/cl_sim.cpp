@@ -1,0 +1,181 @@
+#include <mpi.h>
+#include <task.h>
+#include <resource.h>
+#include <inputs.h>
+#include <comm.h>
+#include <cell.h>
+#include <string>
+#include <cstdlib>
+#include <cstdio>
+#include <iostream>
+#include <task.h>
+#include <tce.h>
+#include <gs.h>
+#include <vector>
+#include <iomanip>
+using namespace std;
+
+int main(int argc, char **argv)
+{
+	int rc=0,rank=0,numtasks=0,omp_thr=0,len=0,*commCells=NULL,allTasks=0;
+	double sTime=0.0,fTime=0.0,endTime=0.0,upInterval=0,t=0.0;
+	MPI_Comm Comm;
+	char hostname[MPI_MAX_PROCESSOR_NAME];
+	
+	//Pointer to siminputs
+	gs *gates=NULL;	
+
+	// Cell
+	cell *clCell=NULL;
+	//Current Job List
+	list<task> jobs;	
+
+	//-----------------------------------
+	// Initialize MPI
+	//-----------------------------------
+	rc=MPI_Init(&argc,&argv);
+	if (rc != MPI_SUCCESS)
+	{
+		cout<<"Error starting MPI program. Terminating..."<<endl;
+		MPI_Abort(MPI_COMM_WORLD,rc);
+	}
+	
+	//-----------------------------------
+	// Get ranks and cluster size
+	//-----------------------------------
+	MPI_Comm_size(MPI_COMM_WORLD,&numtasks);
+	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+	MPI_Get_processor_name(hostname,&len);
+	MPI_Comm_dup(MPI_COMM_WORLD,&Comm);
+	omp_thr=atoi(getenv("OMP_NUM_THREADS"));
+	//-----------------------------------
+	// Print cluster info
+	//-----------------------------------
+	if (rank==0)
+	{
+		sTime=MPI_Wtime();
+		cout<<endl<<"INITIALIZATION PHASE"<<endl;
+		cout<<"------------------------------- "<<endl;
+		cout<<"Cluster Size        : "<<numtasks<<endl;
+		cout<<"Threads per machine : "<<omp_thr<<endl;
+		cout<<"------------------------------- "<<endl;
+	}
+	MPI_Barrier(MPI_COMM_WORLD);
+	if (rank==0)
+		cout<<"Gateway Service : "<<rank<<" Running on "<<hostname<<endl;
+	else
+		cout<<"Cell            : "<<rank<<" Running on "<<hostname<<endl;
+	MPI_Barrier(MPI_COMM_WORLD);
+	
+	//-----------------------------------
+	// Communicate Cell and Resource
+	// parameters and Create all
+	// components
+	//-----------------------------------
+	if (rank==0)
+	{
+		string name="main";
+		string name2="app";
+		string name3="broker";
+		gates=new gs[1];
+		gates[0]=gs(name,name2,name3);
+		gates[0].printfile("systeminfo",ios::out);
+		commSimParameters(gates[0].gsi()[0],rank,numtasks,MPI_COMM_WORLD);		
+		endTime=gates[0].gsi()[0].maxTime;
+		upInterval=gates[0].gsi()[0].upInterval;	
+	}
+	else
+	{
+		struct siminputs *si;
+		si=new siminputs[1];
+		commSimParameters(*si,rank,numtasks,MPI_COMM_WORLD);
+		clCell=new cell[1];
+		*clCell=cell(*(si->cinp));
+		//-----------------------------------
+		// Initialization and Update
+		// outside of the constructor
+		// to avoid changing the values
+		// of the pointers to components
+		// (can be avoided with move copy
+		// constructor in (>=C++11))
+		//-----------------------------------
+		clCell[0].gbrok()->initbroker(clCell->gnumOfTypes(),clCell->gtypes(),clCell->gnumOfResourcesPerType(),clCell->gresources(),clCell->gpowerComp(),clCell->gnetwork(),si->cinp->binp[0]);
+		clCell[0].gbrok()->updateStateInfo(clCell[0].gnetwork(),0.0);
+		endTime=si->maxTime;
+		upInterval=si->upInterval;
+
+	}
+	MPI_Barrier(MPI_COMM_WORLD);
+	if (rank==0)
+	{
+		commStats(gates,clCell,rank,numtasks,MPI_COMM_WORLD);
+		gates[0].printStats("output",ios::out);
+	}
+	else
+	{
+		commStats(gates,clCell,rank,numtasks,MPI_COMM_WORLD);
+	}
+	MPI_Barrier(MPI_COMM_WORLD);
+	int ss=0;
+	for(t=0.0;t<endTime;t+=1.0)
+	{
+		
+		if (rank==0)
+		{
+			taskCreationEngine(jobs,gates[0].gai()[0]);
+			allTasks+=jobs.size();
+		//	taskImplSelect(jobs);
+			taskCellSelect(jobs,gates,&commCells);
+			commTaskParameters(jobs,rank,numtasks,commCells,MPI_COMM_WORLD);
+			jobs.clear();
+		}
+		else
+		{
+			
+			commTaskParameters(jobs,rank,numtasks,commCells,MPI_COMM_WORLD);
+			clCell[0].deploy(&jobs);		
+			ss+=(int)jobs.size();
+			jobs.clear();
+	
+			clCell[0].timestep(t);
+		}
+		
+		MPI_Barrier(MPI_COMM_WORLD);
+
+		if(((int)t+1)%((int)upInterval)==0)
+		{
+			if(rank==0)
+			{
+				commStats(gates,clCell,rank,numtasks,MPI_COMM_WORLD);
+				gates[0].printStats("output",ios::out | ios::app);
+				cout<<std::fixed<<setprecision(2)<<"\r Simulation at: "<<100.0*(t+1)/(endTime)<<" %"<<flush;		
+			}
+			else
+			{
+				commStats(gates,clCell,rank,numtasks,MPI_COMM_WORLD);
+			}
+		}
+				
+	}
+
+	if (rank==0)
+	{
+		commStats(gates,clCell,rank,numtasks,MPI_COMM_WORLD);
+		gates[0].printStats("output",ios::out | ios::app);
+		fTime=MPI_Wtime();
+		cout<<endl;
+		cout<<"Elapsed time: "<<fTime-sTime<<" sec"<<endl;
+		cout<<"Total number of submitted tasks: "<<allTasks<<endl;
+		delete[] gates;
+	}
+	else
+	{
+		cout<<endl<<ss<<endl;
+		commStats(gates,clCell,rank,numtasks,MPI_COMM_WORLD);
+		delete[] clCell;
+	}
+	MPI_Finalize();
+	return 0;
+}
+
+

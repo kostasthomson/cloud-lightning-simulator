@@ -1,0 +1,75 @@
+0 14
+3
+3
+1 2 3
+1386228336.48 5544913345.92
+1 16
+4 8
+4 8
+0.020 0.040
+0.0 0.0
+1 1 1
+1.0 1.0
+1.0 1.0
+1.0 1.0
+0 1 1
+0.0 0.7 0.5
+3
+1 2 3
+462076112.16 2772456672.96
+1 8
+8 16
+4 8
+0.010 0.020
+0.0 0.0
+1 1 1
+1.0 1.0
+1.0 1.0
+1.0 1.0
+0 1 1
+0.0 0.8 0.9
+2
+1 4
+693114168.24 4158685009.44
+1 4
+4 8
+4 8
+0.040 0.080
+0.0 0.0
+1 1 1
+1.0 1.0
+1.0 1.0
+1.0 1.0
+0 1
+0.0 0.9
+
+#Minimum and Maximum Apps per Second
+#NumberOfApps
+	#Number of Available Implementations (App 1)
+	#Available Implementations (App 1)
+	#Min and Max VMs per App (App 1)
+	#Min and Max Memory Per VM (in GB) (App 1)
+	#Min and Max Storage Per VM (in GB) (App 1)
+	#Min and Max Network Per VM (in GBps) (App 1)
+	#Type of Actual Utilization (Proc,Mem,Net) (App 1)
+	#Min and Max Actual Utilization for Proc (App 1)
+	#Min and Max Actual Utilization for Mem (App 1)
+	#Min and Max Actual Utilization for Net (App 1)
+	#Accelerator support (App 1)
+	#Rho for accelerator execution per Implementation (App 1)
+	.
+	.
+	.
+	#Number of Available Implementations (App N)
+	#Available Implementations (App N)
+	#Min and Max VMs per App (App N)
+	#Min and Max Memory Per VM (in GB) (App N)
+	#Min and Max Storage Per VM (in GB) (App N)
+	#Min and Max Network Per VM (in GBps) (App N)
+	#Type of Actual Utilization (Proc,Mem,Net) (App N)
+	#Min and Max Actual Utilization for Proc (App N)
+	#Min and Max Actual Utilization for Mem (App N)
+	#Min and Max Actual Utilization for Net (App N)
+	#Accelerator support (App N)
+	#Rho for accelerator execution per Implementation (App N)
+
