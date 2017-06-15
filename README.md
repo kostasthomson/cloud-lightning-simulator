@@ -1,4 +1,4 @@
-# README #
+# CloudLightning Simulator
 
 These steps are required in order to run the CloudLightning Simulator in your machine:
 
