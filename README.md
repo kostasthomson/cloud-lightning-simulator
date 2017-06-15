@@ -1,7 +1,28 @@
 # CloudLightning Simulator
 
-These steps are required in order to run the CloudLightning Simulator in your machine:
+## Getting started
 
-1. Clone the rep from the bitbucket
-2. At the main folder of the CloudLightning Simulator open the terminal and write "make clean", then press enter and then "make all".
-3. Change directory at the bin folder and write: "sh cl_sim.out".
+Clone project:
+
+      https://gsikotidis@bitbucket.org/cloudlightning/cloudlightning-simulator.git
+
+Install dependencies:
+
+$ Download OpenMPI from https://www.open-mpi.org/
+$ Navigate to the directory of the downloaded file
+$ ./configure --prefix=/where/to/install
+$ make all install
+$ sudo apt-get install libopenmpi-dev
+
+##Project Build
+
+Navigate to the directory of the project and open the terminal
+
+$ Enter "make clean"
+$ Enter "make all"
+
+##Run the CL Simulator
+
+Change directory at the bin folder
+
+$ Enter "sh cl_sim.out"
