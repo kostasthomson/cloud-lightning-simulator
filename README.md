@@ -2,27 +2,27 @@
 
 ## Getting started
 
-Clone project:
+Clone the project:
 
-   https://gsikotidis@bitbucket.org/cloudlightning/cloudlightning-simulator.git
+     $ git clone https://gsikotidis@bitbucket.org/cloudlightning/cloudlightning-simulator.git
 
 Install dependencies:
 
-   $ Download OpenMPI from https://www.open-mpi.org/
-   $ Navigate to the directory of the downloaded file
-   $ ./configure --prefix=/where/to/install
-   $ make all install
-   $ sudo apt-get install libopenmpi-dev
+     $ Download OpenMPI from https://www.open-mpi.org/
+     $ Navigate to the directory of the downloaded file
+     $ ./configure --prefix=/where/to/install
+     $ make all install
+     $ sudo apt-get install libopenmpi-dev
 
 ##Project Build
 
-Navigate to the directory of the project and open the terminal
+Navigate to the directory of the project, open the terminal and enter
 
-   $ Enter "make clean"
-   $ Enter "make all"
+     $ make clean
+     $ make all
 
 ##Run the CL Simulator
 
-Change directory at the bin folder
+Change directory at the bin folder and enter
 
-   $ Enter "sh cl_sim.out"
+     $ sh cl_sim.out
