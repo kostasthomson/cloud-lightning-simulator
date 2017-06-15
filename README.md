@@ -2,14 +2,14 @@
 
 ## Getting started
 
-Clone the project:
+Clone the project
 
      $ git clone https://gsikotidis@bitbucket.org/cloudlightning/cloudlightning-simulator.git
 
-Install dependencies:
+Install dependencies
 
-     Download OpenMPI from https://www.open-mpi.org/
-     Navigate to the directory of the downloaded file open the terminal and enter
+Download OpenMPI from https://www.open-mpi.org/. Navigate to the directory of the downloaded file, open the terminal and enter
+
      $ ./configure --prefix=/where/to/install
      $ make all install
      $ sudo apt-get install libopenmpi-dev
