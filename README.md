@@ -19,7 +19,7 @@ Install OpenMPI
 
 ## Input and Output Data
 
-Input and output JSON data files are located at the corresponding *input* and *output* files of the project
+Input and output JSON data files are located at the corresponding *input* and *output* folders of the project
 
 ##Project Build
 
