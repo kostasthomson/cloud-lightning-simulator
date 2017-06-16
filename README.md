@@ -6,13 +6,20 @@ Clone the project
 
      $ git clone https://gsikotidis@bitbucket.org/cloudlightning/cloudlightning-simulator.git
 
-Install dependencies
+## Prerequisites
 
-Download OpenMPI from https://www.open-mpi.org/. Navigate to the directory of the downloaded file, open the terminal and enter
+* Required gcc versions 4.9-6.0 (https://gcc.gnu.org/)
+* Required OpenMPI version 2.1 (https://www.open-mpi.org)
+
+Install OpenMPI
 
      $ ./configure --prefix=/where/to/install
      $ make all install
      $ sudo apt-get install libopenmpi-dev
+
+## Input and output Data
+
+Input and output JSON data files are located at the corresponding *input* and *output* files of the project
 
 ##Project Build
 
@@ -23,6 +30,6 @@ Navigate to the directory of the project, open the terminal and enter
 
 ##Run the CL Simulator
 
-Change directory at the bin folder and enter
+Change directory at the *bin* folder and enter
 
      $ sh cl_sim.out
