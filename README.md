@@ -17,7 +17,7 @@ Install OpenMPI
      $ make all install
      $ sudo apt-get install libopenmpi-dev
 
-## Input and output Data
+## Input and output data
 
 Input and output JSON data files are located at the corresponding *input* and *output* files of the project
 
