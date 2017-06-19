@@ -2,7 +2,17 @@
 #include<iostream>
 #include<fstream>
 #include<string>
+#include<json.hpp>
 using namespace std;
+
+nlohmann::json js;
+nlohmann::json cl;
+nlohmann::json hw;
+
+nlohmann::json hw_list;
+nlohmann::json js_list;
+nlohmann::json output_list;
+nlohmann::json cl_list;
 
 //---------------------------------
 //        CONSTRUCTORS
@@ -241,4 +251,100 @@ void stat::printfile(const string &outfile, const ios::openmode &mode)
 		file<<currTstep<<" "<<activeSrvs<<" "<<numOfTasks<<" "<<accTasks<<" "<<rejTasks<<" "<<availProc<<" "<<utilProc<<" "<<autilProc<<" "<<totProc<<" "<<phyProc<<" "<<availMem<<" "<<utilMem<<" "<<autilMem<<" "<<totMem<<" "<<phyMem<<" "<<availSto<<" "<<utilSto<<" "<<availSto<<" "<<phySto<<" "<<availNetw<<" "<<utilNetw<<" "<<autilNetw<<" "<<totNetw<<" "<<phyNetw<<" "<<availAcc<<" "<<utilAcc<<" "<<totAcc<<" "<<totPcons<<endl;
 		file.close();
 	}
+}
+
+void stat::printfileJson(const string &outfile, const string &inputfile, const ios::openmode &mode, int a, int b, int overallRecords, int numOfCells, int numOfTypes, int j){
+
+	ifstream file;
+	file.open(inputfile.c_str());
+	std::ofstream ff(outfile,mode);
+    output_list.clear();
+    hw_list.clear();
+
+    int k;
+    for(k=0;k<overallRecords;k++)
+    {
+    	file>>currTstep;
+		file>>activeSrvs;
+		file>>numOfTasks;
+		file>>accTasks;
+		file>>rejTasks;
+		file>>availProc;
+	    file>>utilProc;	
+		file>>autilProc;
+		file>>totProc;
+		file>>phyProc;
+		file>>availMem;
+		file>>utilMem;
+		file>>autilMem;
+		file>>totMem;
+		file>>phyMem;
+		file>>availSto;
+		file>>utilSto;
+		file>>totSto;
+		file>>phySto;
+		file>>availNetw;
+		file>>utilNetw;
+		file>>autilNetw;
+		file>>totNetw;
+		file>>phyNetw;
+		file>>availAcc;
+		file>>utilAcc;
+		file>>totAcc;
+		file>>totPcons;
+    
+	
+		js = {
+				
+				{"Time Step", currTstep},
+				{"Total Energy Consumption",totPcons},
+			  	{"Active Servers", activeSrvs},
+				{"Total Number of currently running VMs",numOfTasks},
+				{"Total Number of accepted Tasks",accTasks},
+				{"Total Number of rejected Tasks",rejTasks},
+				{"Total Physical Processors",phyProc},
+				{"Total Processors",totProc},
+				{"Utilized Processors",utilProc},
+				{"Actual Utilized Processors",autilProc},
+				{"Available Processors",availProc},
+				{"Total Physical Memory",phyMem},
+				{"Total Memory",totMem},
+				{"Utilized Memory",utilMem},
+				{"Actual Utilized Memory",autilMem},
+				{"Available Memory",availMem},
+				{"Total Physical Storage",phySto},
+				{"Total Storage",totSto},
+				{"Utilized Storage",utilSto},
+				{"Available Storage",availSto},
+				{"Total Physical Network",phyNetw},
+				{"Total Network",totNetw},
+				{"Utilized Network",utilNetw},
+				{"Actual Utilized Network",autilNetw},
+				{"Available Network",availNetw},
+				{"Total Accelerators",totAcc},
+				{"Utilized Accelerators",utilAcc},
+				{"Available Accelerators",availAcc}	
+				
+		};
+		output_list.push_back(js);
+    }
+    //hw = 
+    //{
+    //	{"HW Type", j},
+    //	{"Outputs: ", output_list}
+   // };
+   // hw_list.push_back(hw);
+
+	cl = 
+    {
+    	{"Cell", a},
+    	{"HW Type", b},
+    	{"Outputs", output_list}
+    };
+
+    cl_list.push_back(cl);
+
+	if(a==numOfCells && j==numOfTypes)
+    ff << std::setw(4) << cl_list << std::endl;
+ file.close();
 }

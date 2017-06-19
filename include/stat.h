@@ -43,6 +43,7 @@ struct stat
 	~stat();
 	void print() const;
 	void printfile(const string &outfile, const ios::openmode &mode);
+	void printfileJson(const string &outfile, const string &inputfile, const ios::openmode &mode, int i, int j, int overallRecords, int numOfCells, int numOfTypes, int ct);
 };
 
 #endif

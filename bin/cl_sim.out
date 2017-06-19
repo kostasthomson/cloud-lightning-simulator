@@ -1,4 +1,4 @@
 #!/bin/bash
-export MPI_TASKS=3
+export MPI_TASKS=4
 export OMP_NUM_THREADS=1
-mpirun -np $MPI_TASKS ./cl_sim
+mpirun -np $MPI_TASKS ./cl_sim -x OMP_NUM_THREADS=1

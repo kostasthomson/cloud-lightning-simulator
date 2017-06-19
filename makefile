@@ -23,7 +23,7 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 _DEPS = task.h resource.h cell.h inputs.h comm.h power.h tce.h netw.h stat.h gs.h brokers.h misc.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-CFLAGS  = -O3 -lm -fopenmp -I$(IDIR)
+CFLAGS  = -O3 -std=c++11 -lm -fopenmp -I$(IDIR)
 
 # typing 'make' will invoke the first target entry in the file 
 # (in this case the default target entry)

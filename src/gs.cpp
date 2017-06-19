@@ -10,6 +10,7 @@
 #include <gs.h>
 #include <sstream>
 #include <misc.h>
+#include <json.hpp>
 using namespace std;
 
 
@@ -264,3 +265,26 @@ void gs::printStats(const string &outfile, const ios::openmode &mode)
 	}
 }
 
+void gs::printStatsJson(const string &outfile, const ios::openmode &mode, int endTime, int upInterval)
+{
+	int i,j, endT, upIn;
+	endT = endTime;
+	upIn = upInterval;
+	int overallRecords;
+	overallRecords = (endT/upIn)+1;
+	string jsn = "Json";
+	if(alloc)
+	{
+		
+		for(i=0;i<si->numOfCells;i++)
+		{
+			for(j=0;j<si->cinp[i].numOfTypes;j++)
+			{
+					
+					string tmp=outfile+num2str(si->cinp[i].ID)+num2str(si->cinp[i].types[j]);
+					string temp=outfile+jsn;
+					stats[i][j].printfileJson(temp, tmp, mode, si->cinp[i].ID, si->cinp[i].types[j], overallRecords, si->numOfCells, si->cinp[i].numOfTypes, j+1);				
+			}
+		}
+	}
+}

@@ -13,6 +13,7 @@
 #include <gs.h>
 #include <vector>
 #include <iomanip>
+#include <json.hpp>
 using namespace std;
 
 int main(int argc, char **argv)
@@ -74,9 +75,9 @@ int main(int argc, char **argv)
 	//-----------------------------------
 	if (rank==0)
 	{
-		string name="main";
-		string name2="app";
-		string name3="broker";
+		string name="../input/CellData";
+		string name2="../input/AppData";
+		string name3="../input/broker";
 		gates=new gs[1];
 		gates[0]=gs(name,name2,name3);
 		gates[0].printfile("systeminfo",ios::out);
@@ -109,7 +110,7 @@ int main(int argc, char **argv)
 	if (rank==0)
 	{
 		commStats(gates,clCell,rank,numtasks,MPI_COMM_WORLD);
-		gates[0].printStats("output",ios::out);
+		gates[0].printStats("../output/output",ios::out);
 	}
 	else
 	{
@@ -147,7 +148,7 @@ int main(int argc, char **argv)
 			if(rank==0)
 			{
 				commStats(gates,clCell,rank,numtasks,MPI_COMM_WORLD);
-				gates[0].printStats("output",ios::out | ios::app);
+				gates[0].printStats("../output/output",ios::out | ios::app);
 				cout<<std::fixed<<setprecision(2)<<"\r Simulation at: "<<100.0*(t+1)/(endTime)<<" %"<<flush;		
 			}
 			else
@@ -156,6 +157,13 @@ int main(int argc, char **argv)
 			}
 		}
 				
+	}
+
+	//-----------------------------------
+	// Print outputs to json file
+	//-----------------------------------
+    if(rank==0){
+		gates[0].printStatsJson("../output/output",ios::out | ios::app, endTime, upInterval);
 	}
 
 	if (rank==0)
@@ -170,7 +178,7 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		cout<<endl<<ss<<endl;
+		//cout<<endl<<ss<<endl;
 		commStats(gates,clCell,rank,numtasks,MPI_COMM_WORLD);
 		delete[] clCell;
 	}

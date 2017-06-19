@@ -67,6 +67,7 @@ class gs
 	void printStats();
 	void printStats(const string &outfile, const ios::openmode &mode);
 	void printfile(const string &outfile, const ios::openmode &mode);
+	void printStatsJson(const string &outfile, const ios::openmode &mode, int endTime, int upInterval);
 };
 
 #endif
