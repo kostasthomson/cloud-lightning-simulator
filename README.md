@@ -33,3 +33,8 @@ Navigate to the directory of the project, open the terminal and enter
 Change directory at the *bin* folder and enter
 
      $ sh cl_sim.out
+
+##Deliverable
+
+The deliverable 7.1.1 of the CloudLightning Project can be found on the following url:
+http://cloudlightning.eu/work-packages/public-deliverables/
