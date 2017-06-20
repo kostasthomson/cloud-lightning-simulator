@@ -18,161 +18,159 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-	int rc=0,rank=0,numtasks=0,omp_thr=0,len=0,*commCells=NULL,allTasks=0;
-	double sTime=0.0,fTime=0.0,endTime=0.0,upInterval=0,t=0.0;
-	MPI_Comm Comm;
-	char hostname[MPI_MAX_PROCESSOR_NAME];
-	
-	//Pointer to siminputs
-	gs *gates=NULL;	
+  //Pointer to siminputs
+	gs *gates=nullptr;
 
 	// Cell
-	cell *clCell=NULL;
-	//Current Job List
-	list<task> jobs;	
+	cell *clCell=nullptr;
 
-	//-----------------------------------
+	//Current Job List
+	list<task> jobs;
+
 	// Initialize MPI
-	//-----------------------------------
-	rc=MPI_Init(&argc,&argv);
+	int rc=MPI_Init(&argc,&argv);
 	if (rc != MPI_SUCCESS)
 	{
 		cout<<"Error starting MPI program. Terminating..."<<endl;
 		MPI_Abort(MPI_COMM_WORLD,rc);
 	}
-	
-	//-----------------------------------
+
 	// Get ranks and cluster size
-	//-----------------------------------
-	MPI_Comm_size(MPI_COMM_WORLD,&numtasks);
+	int numtasks = 0, rank = 0, len = 0;
+  char hostname[MPI_MAX_PROCESSOR_NAME];
+  MPI_Comm Comm;
+
+  MPI_Comm_size(MPI_COMM_WORLD,&numtasks);
 	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
 	MPI_Get_processor_name(hostname,&len);
 	MPI_Comm_dup(MPI_COMM_WORLD,&Comm);
-	omp_thr=atoi(getenv("OMP_NUM_THREADS"));
-	//-----------------------------------
+
+  unsigned int omp_thr = std::max(atoi(std::getenv("OMP_NUM_THREADS")), 1);
+
 	// Print cluster info
-	//-----------------------------------
+  double startTime=0.0;
 	if (rank==0)
 	{
-		sTime=MPI_Wtime();
-		cout<<endl<<"INITIALIZATION PHASE"<<endl;
+		startTime=MPI_Wtime();
+		cout<< endl <<"INITIALIZATION PHASE"<<endl;
 		cout<<"------------------------------- "<<endl;
 		cout<<"Cluster Size        : "<<numtasks<<endl;
 		cout<<"Threads per machine : "<<omp_thr<<endl;
 		cout<<"------------------------------- "<<endl;
 	}
 	MPI_Barrier(MPI_COMM_WORLD);
-	if (rank==0)
+
+	if (rank==0) {
 		cout<<"Gateway Service : "<<rank<<" Running on "<<hostname<<endl;
-	else
+  }	else {
 		cout<<"Cell            : "<<rank<<" Running on "<<hostname<<endl;
+  }
 	MPI_Barrier(MPI_COMM_WORLD);
-	
-	//-----------------------------------
-	// Communicate Cell and Resource
-	// parameters and Create all
-	// components
-	//-----------------------------------
+
+  // Initialization phase
+	// Communicate Cell and Resource parameters and create all components
+  double endTime=0.0, upInterval=0;
 	if (rank==0)
 	{
-		string name="../input/CellData";
-		string name2="../input/AppData";
-		string name3="../input/BrokerData";
 		gates=new gs[1];
-		gates[0]=gs(name,name2,name3);
+		gates[0]=gs("../input/CellData", "../input/AppData", "../input/BrokerData");
 		gates[0].printfile("systeminfo",ios::out);
-		commSimParameters(gates[0].gsi()[0],rank,numtasks,MPI_COMM_WORLD);		
+    commSimParameters(gates[0].gsi()[0],rank,numtasks,MPI_COMM_WORLD);
+
 		endTime=gates[0].gsi()[0].maxTime;
-		upInterval=gates[0].gsi()[0].upInterval;	
+		upInterval=gates[0].gsi()[0].upInterval;
 	}
 	else
 	{
 		struct siminputs *si;
 		si=new siminputs[1];
+
+    // Receive program values from the master
 		commSimParameters(*si,rank,numtasks,MPI_COMM_WORLD);
+
 		clCell=new cell[1];
+
+    // Initialize cells based on user-defined configuration
 		*clCell=cell(*(si->cinp));
-		//-----------------------------------
-		// Initialization and Update
-		// outside of the constructor
-		// to avoid changing the values
-		// of the pointers to components
-		// (can be avoided with move copy
-		// constructor in (>=C++11))
-		//-----------------------------------
-		clCell[0].gbrok()->initbroker(clCell->gnumOfTypes(),clCell->gtypes(),clCell->gnumOfResourcesPerType(),clCell->gresources(),clCell->gpowerComp(),clCell->gnetwork(),si->cinp->binp[0]);
-		clCell[0].gbrok()->updateStateInfo(clCell[0].gnetwork(),0.0);
+
+		// Initialization and Update outside of the constructor to avoid changing the values of the pointers to components (can be avoided with move copy constructor in (>=C++11))
+		// Creation of the SOSM hierarchical topology
+    clCell[0].gbrok()->initbroker(clCell->gnumOfTypes(),clCell->gtypes(),clCell->gnumOfResourcesPerType(),clCell->gresources(),clCell->gpowerComp(),clCell->gnetwork(),si->cinp->binp[0]);
+		// State information update and Assessment Functions and SI calculation
+    clCell[0].gbrok()->updateStateInfo(clCell[0].gnetwork(),0.0);
 		endTime=si->maxTime;
 		upInterval=si->upInterval;
 
 	}
 	MPI_Barrier(MPI_COMM_WORLD);
-	if (rank==0)
-	{
+
+  // Receive statistics from the cells
+	if (rank==0) {
 		commStats(gates,clCell,rank,numtasks,MPI_COMM_WORLD);
 		gates[0].printStats("../output/output",ios::out);
-	}
-	else
-	{
+	}	else {
 		commStats(gates,clCell,rank,numtasks,MPI_COMM_WORLD);
 	}
 	MPI_Barrier(MPI_COMM_WORLD);
-	int ss=0;
-	for(t=0.0;t<endTime;t+=1.0)
-	{
-		
-		if (rank==0)
-		{
+
+  int ss = 0, allTasks = 0;
+  int *commCells=nullptr;
+
+  // Simulation phase
+	for(double t=0.0;t<endTime;t+=1.0) {
+
+		if (rank==0) {
+      // Create one or more tasks based on AppData configuration
 			taskCreationEngine(jobs,gates[0].gai()[0]);
 			allTasks+=jobs.size();
 		//	taskImplSelect(jobs);
-			taskCellSelect(jobs,gates,&commCells);
+			// For each task, retrieve the list of candidate cells and select the most appropriate
+      taskCellSelect(jobs,gates,&commCells);
+      // Send the task to the selected cell
 			commTaskParameters(jobs,rank,numtasks,commCells,MPI_COMM_WORLD);
+      // Empty the task list
 			jobs.clear();
 		}
-		else
-		{
-			
+		else {
+      // Receive task
 			commTaskParameters(jobs,rank,numtasks,commCells,MPI_COMM_WORLD);
-			clCell[0].deploy(&jobs);		
+      // Begin deployment of task:
+      // Traverse the components tree to locate most sutiable vRM
+      clCell[0].deploy(&jobs);
 			ss+=(int)jobs.size();
 			jobs.clear();
-	
+
+      // Simulation phase:
+      // Actually simulate the process of the task by the vRM
 			clCell[0].timestep(t);
 		}
-		
 		MPI_Barrier(MPI_COMM_WORLD);
 
+    // On every defined interval
 		if(((int)t+1)%((int)upInterval)==0)
 		{
 			if(rank==0)
 			{
+        // Receive statistics from the cells and print to files
 				commStats(gates,clCell,rank,numtasks,MPI_COMM_WORLD);
 				gates[0].printStats("../output/output",ios::out | ios::app);
-				cout<<std::fixed<<setprecision(2)<<"\r Simulation at: "<<100.0*(t+1)/(endTime)<<" %"<<flush;		
+				cout<<std::fixed<<setprecision(2)<<"\r Simulation at: "<<100.0*(t+1)/(endTime)<<" %"<<flush;
 			}
 			else
 			{
 				commStats(gates,clCell,rank,numtasks,MPI_COMM_WORLD);
 			}
 		}
-				
 	}
 
-	//-----------------------------------
-	// Print outputs to json file
-	//-----------------------------------
-    if(rank==0){
+	// Print output to json file
+  if(rank==0) {
 		gates[0].printStatsJson("../output/output",ios::out | ios::app, endTime, upInterval);
-	}
 
-	if (rank==0)
-	{
 		commStats(gates,clCell,rank,numtasks,MPI_COMM_WORLD);
-		gates[0].printStats("output",ios::out | ios::app);
-		fTime=MPI_Wtime();
-		cout<<endl;
-		cout<<"Elapsed time: "<<fTime-sTime<<" sec"<<endl;
+
+  	gates[0].printStats("output",ios::out | ios::app);
+		cout << endl << "Elapsed time: "<<MPI_Wtime() - startTime<<" sec"<<endl;
 		cout<<"Total number of submitted tasks: "<<allTasks<<endl;
 		delete[] gates;
 	}

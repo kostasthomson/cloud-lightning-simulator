@@ -14,9 +14,9 @@ double power::modelCPU(double &u)
 	int i;
 	switch (typeCpu)
 	{
-
+		// Global models
 		case -1:
-			pcons=cpuPmin+(cpuPmax-cpuPmin)*u;			
+			pcons=cpuPmin+(cpuPmax-cpuPmin)*u;
 			break;
 		case -2:
 			pcons=cpuPmin+(cpuPmax-cpuPmin)*u*u;
@@ -32,6 +32,7 @@ double power::modelCPU(double &u)
 			Pmid=5.0*cpuPmax/9.0;
 			pcons=(4.0/3.0*Pmid-cpuPmin/6.0-cpuPmax/3.0)+(4.0/3.0*Pmid-2.0*cpuPmin/3.0-cpuPmax/3.0)*u+(2.0*cpuPmax+2.0*cpuPmin-4.0*Pmid)*u*u+(4.0/3.0*Pmid-7.0/6.0*cpuPmin-cpuPmax/3.0)*(2.0*u-1.0)*(2.0*u-1.0)*(2.0*u-1.0);
 			break;
+		// Piecewise models
 		case 1:
 			if(u<cpubins[0])
 				pcons=cpuP[0]+(cpuP[1]-cpuP[0])*(u-cpubins[0])/(cpubins[1]-cpubins[0]);
@@ -59,11 +60,10 @@ double power::modelCPU(double &u)
 				pcons=a[i]+b[i]*(u-cpubins[i])+c[i]*(u-cpubins[i])*(u-cpubins[i])+d[i]*(u-cpubins[i])*(u-cpubins[i])*(u-cpubins[i]);
 			}
 			break;
-			
+
 	}
 	return pcons;
 }
-
 
 double power::modelACC(double &rho, int &numAcc)
 {
@@ -155,8 +155,8 @@ power::power(const powinputs &t)
 			for(i=1;i<numOfPoints-1;i++)
 				tb[i]=2.0*(h[i-1]+h[i]);
 			tb[numOfPoints-1]=h[numOfPoints-3]*h[numOfPoints-3]-h[numOfPoints-2]*h[numOfPoints-2];
-	
-			tc[0]=-2.0*h[0]*h[0]-3.0*h[0]*h[1]-h[1]*h[1];	
+
+			tc[0]=-2.0*h[0]*h[0]-3.0*h[0]*h[1]-h[1]*h[1];
 			for(i=1;i<numOfPoints-1;i++)
 				tc[i]=h[i];
 			for(i=1;i<numOfPoints-1;i++)
@@ -171,7 +171,7 @@ power::power(const powinputs &t)
 			s[0]=s[0]/tb[0];
 			for(i=1;i<numOfPoints;i++)
 				s[i]=(s[i]-ta[i]*s[i-1])/(tb[i]-ta[i]*tc[i]);
-	
+
 			c[numOfPoints-1]=s[numOfPoints-1];
 			for(i=numOfPoints-2;i>=0;i--)
 				c[i]=s[i]-tc[i]*c[i+1];
@@ -179,7 +179,7 @@ power::power(const powinputs &t)
 				d[i]=(c[i+1]-c[i])/(3.0*h[i]);
 			for(i=0;i<numOfPoints-1;i++)
 				b[i]=(cpuP[i+1]-cpuP[i])/h[i]-c[i]*h[i]-d[i]*h[i]*h[i];
-	
+
 			delete[] h;
 			delete[] ta;
 			delete[] tb;
@@ -193,7 +193,7 @@ power::power(const powinputs &t)
 	accPmin=t.accPmin;
 	accPmax=t.accPmax;
 	accC=t.accC;
-	
+
 }
 
 power::power(const power & t)
@@ -306,7 +306,7 @@ power & power::operator=(const power & t)
 		typeCpu=0;
 		accPmin=0.0;
 		accPmax=0.0;
-		accC=0.0;			
+		accC=0.0;
 	}
 	alloc=t.galloc();
 	if (alloc)
@@ -352,10 +352,10 @@ power & power::operator=(const power & t)
 		}
 		accPmin=t.gaccPmin();
 		accPmax=t.gaccPmax();
-		accC=t.gaccC();	
+		accC=t.gaccC();
 	}
     }
-    return *this;  
+    return *this;
 }
 
 double power::cpCons(double &u, double &rho, int &active, int &numAcc)

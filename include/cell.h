@@ -1,82 +1,63 @@
 #ifndef CELL_H
 #define CELL_H
-#include <inputs.h>
-#include <resource.h>
-#include <task.h>
-#include <power.h>
-#include <netw.h>
-#include <stat.h>
 #include <brokers.h>
+#include <inputs.h>
+#include <netw.h>
+#include <power.h>
+#include <resource.h>
+#include <stat.h>
+#include <task.h>
 using namespace std;
 
-
-class cell 
+class cell
 {
-    private:
-	int ID;
-	int alloc;
-	int numOfTypes;
-	int *types;
-	int *numOfResourcesPerType;
-	power *powerComp;
-	netw *network;
-	broker *brok;
-        resource **resources;
-	stat *stats;
-    public:
+ private:
+  int ID;
+  int alloc;
+  int numOfTypes;             //! Number of hardware types
+  int* types;                 //! Hardware type
+  int* numOfResourcesPerType; //! Number of resources that correspond to each hardware type
+  power* powerComp;
+  netw* network;
+  broker* brok;
+  resource** resources; //! Two-dimensional array of computer resources (servers)
+  stat* stats;          //! Array to keep cell statistics
 
-        //---------------------------------
-        //        CONSTRUCTORS
-        //---------------------------------
-	cell();
-	cell(const cellinputs & setup);
- 	cell(const cell & t);
+ public:
+  cell();
 
-        //---------------------------------
-        //        ASSIGNMENT OPERATOR
-        //---------------------------------
-	cell & operator=(const cell & t);
-  
+  /// Creates cell based on user-supplied configuration
+  /// \param setup Stores cell-related configuration from the CellData file
+  cell(const cellinputs& setup);
 
-        //---------------------------------
-        //        DECONSTRUCTOR
-        //---------------------------------        
-    	~cell();
+  cell(const cell& t);
 
-        //---------------------------------
-        //        TIMESTEPPING
-        //---------------------------------
-	void timestep(const double &tstep);
- 
+  cell& operator=(const cell& t);
 
-        //---------------------------------
-        //        GATEWAYS
-        //---------------------------------
-	int gID() const;
-	int galloc() const;
-	int gnumOfTypes() const;
-	int *gtypes() const;
-	int *gnumOfResourcesPerType() const;
- 	resource **gresources() const;
-	broker *gbrok() const;
-	power *gpowerComp() const;
-	netw *gnetwork() const;
-	stat *gstats() const;
+  ~cell();
 
-        //---------------------------------
-        //           DEPLOY
-        //---------------------------------
-	void deploy(list<task> *jobs);
+  /// Calls broker::timestep to perform simulation phase, update state information and update cell statistics
+  void timestep(const double& tstep);
 
-        //---------------------------------
-        //        UPDATE STATS
-        //---------------------------------
-	void updateStats(const double &tstep);	
+  /// Deploys the tasks to the appropriate vRMs, by calling recursively the broker::deploy method
+  void deploy(list<task>* jobs);
 
-        //---------------------------------
-        //        PRINT
-        //---------------------------------
-	void print();
+  /// Updates cell-related statistics. The statistics are gathered per resource and summed.
+  /// \param tstep The current time-step
+  void updateStats(const double& tstep);
+
+  void print();
+
+  int gID() const;
+  int galloc() const;
+  int gnumOfTypes() const;
+  int* gtypes() const;
+  int* gnumOfResourcesPerType() const;
+  resource** gresources() const;
+  broker* gbrok() const;
+  power* gpowerComp() const;
+  netw* gnetwork() const;
+  stat* gstats() const;
 };
 
 #endif

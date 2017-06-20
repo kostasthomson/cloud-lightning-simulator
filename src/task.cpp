@@ -55,14 +55,14 @@ task::task(const task &t)
 	avAcc=new int[numOfAvailImpl];
 	for(i=0;i<numOfAvailImpl;i++)
 	{
-		rhoAcc[i]=t.grhoAcc()[i];	
+		rhoAcc[i]=t.grhoAcc()[i];
 		avAcc[i]=t.gavAcc()[i];
 	}
 	if (t.gresourceIDs()!=NULL)
 	{
 		resourceIDs=new int[numOfVMs];
 		for(i=0;i<numOfVMs;i++)
-			resourceIDs[i]=t.gresourceIDs()[i];	
+			resourceIDs[i]=t.gresourceIDs()[i];
 	}
 	else
 		resourceIDs=NULL;
@@ -136,14 +136,14 @@ task & task::operator=(const task &t)
 		avAcc=new int[numOfAvailImpl];
 		for(i=0;i<numOfAvailImpl;i++)
 		{
-			rhoAcc[i]=t.grhoAcc()[i]; 
+			rhoAcc[i]=t.grhoAcc()[i];
 			avAcc[i]=t.gavAcc()[i];
 		}
 		if (t.gresourceIDs()!=NULL)
 		{
 			resourceIDs=new int[numOfVMs];
 			for(i=0;i<numOfVMs;i++)
-				resourceIDs[i]=t.gresourceIDs()[i];	
+				resourceIDs[i]=t.gresourceIDs()[i];
 		}
 		else
 			resourceIDs=NULL;
@@ -190,7 +190,7 @@ task::~task()
 	resourceIDs=NULL;
 	delete[] cUtilPMNr;
 	cUtilPMNr=NULL;
-		
+
     }
 }
 
@@ -235,8 +235,10 @@ task::task(const int &L_type, const int &L_numOfAvailImpl,const int *L_availImpl
 	}
 	resourceIDs=NULL;
 	cUtilPMNr=new double[4];
-	for(i=0;i<4;i++)
+	for(i=0;i<4;i++) {
 		cUtilPMNr[i]=0.0;
+	}
+	//print();
 }
 
 //---------------------------------
@@ -260,9 +262,9 @@ double task::getactP()
 			break;
 		default:
 			return 0;
-			break;			
+			break;
 	}
-	
+
 }
 
 double task::getactM()
@@ -278,7 +280,7 @@ double task::getactM()
 			break;
 		default:
 			return 0;
-			break;				
+			break;
 	}
 }
 
@@ -295,7 +297,7 @@ double task::getactN()
 			break;
 		default:
 			return 0;
-			break;	
+			break;
 	}
 }
 
@@ -391,7 +393,7 @@ void task::attachResources(const int *IDs)
 				resourceIDs[i]=IDs[i];
 		}
 	}
-		
+
 }
 
 void task::detachResources()
@@ -445,7 +447,7 @@ void task::print() const
 	if(alloc)
 	{
 		cout<<"-----------------------------------------------"<<endl;
-		cout<<"Task type: "<<type<<endl;
+		cout<<"Task type (oil, genomics etc): "<<type<<endl;
 		cout<<"Number of available implementations: "<<numOfAvailImpl<<endl;
 		cout<<"Available Implementations: ";
 		for(i=0;i<numOfAvailImpl;i++)
@@ -467,7 +469,7 @@ void task::print() const
 		cout<<"Accelerator support per Implementation: ";
 		for(i=0;i<numOfAvailImpl;i++)
 			cout<<avAcc[i]<<" ";
-		cout<<endl;		
+		cout<<endl;
 		cout<<"Actual accelerator usage: ";
 		for(i=0;i<numOfAvailImpl;i++)
 			cout<<rhoAcc[i]<<" ";

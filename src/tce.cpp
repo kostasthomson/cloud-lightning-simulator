@@ -25,13 +25,13 @@ void taskCreationEngine(list<task> &jobs, const struct appinputs &app)
 		curr_reqIns=app.minmaxInsPerApp[curr_task][0]+r*(app.minmaxInsPerApp[curr_task][1]-app.minmaxInsPerApp[curr_task][0]);
 		curr_numOfVMs=round(app.minmaxVMPerApp[curr_task][0]+r*(app.minmaxVMPerApp[curr_task][1]-app.minmaxVMPerApp[curr_task][0]));
 
+		// Requirements for resources
 		curr_reqP=round(app.minmaxProcPerVM[curr_task][0]+r*(app.minmaxProcPerVM[curr_task][1]-app.minmaxProcPerVM[curr_task][0]));
 		curr_reqM=app.minmaxMemPerVM[curr_task][0]+r*(app.minmaxMemPerVM[curr_task][1]-app.minmaxMemPerVM[curr_task][0]);
 		curr_reqN=app.minmaxNetPerApp[curr_task][0]+r*(app.minmaxNetPerApp[curr_task][1]-app.minmaxNetPerApp[curr_task][0]);
 		curr_reqS=app.minmaxStoPerVM[curr_task][0]+r*(app.minmaxStoPerVM[curr_task][1]-app.minmaxStoPerVM[curr_task][0]);
 
 		jobs.push_back(task(curr_task,app.numOfAvailImplPerApp[curr_task],&app.availImplPerApp[curr_task][0],curr_reqIns, curr_numOfVMs, curr_reqP, curr_reqM, curr_reqN, curr_reqS, app.typeOfActP[curr_task], app.typeOfActM[curr_task], app.typeOfActN[curr_task], &app.minmaxActP[curr_task][0], &app.minmaxActM[curr_task][0], &app.minmaxActN[curr_task][0], &app.accelerator[curr_task][0], &app.rhoAcc[curr_task][0]));
-
 	}
 }
 
@@ -49,7 +49,7 @@ void taskImplSelect(list<task> &jobs)
 	int *L_typeactPMN;
 	double **L_minmaxactPMN;
 	int *L_avAcc;
-	double *L_rhoAcc;	
+	double *L_rhoAcc;
 	list<task>::iterator it=jobs.begin();
 	for(i=0;i<numtasks;i++)
 	{
@@ -79,9 +79,9 @@ void taskImplSelect(list<task> &jobs)
 				L_minmaxactPMN[j][k]=(*it).gminmaxactPMN()[j][k];
 		L_avAcc=new int[1];
 		L_rhoAcc=new double[1];
-		L_avAcc[0]=(*it).gavAcc()[impltype];	
+		L_avAcc[0]=(*it).gavAcc()[impltype];
 		L_rhoAcc[0]=(*it).grhoAcc()[impltype];
-		
+
 		(*it)=(task(L_type,L_numOfAvailImpl,L_availImpl,L_reqIns, L_numOfVMs, L_reqPMNS[0], L_reqPMNS[1], L_reqPMNS[2], L_reqPMNS[3], L_typeactPMN[0], L_typeactPMN[1], L_typeactPMN[2], &L_minmaxactPMN[0][0], &L_minmaxactPMN[1][0], &L_minmaxactPMN[2][0], L_avAcc, L_rhoAcc));
 		delete[] L_availImpl;
 		delete[] L_reqPMNS;
@@ -108,13 +108,13 @@ void taskCellSelect(list<task> &jobs, const gs *gates, int **commCells)
 		for(i=0;i<(int)jobs.size();i++)
 		{
 			(*commCells)[i]=-1;
-		}		
+		}
 		list<task>::iterator it=jobs.begin();
 		for(i=0;i<(int)jobs.size();i++)
 		{
-			(*commCells)[i]=gates->findCell((*it).gavailImpl(),(*it).gnumOfAvailImpl(),(*it).gnumOfVMs(),(*it).greqPMNS()[0],(*it).greqPMNS()[1],(*it).greqPMNS()[2],(*it).greqPMNS()[3],(*it).gavAcc());	
+			(*commCells)[i]=gates->findCell((*it).gavailImpl(),(*it).gnumOfAvailImpl(),(*it).gnumOfVMs(),(*it).greqPMNS()[0],(*it).greqPMNS()[1],(*it).greqPMNS()[2],(*it).greqPMNS()[3],(*it).gavAcc());
 			it++;
 		}
 	}
-	
+
 }

@@ -51,7 +51,7 @@ resource::resource()
 	autilMem=0.0;
 	arhoAcc=0.0;
 
-        numOfTasks=0; 
+        numOfTasks=0;
 	cCompCapPerProc=0.0;
 	cCompCapPerAcc=0.0;
 }
@@ -83,7 +83,7 @@ resource::resource(const resinputs & setup, const int &_ID)
     utilSto=0.0;
 
     compCap=setup.compCap;
-    
+
     accelerator=setup.accelerator;
     accCompCap=setup.accCompCap;
     totAcc=setup.totAcc;
@@ -95,14 +95,14 @@ resource::resource(const resinputs & setup, const int &_ID)
     arhoAcc=0.0;
 
     numOfTasks=0;
-    cCompCapPerProc=0.0;  
+    cCompCapPerProc=0.0;
     cCompCapPerAcc=0.0;
 }
 
 resource::resource(const resource & t)
 {
 
-    
+
     if (t.galloc())
     {
         alloc=t.galloc();
@@ -129,7 +129,7 @@ resource::resource(const resource & t)
 	utilAcc=t.gutilAcc();
 	availAcc=t.gavailAcc();
 	accCompCap=t.gaccCompCap();
-        
+
         overCommitProc=t.goverCommitProc();
         overCommitMem=t.goverCommitMem();
 
@@ -193,7 +193,7 @@ resource & resource::operator=(const resource & t)
 		numOfTasks=0;
 		cCompCapPerProc=0.0;
 		cCompCapPerAcc=0.0;
-	
+
 	}
         alloc=t.galloc();
         if (alloc)
@@ -237,10 +237,10 @@ resource & resource::operator=(const resource & t)
             numOfTasks=t.gnumOfTasks();
 	    cCompCapPerProc=t.gcCompCapPerProc();
 	    cCompCapPerAcc=t.gcCompCapPerAcc();
-               
+
         }
     }
-    return *this;    
+    return *this;
 }
 
 //---------------------------------
@@ -292,7 +292,7 @@ resource::~resource()
 	cCompCapPerProc=0.0;
 	cCompCapPerAcc=0.0;
 
-    } 
+    }
 }
 
 //---------------------------------
@@ -325,7 +325,8 @@ void resource::compcCompCapPerProc()
 	{
 		ratio=(MY_MAX(utilProc,1.0)/physProc);
 		cCompCapPerProc=(compCap/physProc)/ratio;
-	}	
+	}
+	// cap = (processor MIPS/physical processors) / (util processors/physical processsors)
 }
 
 void resource::compcCompCapPerAcc()
@@ -335,7 +336,7 @@ void resource::compcCompCapPerAcc()
 	{
 		ratio=ceil(MY_MAX(utilProc,1.0)/physProc);
 		cCompCapPerAcc=(accCompCap/ratio);
-	}	
+	}
 }
 
 //---------------------------------
@@ -390,9 +391,9 @@ void resource::unload(const list<task>::iterator &t)
 		utilAcc=totAcc-availAcc;
 	 	autilProc-=t->gcUtilPMNr()[0];
 	    	autilMem-=t->gcUtilPMNr()[1];
-		arhoAcc-=t->gcUtilPMNr()[3];				
+		arhoAcc-=t->gcUtilPMNr()[3];
 	}
-		
+
 }
 
 int resource::probe(const double &reqProc, const double &reqMem, const double &reqSto, const int &reqAcc)
@@ -471,7 +472,7 @@ int resource::gmovable() const
 {
     return movable;
 }
-       
+
 int resource::gtype() const
 {
     return type;
@@ -571,7 +572,7 @@ double resource::gaccCompCap() const
 {
     return accCompCap;
 }
-        
+
 double resource::goverCommitProc() const
 {
     return overCommitProc;

@@ -14,10 +14,6 @@
 #define MY_MAX(a,b) ((a) >= (b) ? (a) : (b))
 using namespace std;
 
-
-//---------------------------------
-//---- pRouter --------------------
-//---------------------------------
 pRouter::pRouter()
 {
 	alloc=0;
@@ -52,8 +48,9 @@ pRouter::pRouter(const int &start, const int &end, const int &type, list<pSwitch
 	pollIntervalpRouter=L_pollIntervalpRouter;
 	list<pSwitch>::iterator it = LpSwitches[type]->begin();
 	pSwitches=new list<pSwitch*>[1];
-	for(i=0;i<start;i++)
+	for(i=0;i<start;i++) {
 		it++;
+	}
 	for(i=start;i<end;i++)
 	{
 		pSwitches->push_back(&(*it));
@@ -68,7 +65,7 @@ pRouter::pRouter(const int &start, const int &end, const int &type, list<pSwitch
 	}
 	availProc=new double[numOfpSwitches];
 	totProc=new double[numOfpSwitches];
-	availMem=new double[numOfpSwitches];	
+	availMem=new double[numOfpSwitches];
 	totMem=new double[numOfpSwitches];
 	availAcc=new double[numOfpSwitches];
 	totAcc=new double[numOfpSwitches];
@@ -81,7 +78,7 @@ pRouter::pRouter(const int &start, const int &end, const int &type, list<pSwitch
 	P=L_P;
 	Pi=L_Pi;
 	updateStateInfo(0.0);
-} 
+}
 
 pRouter::pRouter(const pRouter &t)
 {
@@ -104,7 +101,7 @@ pRouter::pRouter(const pRouter &t)
 		}
 		availProc=new double[numOfpSwitches];
 		totProc=new double[numOfpSwitches];
-		availMem=new double[numOfpSwitches];	
+		availMem=new double[numOfpSwitches];
 		totMem=new double[numOfpSwitches];
 		availAcc=new double[numOfpSwitches];
 		totAcc=new double[numOfpSwitches];
@@ -130,14 +127,14 @@ pRouter::pRouter(const pRouter &t)
 		C=t.gC();
 		P=t.gP();
 		Pi=t.gPi();
-	}	
+	}
 }
 
 pRouter & pRouter::operator=(const pRouter & t)
 {
 	int i;
-    	if (this!=&t)
-    	{
+    if (this!=&t)
+    {
 		if (alloc)
 		{
 			alloc=0;
@@ -194,7 +191,7 @@ pRouter & pRouter::operator=(const pRouter & t)
 			}
 			availProc=new double[numOfpSwitches];
 			totProc=new double[numOfpSwitches];
-			availMem=new double[numOfpSwitches];	
+			availMem=new double[numOfpSwitches];
 			totMem=new double[numOfpSwitches];
 			availAcc=new double[numOfpSwitches];
 			totAcc=new double[numOfpSwitches];
@@ -219,10 +216,10 @@ pRouter & pRouter::operator=(const pRouter & t)
 				sPMSA[i]=t.gsPMSA()[i];
 			C=t.gC();
 			P=t.gP();
-			Pi=t.gPi();	
+			Pi=t.gPi();
 		}
 	}
-	return *this;	
+	return *this;
 }
 
 pRouter::~pRouter()
@@ -234,7 +231,7 @@ pRouter::~pRouter()
 		numOfFuncs=0;
 		pollIntervalpRouter=0.0;
 		pSwitches->clear();
-		delete[] pSwitches;	
+		delete[] pSwitches;
 		pSwitches=NULL;
 		delete[] Ws;
 		delete[] Fs;
@@ -272,8 +269,9 @@ void pRouter::computeFs()
 	int i,j;
 	if(alloc)
 	{
-		for(i=0;i<numOfFuncs;i++)
+		for(i=0;i<numOfFuncs;i++) {
 			Fs[i]=0.0;
+		}
 		list<pSwitch*>::iterator it=pSwitches->begin();
 		for(i=0;i<numOfpSwitches;i++)
 		{
@@ -283,8 +281,9 @@ void pRouter::computeFs()
 			}
 			it++;
 		}
-		for(j=0;j<numOfFuncs;j++)
+		for(j=0;j<numOfFuncs;j++) {
 			Fs[j]/=numOfpSwitches;
+		}
 	}
 }
 
@@ -294,19 +293,20 @@ void pRouter::computeSI()
 	if (alloc)
 	{
 		SI=(1e-4)*(((double)rand())/RAND_MAX);
-		for(i=0;i<numOfFuncs;i++)
+		for(i=0;i<numOfFuncs;i++) {
 			SI+=Ws[i]*Fs[i];
+		}
 	}
 }
 
 int pRouter::probe(const double &Proc, const double &Mem, const double &Sto, const int &Acc)
 {
-	int res=-1;
-	if (Proc<=sPMSA[0] && Mem<=sPMSA[2] && Sto<=sPMSA[4] && Acc<=(int)sPMSA[6])
-	{
-		res=1;
+	if (Proc<=sPMSA[0] && Mem<=sPMSA[2] && Sto<=sPMSA[4] && Acc<=(int)sPMSA[6]) {
+		return 1;
 	}
-	return res;
+	else {
+		return -1;
+	}
 }
 
 void pRouter::deploy(resource **resources, netw *network, stat* stats, task * t)
@@ -332,7 +332,7 @@ void pRouter::deploy(resource **resources, netw *network, stat* stats, task * t)
 		double reqMem=L_numOfVMs*L_reqPMNS[1];
 		double reqSto=L_numOfVMs*L_reqPMNS[3];
 		int reqAcc=L_numOfVMs*L_avAcc;
-		
+
 		#pragma omp parallel default(shared) private(i,tid) num_threads(omp_thr)
 		{
 			tid=omp_get_thread_num();
@@ -346,7 +346,7 @@ void pRouter::deploy(resource **resources, netw *network, stat* stats, task * t)
 				}
 			}
 		}
-               
+
 		choice=choices[0];
 		maxSI=maxSIs[0];
 		for(i=1;i<omp_thr;i++)
@@ -375,7 +375,7 @@ void pRouter::deploy(resource **resources, netw *network, stat* stats, task * t)
 		sPMSA[2]-=reqMem;
 		sPMSA[4]-=reqSto;
 		sPMSA[6]-=(double)reqAcc;
-		
+
 		if (reqAcc>0)
 			for(i=0;i<4;i++)
 			{
@@ -427,20 +427,20 @@ void pRouter::updateStateInfo(const double &tstep)
 				SIs[i]=((*it)->gSI());
 				i++;
 			}
-			
+
 			for(i=0;i<len;i++)
 			{
 				sPMSA[0]+=availProc[i];
 				sPMSA[1]+=totProc[i];
 				sPMSA[2]+=availMem[i];
-				sPMSA[3]+=totMem[i];				
+				sPMSA[3]+=totMem[i];
 				sPMSA[4]+=availSto[i];
 				sPMSA[5]+=totSto[i];
 				sPMSA[6]+=availAcc[i];
 				sPMSA[7]+=totAcc[i];
 			}
 			computeFs();
-			computeSI();	
+			computeSI();
 		}
 	}
 }
@@ -470,7 +470,7 @@ double pRouter::dassessfuncs(const double &dNu,const double &totNu, const double
 			break;
 		default:
 			return 0.0;
-	}	
+	}
 }
 
 int pRouter::galloc() const
@@ -672,11 +672,11 @@ pSwitch::pSwitch(const int &start, const int &end, const int &type, list<vRM> **
 	sPMSA=new double[8];
 	for(i=0;i<8;i++)
 		sPMSA[i]=0.0;
-	C=L_C;	
+	C=L_C;
 	P=L_P;
 	Pi=L_Pi;
 	updateStateInfo(0.0);
-} 
+}
 
 pSwitch::pSwitch(const pSwitch &t)
 {
@@ -701,7 +701,7 @@ pSwitch::pSwitch(const pSwitch &t)
 		}
 		availProc=new double[numOfvRMs];
 		totProc=new double[numOfvRMs];
-		availMem=new double[numOfvRMs];	
+		availMem=new double[numOfvRMs];
 		totMem=new double[numOfvRMs];
 		availAcc=new double[numOfvRMs];
 		totAcc=new double[numOfvRMs];
@@ -727,7 +727,7 @@ pSwitch::pSwitch(const pSwitch &t)
 		C=t.gC();
 		P=t.gP();
 		Pi=t.gPi();
-	}	
+	}
 }
 
 pSwitch & pSwitch::operator=(const pSwitch & t)
@@ -791,7 +791,7 @@ pSwitch & pSwitch::operator=(const pSwitch & t)
 			}
 			availProc=new double[numOfvRMs];
 			totProc=new double[numOfvRMs];
-			availMem=new double[numOfvRMs];	
+			availMem=new double[numOfvRMs];
 			totMem=new double[numOfvRMs];
 			availAcc=new double[numOfvRMs];
 			totAcc=new double[numOfvRMs];
@@ -809,7 +809,7 @@ pSwitch & pSwitch::operator=(const pSwitch & t)
 				availAcc[i]=t.gavailAcc()[i];
 				totAcc[i]=t.gtotAcc()[i];
 				SIs[i]=t.gSIs()[i];
-				
+
 			}
 			SI=t.gSI();
 			sPMSA=new double[8];
@@ -818,10 +818,10 @@ pSwitch & pSwitch::operator=(const pSwitch & t)
 			C=t.gC();
 			P=t.gP();
 			Pi=t.gPi();
-			
+
 		}
 	}
-	return *this;	
+	return *this;
 }
 
 pSwitch::~pSwitch()
@@ -835,7 +835,7 @@ pSwitch::~pSwitch()
 		vRMs->clear();
 		delete[] vRMs;
 		delete[] Fs;
-		delete[] Ws;	
+		delete[] Ws;
 		vRMs=NULL;
 		Fs=NULL;
 		Ws=NULL;
@@ -921,13 +921,13 @@ void pSwitch::updateStateInfo(const double &tstep)
 				SIs[i]=((*it)->gSI());
 				i++;
 			}
-			
+
 			for(i=0;i<(int)vRMs->size();i++)
 			{
 				sPMSA[0]+=availProc[i];
 				sPMSA[1]+=totProc[i];
 				sPMSA[2]+=availMem[i];
-				sPMSA[3]+=totMem[i];				
+				sPMSA[3]+=totMem[i];
 				sPMSA[4]+=availSto[i];
 				sPMSA[5]+=totSto[i];
 				sPMSA[6]+=availAcc[i];
@@ -957,7 +957,7 @@ double pSwitch::dassessfuncs(const double &dNu,const double &totNu, const double
 			break;
 		default:
 			return 0.0;
-	}	
+	}
 }
 
 int pSwitch::probe(const double &Proc, const double &Mem, const double &Sto, const int &Acc)
@@ -993,7 +993,7 @@ void pSwitch::deploy(resource **resources, netw *network, stat* stats, task * t)
 		double reqMem=L_numOfVMs*L_reqPMNS[1];
 		double reqSto=L_numOfVMs*L_reqPMNS[3];
 		int reqAcc=L_numOfVMs*L_avAcc;
-		
+
 		#pragma omp parallel default(shared) private(i,tid) num_threads(omp_thr)
 		{
 			tid=omp_get_thread_num();
@@ -1006,7 +1006,7 @@ void pSwitch::deploy(resource **resources, netw *network, stat* stats, task * t)
 				}
 			}
 		}
-               
+
 		choice=choices[0];
 		maxSI=maxSIs[0];
 		for(i=1;i<omp_thr;i++)
@@ -1086,7 +1086,7 @@ void pSwitch::deploy(resource **resources, netw *network, stat* stats, task * t)
 					availAcc[i]-=((double)pores.size())*((double)(*pores.begin())->gtotAcc());
 					SIs[i]+=ssum;
 					ores.splice(ores.end(),pores);
-				}			
+				}
 				if(remProc<=0.0 && remMem<=0.0 && remSto<=0.0 && remAcc<=0.0)
 					break;
 				itt++;
@@ -1157,7 +1157,7 @@ void pSwitch::deploy(resource **resources, netw *network, stat* stats, task * t)
 			}
 			else
 				choice=-1;
-			
+
 		}
 		delete[] choices;
 		delete[] maxSIs;
@@ -1205,10 +1205,10 @@ void pSwitch::deploy(resource **resources, netw *network, stat* stats, task * t)
 				ssum+=Ws[i]*dassessfuncs(-reqProc,totProc[choice],-reqMem,totMem[choice],i);
 			}
 		SIs[choice]+=ssum;
-		
+
 		(*itf)->deploy(resources,network,stats,t);
-		
-	}	
+
+	}
 }
 
 int pSwitch::galloc() const
@@ -1327,7 +1327,7 @@ void vRM::print()
 	{
 		for(list<resource*>::iterator it = res->begin(); it != res->end(); it++)
 			(*it)->print();
-		
+
 	}
 }
 
@@ -1386,8 +1386,8 @@ vRM::vRM(const int &start,const int &end,const int &type,resource** resources, c
 	sPMSA=new double[8];
 	for(i=0;i<8;i++)
 		sPMSA[i]=0.0;
-	Fs=new double[numOfFuncs];	
-	Ws=new double[numOfFuncs];	
+	Fs=new double[numOfFuncs];
+	Ws=new double[numOfFuncs];
 	for(i=0;i<numOfFuncs;i++)
 	{
 		Ws[i]=L_Ws[i];
@@ -1396,7 +1396,7 @@ vRM::vRM(const int &start,const int &end,const int &type,resource** resources, c
 	SI=0.0;
 	dep_strategy=L_dep_strategy;
 	updateStateInfo(0.0);
-	
+
 }
 
 vRM::vRM(const vRM &t)
@@ -1420,7 +1420,7 @@ vRM::vRM(const vRM &t)
 			res->push_back(*it);
 		availProc=new double[numOfRes];
 		totProc=new double[numOfRes];
-		availMem=new double[numOfRes];	
+		availMem=new double[numOfRes];
 		totMem=new double[numOfRes];
 		availAcc=new double[numOfRes];
 		totAcc=new double[numOfRes];
@@ -1509,7 +1509,7 @@ vRM & vRM::operator=(const vRM & t)
 			Pi=t.gPi();
 			pollIntervalvRM=t.gpollIntervalvRM();
 			queue=new list<task>[1];
-			res=new list<resource*>[1];	
+			res=new list<resource*>[1];
 			for(list<task>::iterator it = t.gqueue()->begin(); it != t.gqueue()->end(); it++)
 				queue->push_back(*it);
 		//	queue[0]=t.gqueue()[0];
@@ -1518,7 +1518,7 @@ vRM & vRM::operator=(const vRM & t)
 		//	res[0]=t.gres()[0];
 			availProc=new double[numOfRes];
 			totProc=new double[numOfRes];
-			availMem=new double[numOfRes];	
+			availMem=new double[numOfRes];
 			totMem=new double[numOfRes];
 			availAcc=new double[numOfRes];
 			totAcc=new double[numOfRes];
@@ -1621,7 +1621,7 @@ void vRM::obtainresources(list<resource*> &ores, double &remProc, double &remMem
 				sPMSA[3]-=totMem[i];
 				sPMSA[4]-=totSto[i];
 				sPMSA[5]-=totSto[i];
-				sPMSA[6]-=totAcc[i];				
+				sPMSA[6]-=totAcc[i];
 				sPMSA[7]-=totAcc[i];
 
 				double *availProc2=new double[numOfRes];
@@ -1632,7 +1632,7 @@ void vRM::obtainresources(list<resource*> &ores, double &remProc, double &remMem
 				double *totAcc2=new double[numOfRes];
 				double *availSto2=new double[numOfRes];
 				double *totSto2=new double[numOfRes];
-				
+
 				int k=0;
 				for(int j=0;j<i;j++)
 				{
@@ -1644,7 +1644,7 @@ void vRM::obtainresources(list<resource*> &ores, double &remProc, double &remMem
 					totAcc2[k]=totAcc[j];
 					availSto2[k]=availSto[j];
 					totSto2[k]=totSto[j];
-					k++;			
+					k++;
 				}
 				for(int j=i+1;j<numOfRes+1;j++)
 				{
@@ -1656,7 +1656,7 @@ void vRM::obtainresources(list<resource*> &ores, double &remProc, double &remMem
 					totAcc2[k]=totAcc[j];
 					availSto2[k]=availSto[j];
 					totSto2[k]=totSto[j];
-					k++;			
+					k++;
 				}
 				delete[] availProc;
 				delete[] totProc;
@@ -1687,15 +1687,15 @@ void vRM::obtainresources(list<resource*> &ores, double &remProc, double &remMem
 				it=res->erase(it);
 				if (remProc<=0.0 && remMem<=0.0 && remSto<=0.0 && remAcc<=0)
 					break;
-			}	
+			}
 			else
 			{
 				++it;
 				i++;
 			}
-		}		
+		}
 	}
-	
+
 }
 
 void vRM::attachresources(list<resource*> &ores)
@@ -1726,7 +1726,7 @@ void vRM::attachresources(list<resource*> &ores)
 			sPMSA[3]+=(*it)->gtotalMem();
 			sPMSA[4]+=(*it)->gtotalSto();
 			sPMSA[5]+=(*it)->gtotalSto();
-			sPMSA[6]+=(double)(*it)->gtotAcc();				
+			sPMSA[6]+=(double)(*it)->gtotAcc();
 			sPMSA[7]+=(double)(*it)->gtotAcc();
 			availProc2[i]=(*it)->gtotalProc();
 			totProc2[i]=(*it)->gtotalProc();
@@ -1750,7 +1750,7 @@ void vRM::attachresources(list<resource*> &ores)
 			availAcc2[j]=availAcc[j];
 			totAcc2[j]=totAcc[j];
 			availSto2[j]=availSto[j];
-			totSto2[j]=totSto[j];			
+			totSto2[j]=totSto[j];
 		}
 		delete[] availProc;
 		delete[] totProc;
@@ -1778,7 +1778,7 @@ void vRM::attachresources(list<resource*> &ores)
 		totSto2=NULL;
 		computeFs();
 		computeSI();
-		
+
 	}
 }
 
@@ -1789,12 +1789,13 @@ void vRM::updateStateInfo(const double &tstep)
 	{
 		if(((int)tstep%(int)pollIntervalvRM)==0)
 		{
-			for(i=0;i<8;i++)
+			for(i=0;i<8;i++) {
 				sPMSA[i]=0.0;
+			}
 			i=0;
 			for(list<resource*>::iterator it=res->begin();it!=res->end();it++)
 			{
-				
+
 				availProc[i]=(*it)->gavailProc();
 				totProc[i]=(*it)->gtotalProc();
 				availMem[i]=(*it)->gavailMem();
@@ -1810,7 +1811,7 @@ void vRM::updateStateInfo(const double &tstep)
 				sPMSA[0]+=availProc[i];
 				sPMSA[1]+=totProc[i];
 				sPMSA[2]+=availMem[i];
-				sPMSA[3]+=totMem[i];				
+				sPMSA[3]+=totMem[i];
 				sPMSA[4]+=availSto[i];
 				sPMSA[5]+=totSto[i];
 				sPMSA[6]+=availAcc[i];
@@ -1984,7 +1985,7 @@ double vRM::assessfuncs(const int &choice)
 				break;
 			default:
 				return 0.0;
-		}		
+		}
 	}
 	else
 	{
@@ -2068,7 +2069,7 @@ int vRM::deploy_strategy(list<resource*>::iterator *it, int *IDs, const int &nVM
 				for(i=0;i<nVMs;i++)
 				{
 					L_ID=-1;
-					itt=res->begin();			
+					itt=res->begin();
 					for(j=0;j<numOfRes;j++)
 					{
 						if(availProc[j]>=Proc && availMem[j]>=Mem && availSto[j]>=Sto && availAcc[j]>=Acc)
@@ -2092,7 +2093,7 @@ int vRM::deploy_strategy(list<resource*>::iterator *it, int *IDs, const int &nVM
 						availProc[j]-=Proc;
 						availMem[j]-=Mem;
 						availSto[j]-=Sto;
-						availAcc[j]-=Acc;				
+						availAcc[j]-=Acc;
 					}
 				}
 				if(L_ID==-1)
@@ -2106,14 +2107,14 @@ int vRM::deploy_strategy(list<resource*>::iterator *it, int *IDs, const int &nVM
 						availProc[IDs[i]]+=Proc;
 						availMem[IDs[i]]+=Mem;
 						availSto[IDs[i]]+=Sto;
-						availAcc[IDs[i]]+=Acc;				
+						availAcc[IDs[i]]+=Acc;
 					}
 					return (-1);
 				}
 				return (1);
 
 			case 2:
-				
+
 				rem=nVMs;
 				j=0;i=0;
 				while (rem!=0 && i<nVMs)
@@ -2154,7 +2155,7 @@ int vRM::deploy_strategy(list<resource*>::iterator *it, int *IDs, const int &nVM
 						availProc[IDs[i]]+=Proc;
 						availMem[IDs[i]]+=Mem;
 						availSto[IDs[i]]+=Sto;
-						availAcc[IDs[i]]+=Acc;				
+						availAcc[IDs[i]]+=Acc;
 					}
 					return (-1);
 				}
@@ -2178,9 +2179,9 @@ void vRM::deploy(resource **resources, netw *network, stat* stats, task * t)
 		int L_ID=-1;
 		int *IDs;
 		list<resource*>::iterator *it,itt;
-		
-	
-		L_ID=network[0].probe(L_reqPMNS[2]);	
+
+
+		L_ID=network[0].probe(L_reqPMNS[2]);
 		if (L_ID==-1)
 		{
 			stats[type].rejTasks++;
@@ -2222,11 +2223,11 @@ void vRM::deploy(resource **resources, netw *network, stat* stats, task * t)
 			}
 			SI+=ssum;
 		}
-		
+
 		delete[] IDs;
 		delete[] it;
-		
-	}	
+
+	}
 }
 
 int vRM::probe(const double &Proc, const double &Mem, const double &Sto, const int &Acc)
@@ -2280,29 +2281,29 @@ broker::broker()
 
 void broker::initbroker(const int &L_numOfTypes, const int *L_types, const int *L_numOfResourcesPerType, resource **resources, power *powerComp, netw *network, const brinputs &binp)
 {
-	int i=0,j=0;
-	double *tempC=NULL,*tempP=NULL,*tempPi=NULL;
-	double minP,minC;
-	int tminC,tminP;
 	alloc=1;
 	numOfTypes=L_numOfTypes;
 	types=new int[numOfTypes];
 	numOfResourcesPerType=new int[numOfTypes];
-	for(i=0;i<numOfTypes;i++)
+
+	for(int i=0;i<numOfTypes;i++)
 	{
 		types[i]=L_types[i];
 		numOfResourcesPerType[i]=L_numOfResourcesPerType[i];
 	}
+
+	// Copy the interval time for polling from the BrokerData configuration file
 	pollIntervalCellM=binp.pollIntervalCellM;
 	pollIntervalpRouter=binp.pollIntervalpRouter;
 	pollIntervalpSwitch=binp.pollIntervalpSwitch;
 	pollIntervalvRM=binp.pollIntervalvRM;
 
-	tempC=new double[numOfTypes];
-	tempP=new double[numOfTypes];
-	tempPi=new double[numOfTypes];
-	for(i=0;i<numOfTypes;i++)
-	{
+	double *tempC=new double[numOfTypes];
+	double *tempP=new double[numOfTypes];
+	double *tempPi=new double[numOfTypes];
+
+	// Calculate the values for C, P and Pi to be used for the assessment functions
+	for(int i=0;i<numOfTypes;i++) {
 		tempC[i]=resources[i][0].gcompCap()+resources[i][0].gaccCompCap();
 		double oz=1.0;
 		int active=resources[i][0].gactive();
@@ -2311,50 +2312,60 @@ void broker::initbroker(const int &L_numOfTypes, const int *L_types, const int *
 		oz=0.0;
 		tempPi[i]=powerComp[i].cpCons(oz,oz,active,totAcc);
 	}
-	tminC=0;
-	tminP=0;
-	for(i=1;i<numOfTypes;i++)
+
+	int tminC=0;
+	int tminP=0;
+	for(int i=1;i<numOfTypes;i++)
 	{
 		if(tempC[tminC]>tempC[i])
 			tminC=i;
 		if(tempP[tminP]>tempP[i])
 			tminP=i;
 	}
-	minC=tempC[tminC];
-	minP=tempP[tminP];
-	
-	for(i=0;i<numOfTypes;i++)
+	double minC=tempC[tminC];
+	double minP=tempP[tminP];
+
+	for(int i=0;i<numOfTypes;i++)
 	{
 		tempPi[i]=tempPi[i]/tempP[i];
 	}
 
-	for(i=0;i<numOfTypes;i++)
+	for(int i=0;i<numOfTypes;i++)
 	{
 		tempC[i]/=minC;
 		tempP[i]/=minP;
 	}
 
+	// Set the number of assesment functions
 	numOfFuncs=binp.numOfFuncs;
-	Ws=new double[numOfFuncs];
-	for(i=0;i<numOfFuncs;i++)
-		Ws[i]=binp.Ws[i];
 
+	// Allocate an array of weights for the assesment functions
+	Ws=new double[numOfFuncs];
+
+	// Set the individual weights
+	for(int i=0;i<numOfFuncs;i++) {
+		Ws[i]=binp.Ws[i];
+	}
+
+	// Set the number of pRouters as equal to the number of hardware types
 	numOfpRouters=numOfTypes;
 	numOfvRMs=0;
 	numOfpSwitches=0;
 	vRMs=new list<vRM>*[numOfTypes];
 	pSwitches=new list<pSwitch>*[numOfTypes];
 	pRouters=new list<pRouter>*[numOfTypes];
-	for(i=0;i<numOfTypes;i++)
+	for(int i=0;i<numOfTypes;i++)
 	{
 		vRMs[i]=new list<vRM>[1];
 		pSwitches[i]=new list<pSwitch>[1];
 		pRouters[i]=new list<pRouter>[1];
 	}
-	for(i=0;i<numOfTypes;i++)
+
+	// Create hierarchical the SOSM vRMs
+	for(int i=0;i<numOfTypes;i++)
 	{
 		int temp=numOfResourcesPerType[i]/binp.initResPervRM;
-		for(j=0;j<temp;j++)
+		for(int j=0;j<temp;j++)
 		{
 			vRMs[i]->push_back(vRM(j*binp.initResPervRM,(j+1)*binp.initResPervRM,i,resources,pollIntervalvRM,tempC[i],tempP[i],tempPi[i],binp.initResPervRM,binp.numOfFuncs,binp.Ws,binp.vRMdeploystrategy));
 		}
@@ -2366,42 +2377,49 @@ void broker::initbroker(const int &L_numOfTypes, const int *L_types, const int *
 		}
 	}
 
-	for(i=0;i<numOfTypes;i++)
+	// Create hierarchical the SOSM pSwitches
+	for(int i=0;i<numOfTypes;i++)
 	{
 		int temp=((int)vRMs[i]->size())/binp.initvRMPerpSwitch;
-		for(j=0;j<temp;j++)
+		for(int j=0;j<temp;j++)
 		{
 			pSwitches[i]->push_back(pSwitch(j*binp.initvRMPerpSwitch,(j+1)*binp.initvRMPerpSwitch,i,vRMs,pollIntervalpSwitch,tempC[i],tempP[i],tempPi[i],binp.numOfFuncs,binp.Ws));
 		}
 		numOfpSwitches+=temp;
 		if(temp*binp.initvRMPerpSwitch!=((int)vRMs[i]->size()))
-		{	
+		{
 			pSwitches[i]->push_back(pSwitch(temp*binp.initvRMPerpSwitch,((int)vRMs[i]->size()),i,vRMs,pollIntervalpSwitch,tempC[i],tempP[i],tempPi[i],binp.numOfFuncs,binp.Ws));
 			numOfpSwitches++;
 		}
 	}
-	
-	for(i=0;i<numOfTypes;i++)
+
+	// Create hierarchical the SOSM pRouters
+	for(int i=0;i<numOfTypes;i++)
 	{
 		pRouters[i]->push_back(pRouter(0,((int)pSwitches[i]->size()),i,pSwitches,pollIntervalpRouter,tempC[i],tempP[i],tempPi[i],binp.numOfFuncs,binp.Ws));
 	}
-	sPMSA=new double*[numOfTypes];
-	for(i=0;i<numOfTypes;i++)
-		sPMSA[i]=new double[8];
 
-	for(i=0;i<numOfTypes;i++)
+	// Allocate the sPMSA array
+	sPMSA=new double*[numOfTypes];
+	for(int i=0;i<numOfTypes;i++) {
+		sPMSA[i]=new double[8];
+	}
+
+	for(int i=0;i<numOfTypes;i++)
 	{
 		for(list<pRouter>::iterator it = pRouters[i]->begin(); it != pRouters[i]->end(); it++)
 		{
-			for(j=0;j<8;j++)
-				sPMSA[i][j]=it->gsPMSA()[j];				
+			for(int j=0;j<8;j++) {
+				sPMSA[i][j]=it->gsPMSA()[j];
+			}
 		}
 	}
 	availNetw=network->gavailNetw();
 	totNetw=network->gtotalNetw();
 	SIs=new double[numOfTypes];
-	for(i=0;i<numOfTypes;i++)
+	for(int i=0;i<numOfTypes;i++) {
 		SIs[i]=0.0;
+	}
 	Cs=tempC;
 	tempC=NULL;
 	Ps=tempP;
@@ -2409,7 +2427,7 @@ void broker::initbroker(const int &L_numOfTypes, const int *L_types, const int *
 	Pis=tempPi;
 	tempPi=NULL;
 }
-
+/*
 broker::broker(const int &L_numOfTypes, const int *L_types, const int *L_numOfResourcesPerType, resource **resources, power *powerComp, netw *network, const brinputs &binp)
 {
 	int i=0,j=0;
@@ -2454,7 +2472,7 @@ broker::broker(const int &L_numOfTypes, const int *L_types, const int *L_numOfRe
 	}
 	minC=tempC[tminC];
 	minP=tempP[tminP];
-	
+
 	for(i=0;i<numOfTypes;i++)
 	{
 		tempPi[i]=tempPi[i]/tempP[i];
@@ -2507,12 +2525,12 @@ broker::broker(const int &L_numOfTypes, const int *L_types, const int *L_numOfRe
 		}
 		numOfpSwitches+=temp;
 		if(temp*binp.initvRMPerpSwitch!=((int)vRMs[i]->size()))
-		{	
+		{
 			pSwitches[i]->push_back(pSwitch(temp*binp.initvRMPerpSwitch,((int)vRMs[i]->size()),i,vRMs,pollIntervalpSwitch,tempC[i],tempP[i],tempPi[i],binp.numOfFuncs,binp.Ws));
 			numOfpSwitches++;
 		}
 	}
-	
+
 	for(i=0;i<numOfTypes;i++)
 	{
 		pRouters[i]->push_back(pRouter(0,((int)pSwitches[i]->size()),i,pSwitches,pollIntervalpRouter,tempC[i],tempP[i],tempPi[i],binp.numOfFuncs,binp.Ws));
@@ -2526,7 +2544,7 @@ broker::broker(const int &L_numOfTypes, const int *L_types, const int *L_numOfRe
 		for(list<pRouter>::iterator it = pRouters[i]->begin(); it != pRouters[i]->end(); it++)
 		{
 			for(j=0;j<8;j++)
-				sPMSA[i][j]=it->gsPMSA()[j];				
+				sPMSA[i][j]=it->gsPMSA()[j];
 		}
 	}
 	availNetw=network->gavailNetw();
@@ -2541,7 +2559,7 @@ broker::broker(const int &L_numOfTypes, const int *L_types, const int *L_numOfRe
 	Pis=tempPi;
 	tempPi=NULL;
 }
-
+*/
 broker::broker(const broker &t)
 {
 	int i,j;
@@ -2632,7 +2650,7 @@ broker & broker::operator=(const broker & t)
 			delete[] vRMs[i];
 			delete[] pSwitches[i];
 			delete[] pRouters[i];
-			delete[] sPMSA[i];	
+			delete[] sPMSA[i];
 		}
 		delete[] pRouters;
 		delete[] pSwitches;
@@ -2698,7 +2716,7 @@ broker & broker::operator=(const broker & t)
 			for(list<pSwitch>::iterator it = t.gpSwitches()[i]->begin(); it != t.gpSwitches()[i]->end(); it++)
 				pSwitches[i]->push_back(*it);
 		for(i=0;i<numOfTypes;i++)
-			
+
 			for(list<pRouter>::iterator it = t.gpRouters()[i]->begin(); it != t.gpRouters()[i]->end(); it++)
 				pRouters[i]->push_back(*it);
 
@@ -2857,32 +2875,36 @@ void broker::updateStateInfo(netw *network, const double &tstep)
 	list<vRM>::iterator it;
 	if (alloc)
 	{
+		// On every time interval
 		if(((int)tstep%(int)pollIntervalvRM)==0)
 		{
 			int omp_thr,len;
+			// For each hardware type
 			for(i=0;i<numOfTypes;i++)
 			{
+				//How many vRMs correspond to each hardware type
 				len=(int)vRMs[i]->size();
 				omp_thr=atoi(getenv("OMP_NUM_THREADS"));
 				#pragma omp parallel default(shared) private(j,k,it) num_threads(omp_thr)
 				{
 					int tid=omp_get_thread_num();
 					it = vRMs[i]->begin();
-					for(j=0;j<tid;j++)
+					for(j=0;j<tid;j++) {
 						it++;
+					}
 					j=tid;
 					while(j<len)
 					{
+						// Update state info on each vRM in parallel
 						it->updateStateInfo(tstep);
 						j+=omp_thr;
-						for(k=0;k<omp_thr;k++)
+						for(k=0;k<omp_thr;k++) {
 							it++;
+						}
 					}
 					#pragma omp barrier
 				}
-				
-				
-			}			
+			}
 		}
 		if(((int)tstep%(int)pollIntervalpSwitch)==0)
 		{
@@ -2897,7 +2919,7 @@ void broker::updateStateInfo(netw *network, const double &tstep)
 					itt = pSwitches[i]->begin();
 					for(j=0;j<tid;j++)
 						itt++;
-					j=tid;			
+					j=tid;
 					while(j<len)
 					{
 						itt->updateStateInfo(tstep);
@@ -2907,7 +2929,7 @@ void broker::updateStateInfo(netw *network, const double &tstep)
 					}
 					#pragma omp barrier
 				}
-			}			
+			}
 		}
 		if(((int)tstep%(int)pollIntervalpRouter)==0)
 		{
@@ -2917,7 +2939,7 @@ void broker::updateStateInfo(netw *network, const double &tstep)
 			{
 				ittt = pRouters[i]->begin();
 				ittt->updateStateInfo(tstep);
-			}			
+			}
 		}
 		if(((int)tstep%(int)pollIntervalCellM)==0)
 		{
@@ -2928,7 +2950,7 @@ void broker::updateStateInfo(netw *network, const double &tstep)
 					for(j=0;j<8;j++)
 						sPMSA[i][j]=itttt->gsPMSA()[j];
 					SIs[i]=itttt->gSI();
-				
+
 				}
 
 			}
@@ -2944,11 +2966,12 @@ void broker::deploy(resource **resources, netw *network, stat *stats, task *t)
 	int L_numOfVMs,*L_availImpl,*rem,*rem2,count;
 	double maxSI;
 	L_availImpl=t->gavailImpl();
-	
 
 	rem=new int[numOfTypes];
 	rem2=new int[t->gnumOfAvailImpl()];
 	count=0;
+
+	// Determine how many (count) of the pRouter hardware types match the tasks' requested type, and store the types to the rem and rem arrays
 	for(j=0;j<t->gnumOfAvailImpl();j++)
 	{
 		for(i=0;i<numOfTypes;i++)
@@ -2976,9 +2999,11 @@ void broker::deploy(resource **resources, netw *network, stat *stats, task *t)
 	maxSI=0.0;
 	type=-1;
 	L_numOfVMs=t->gnumOfVMs();
+	// Lets find the pRouter out of the pRouters with a compatible Hardware Type with the highest Suitability Index
 	for(i=0;i<count;i++)
 	{
 		list<pRouter>::iterator itt=pRouters[rem[i]]->begin();
+		// Compare the current found maximum SI to the SI of each pRouter with a matching Hardware Type and double check that the pRouter offers the requested PMNS resources
 		if(maxSI<SIs[rem[i]] && L_numOfVMs*t->greqPMNS()[0]<=sPMSA[rem[i]][0] && L_numOfVMs*t->greqPMNS()[1]<=sPMSA[rem[i]][2] && L_numOfVMs*t->greqPMNS()[3]<=sPMSA[rem[i]][4] && L_numOfVMs*t->gavAcc()[rem2[i]]<=sPMSA[rem[i]][6])
 		{
 			if(itt->probe(L_numOfVMs*t->greqPMNS()[0],L_numOfVMs*t->greqPMNS()[1],L_numOfVMs*t->greqPMNS()[3],L_numOfVMs*t->gavAcc()[rem2[i]])!=-1)
@@ -2990,8 +3015,9 @@ void broker::deploy(resource **resources, netw *network, stat *stats, task *t)
 	}
 	if (type==-1)
 	{
+		// Reject tasks if type is still -1
 		stats[rem[0]].rejTasks++;
-		return;		
+		return;
 	}
 	t->reduceImpl(&rem2[type]);
 	t->remapType(&rem[type],1);
@@ -3001,10 +3027,11 @@ void broker::deploy(resource **resources, netw *network, stat *stats, task *t)
 	sPMSA[type][4]-=L_numOfVMs*t->greqPMNS()[3];
 	sPMSA[type][6]-=L_numOfVMs*t->gavAcc()[0];
 
-	for(i=0;i<4;i++)
+	// Update SI for the chosen pRouter
+	for(i=0;i<4;i++) {
 		SIs[type]+=Ws[i]*dassessfuncs(-L_numOfVMs*t->greqPMNS()[0],-L_numOfVMs*t->greqPMNS()[1],i,type);
-	
-	
+	}
+
 	list<pRouter>::iterator it = pRouters[type]->begin();
 	it->deploy(resources,network,stats,t);
 	delete[] rem;
@@ -3014,10 +3041,18 @@ void broker::deploy(resource **resources, netw *network, stat *stats, task *t)
 
 void broker::timestep(resource **resources, netw *network, stat* stats, power *powerComp)
 {
+// The simulation phase consists of 6 execution steps
+// 1. Initialize the running quantities: Proc and memory utilization, rho, network. Set initial values to 0.
+// 2. Calculate for all tasks per vRM their running quantites (except network) and add them to calulcate the total
+// 3. Calculate the number of instructions per processor can be execute for CPUs and accelerator
+// 4. Calculate the power consumption on each timestep
+// 5. Execute the tasks, and subtract the instructions already calculated
+// 6. Remove the completed tasks
+
 	int i=0,j,rID,len,k;
 	double insR,insRa;
 	double procUtil;
-	double rhoAcc,L_totPcons;	
+	double rhoAcc,L_totPcons;
 	int active,L_numOfVMs;
 	int totalAcc;
 	int omp_thr=atoi(getenv("OMP_NUM_THREADS"));
@@ -3029,56 +3064,67 @@ void broker::timestep(resource **resources, netw *network, stat* stats, power *p
 	int tid,jj;
 	if(alloc)
 	{
+		// Step 1
+		// Create a two-dimensional array of pointers to different vRMs (itf) in order to asssign them later to different OpenMP threads
 		itf=new list<vRM>::iterator*[numOfTypes];
-		for(i=0;i<numOfTypes;i++)
+		for(i=0;i<numOfTypes;i++) {
 			itf[i]=new list<vRM>::iterator[omp_thr];
-		for(i=0;i<numOfTypes;i++)
+		}
+		for(i=0;i<numOfTypes;i++) {
 			itf[i][0]=vRMs[i]->begin();
-		for(i=0;i<numOfTypes;i++)
-		{
+		}
+		for(i=0;i<numOfTypes;i++) {
 			len=(int)vRMs[i]->size();
-			for(j=1;j<omp_thr;j++)
-			{
+			for(j=1;j<omp_thr;j++) {
 				itt=itf[i][j-1];
-				for(k=0;k<(j*len)/omp_thr-((j-1)*len)/omp_thr;k++)
-				{
+				for(k=0;k<(j*len)/omp_thr-((j-1)*len)/omp_thr;k++) {
 					itt++;
 				}
 				itf[i][j]=itt;
 			}
 		}
 
-		for(i=0;i<numOfTypes;i++)
-		{
+		for(i=0;i<numOfTypes;i++) {
+			// Assign different resources (j) of the same hardware type (i) to different threads
 			#pragma omp parallel for default(shared) private(j) num_threads(omp_thr) schedule(static,chunk)
 			for(j=0;j<numOfResourcesPerType[i];j++)
-				if(resources[i][j].gnumOfTasks()>0)		
+				// If a given resource has one or more tasks assigned
+				if(resources[i][j].gnumOfTasks()>0) {
+					// Reset the overcommitment value in terms of processors and memory
 					resources[i][j].initRunQuan();
+				}
 		}
+		// Reset the overcommitment value in terms of network
 		network[0].initRunQuan();
+
+		// Step 2
 		omp_thr=1;
 		L_net=new double[omp_thr];
-		for(i=0;i<omp_thr;i++)
+		for(i=0;i<omp_thr;i++) {
 			L_net[i]=0.0;
-		for(i=0;i<numOfTypes;i++)
-		{
+		}
+		// Scan all vRMs and for each vRM task retrieve mem and proc utilization and rho (the parallel percentage)
+		// Calculate total utilization (by increasing the running quantities) in order to caluclate power consumption and intsructions per seconds to reduce from each task
+		for(i=0;i<numOfTypes;i++) {
 			len=(int)vRMs[i]->size();
 			#pragma omp parallel default(shared) private(itt,ittt,k,rID,j,tid,L_numOfVMs) num_threads(omp_thr)
 			{
 				tid=omp_get_thread_num();
 				itt=itf[i][tid];
-				for(k=(tid*len)/omp_thr;k<((tid+1)*len)/omp_thr;k++)
-				{
-					for(ittt=(itt->gqueue())->begin();ittt!=(itt->gqueue())->end();ittt++)
-					{
+				// For every vRM..
+				for(k=(tid*len)/omp_thr;k<((tid+1)*len)/omp_thr;k++) {
+					// Scan the task queue of the vRM..
+					for(ittt=(itt->gqueue())->begin();ittt!=(itt->gqueue())->end();ittt++) {
+						// Compute the utilization
 						ittt->compcUtilPMNr();
 						double *gcU=ittt->gcUtilPMNr();
 						int *gr=ittt->gresourceIDs();
 						L_net[tid]+=gcU[2];
 						L_numOfVMs=ittt->gnumOfVMs();
-						for(j=0;j<L_numOfVMs;j++)
-						{
+						for(j=0;j<L_numOfVMs;j++) {
 							rID=gr[j];
+							// For every [hardware type][server per hardware type] increase the mem and proc utilization and rho
+							// 1 vRm has 5 tasks; for every task see which servers it uses, and on every server calculate the running quantities it utilizes
 							resources[i][rID].incrRunQuan(gcU[0], gcU[1], gcU[3]);
 						}
 					}
@@ -3087,14 +3133,18 @@ void broker::timestep(resource **resources, netw *network, stat* stats, power *p
 				#pragma omp barrier
 			}
 		}
-		for(i=1;i<omp_thr;i++)
+
+		for(i=1;i<omp_thr;i++) {
 			L_net[0]+=L_net[i];
+		}
 		network[0].incrRunQuan(L_net[0]);
 		delete[] L_net;
+
+		// Step 3
 		omp_thr=atoi(getenv("OMP_NUM_THREADS"));
 
-		for(i=0;i<numOfTypes;i++)
-		{
+		// Run through all resources and calculate the number of instructions to calculate per processing unit (taking into account the overcommitment of the processor resources)
+		for(i=0;i<numOfTypes;i++) {
 			#pragma omp parallel for default(shared) private(j) num_threads(omp_thr) schedule(static,chunk)
 			for(j=0;j<numOfResourcesPerType[i];j++)
 			{
@@ -3105,7 +3155,8 @@ void broker::timestep(resource **resources, netw *network, stat* stats, power *p
 				}
 			}
 		}
-
+		// Step 4
+		// Calculate power consumption per pc and increase consumption on the stats engine
 		for(i=0;i<numOfTypes;i++)
 		{
 			L_totPcons=0.0;
@@ -3116,18 +3167,22 @@ void broker::timestep(resource **resources, netw *network, stat* stats, power *p
 				rhoAcc=resources[i][j].garhoAcc();
 				active=resources[i][j].gactive();
 				totalAcc=resources[i][j].gtotAcc();
-				L_totPcons+=powerComp[i].cpCons(procUtil,rhoAcc,active,totalAcc);		
+				L_totPcons+=powerComp[i].cpCons(procUtil,rhoAcc,active,totalAcc);
 			}
 			stats[i].totPcons+=L_totPcons;
 		}
+		// Step 5
+		// Run through all tasks to calculate the minimum of the instructions that can be executed based on the utilization and the overcommitment of each node
 		for(i=0;i<numOfTypes;i++)
 		{
 			ocP=resources[i][0].goverCommitProc();
 			len=(int)vRMs[i]->size();
+			// For all vRms..
 			#pragma omp parallel default(shared) private(itt,ittt,jj,j,tid,rID,insR,insRa,L_numOfVMs) num_threads(omp_thr)
 			{
 				tid=omp_get_thread_num();
 				itt=itf[i][tid];
+				// For all tasks of the vRM
 				for(jj=(tid*len)/omp_thr;jj<((tid+1)*len)/omp_thr;jj++)
 				{
 					for(ittt=itt->gqueue()->begin();ittt!=itt->gqueue()->end();ittt++)
@@ -3136,20 +3191,25 @@ void broker::timestep(resource **resources, netw *network, stat* stats, power *p
 						insR=resources[i][rID].gcCompCapPerProc();
 						insRa=resources[i][rID].gcCompCapPerAcc();
 						L_numOfVMs=ittt->gnumOfVMs();
+						// For each VM of the server (resource)
 						for(j=1;j<L_numOfVMs;j++)
 						{
-							rID=(ittt->gresourceIDs())[j];		
+							rID=(ittt->gresourceIDs())[j];
+							// Get the minimum CPU task instructions that can be calculated on the given server (resource) between the requested instructions and the servers' available instructions based on the servers overcommitment value
 							insR=MY_MIN(insR,resources[i][rID].gcCompCapPerProc());
+							// Get the minimum accelerator task instructions that can be calculated on the given server (resource) between the requested instructions and the servers' available instructions based on the servers overcommitment value
 							insRa=MY_MIN(insRa,resources[i][rID].gcCompCapPerAcc());
 						}
+						// Reduce the instructions left to compute of the given task
 						ittt->reduceIns(L_numOfVMs*insR*MY_MIN(ittt->gcUtilPMNr()[0]*ocP,1.0)+L_numOfVMs*insRa*((ittt->gcUtilPMNr())[3]));
-					}				
+					}
 					itt++;
 				}
 				#pragma omp barrier
 			}
 		}
-		
+		// Step 6
+		// Estimate when a task has finished, by calculating when the number of instructions left goes to zero. (on the previous step the resources were reduced gradually). Run through all vRMs and free the task' resources that are done and the network
 		int *numtasks;
 		double **avau;
 		numtasks=new int[omp_thr];
@@ -3164,7 +3224,7 @@ void broker::timestep(resource **resources, netw *network, stat* stats, power *p
 				avau[j][1]=0.0;
 				numtasks[j]=0;
 			}
-			
+
 			len=(int)vRMs[i]->size();
 			#pragma omp parallel default(shared) private(itt,ittt,jj,j,tid,rID,L_numOfVMs) num_threads(omp_thr)
 			{
@@ -3177,26 +3237,30 @@ void broker::timestep(resource **resources, netw *network, stat* stats, power *p
 					ittt=(itt->gqueue())->begin();
 					while (ittt!=(itt->gqueue())->end())
 					{
+						// If the requested instruction of a task were dropped to zero
 						if((ittt->greqIns())<=0.0)
 						{
 							L_numOfVMs=ittt->gnumOfVMs();
+							// For all VMs
 							for(j=0;j<L_numOfVMs;j++)
 							{
 								rID=(ittt->gresourceIDs())[j];
+								// Mark the resources used by the task as not used any more and therefore "free" them to be used by another task in a future timestep
 								resources[i][rID].unload(ittt);
 							}
 							numtasks[tid]++;
 							avau[tid][0]+=(ittt->greqPMNS())[2];
 							avau[tid][1]+=(ittt->gcUtilPMNr())[2];
+							// Erase the task (ittt) from the task queue of the specific vRM (itt)
 							ittt=(itt->gqueue())->erase(ittt);
-						}	
+						}
 						else
 							++ittt;
-					}		
+					}
 					itt++;
 				}
 				#pragma omp barrier
-				
+
 			}
 			for(j=1;j<omp_thr;j++)
 			{
@@ -3220,7 +3284,7 @@ void broker::timestep(resource **resources, netw *network, stat* stats, power *p
 
 int broker::galloc() const
 {
-	return alloc;	
+	return alloc;
 }
 
 int broker::gnumOfTypes() const
@@ -3294,7 +3358,7 @@ double *broker::gSIs() const
 
 double *broker::gCs() const
 {
-	return Cs;	
+	return Cs;
 }
 
 double *broker::gPs() const
@@ -3331,10 +3395,3 @@ list<pRouter> **broker::gpRouters() const
 {
 	return pRouters;
 }
-
-//-----------------------------------------
-//  Self-Organization Self-Management
-//              Components
-//-----------------------------------------
-
-
