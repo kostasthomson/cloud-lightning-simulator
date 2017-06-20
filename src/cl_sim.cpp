@@ -77,7 +77,7 @@ int main(int argc, char **argv)
 	{
 		string name="../input/CellData";
 		string name2="../input/AppData";
-		string name3="../input/broker";
+		string name3="../input/BrokerData";
 		gates=new gs[1];
 		gates[0]=gs(name,name2,name3);
 		gates[0].printfile("systeminfo",ios::out);

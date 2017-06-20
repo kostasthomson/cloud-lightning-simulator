@@ -21,7 +21,7 @@ struct brinputs
 	brinputs(const brinputs & t);
 	brinputs & operator=(const brinputs & t);
 	~brinputs();
-	void parse(ifstream &outname);
+	void parse(const string &outname, int cell_id);
 	void print();
 	void printfile(const string &outname, const ios::openmode &mode);
 };

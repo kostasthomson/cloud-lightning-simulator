@@ -87,7 +87,7 @@ Number of Cells: 3
                    Accelerator Sleep Power Consumption: 20 Watts
     =========== Broker ===========
         Number of Assessment Functions: 5
-        Weights: 1 1 1 1 0 
+        Weights: 1 1 1 1 1 
         Initial number of Resources per vRM: 100
         Initial number of vRMs per pSwitch: 10
         Initial number of pSwitches per pRouter: 5
@@ -179,7 +179,7 @@ Number of Cells: 3
                    Accelerator Sleep Power Consumption: 20 Watts
     =========== Broker ===========
         Number of Assessment Functions: 5
-        Weights: 1 1 1 1 0 
+        Weights: 1 1 1 1 1 
         Initial number of Resources per vRM: 100
         Initial number of vRMs per pSwitch: 10
         Initial number of pSwitches per pRouter: 5
@@ -271,7 +271,7 @@ Number of Cells: 3
                    Accelerator Sleep Power Consumption: 20 Watts
     =========== Broker ===========
         Number of Assessment Functions: 5
-        Weights: 1 1 1 1 0 
+        Weights: 1 1 1 1 1 
         Initial number of Resources per vRM: 100
         Initial number of vRMs per pSwitch: 10
         Initial number of pSwitches per pRouter: 5

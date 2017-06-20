@@ -1,0 +1,59 @@
+{
+"Brokers":
+[
+    {
+      "Number of functions": 5,
+      "Weights of functions": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "Number of Resources per vRM": 100,
+      "Number of vRMs per pSwitch": 10,
+      "Number of pSwitch per pRouter": 5,
+      "Poll Interval Cell Manager": 20,
+      "Poll Interval pRouter": 20,
+      "Poll Interval pSwitch": 20,
+      "Poll Interval vRM": 20,
+      "vRM deployment strategy": 1
+    },
+    {
+      "Number of functions": 5,
+      "Weights of functions": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "Number of Resources per vRM": 100,
+      "Number of vRMs per pSwitch": 10,
+      "Number of pSwitch per pRouter": 5,
+      "Poll Interval Cell Manager": 20,
+      "Poll Interval pRouter": 20,
+      "Poll Interval pSwitch": 20,
+      "Poll Interval vRM": 20,
+      "vRM deployment strategy": 1
+    },
+    {
+      "Number of functions": 5,
+      "Weights of functions": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "Number of Resources per vRM": 100,
+      "Number of vRMs per pSwitch": 10,
+      "Number of pSwitch per pRouter": 5,
+      "Poll Interval Cell Manager": 20,
+      "Poll Interval pRouter": 20,
+      "Poll Interval pSwitch": 20,
+      "Poll Interval vRM": 20,
+      "vRM deployment strategy": 1
+    }
+  ]
+}

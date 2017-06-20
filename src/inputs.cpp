@@ -128,10 +128,27 @@ void brinputs::print()
 	}
 }
 
-void brinputs::parse(ifstream &outname)
+void brinputs::parse(const string &outname, int i)
 {
-	int i;
+	ifstream bb(outname);		//open json file
+	nlohmann::json xx;		    //declare a json object
+	bb >> xx;				    //connect json object with file
+	int k=i;
+	int j;
 	alloc=1;
+	numOfFuncs = xx["Brokers"][k]["Number of functions"].get<int>();
+	Ws=new double[numOfFuncs];
+	for(j=0;j<numOfFuncs;j++)
+		Ws[j] = xx["Brokers"][k]["Weights of functions"][j].get<double>();
+	initResPervRM = xx["Brokers"][k]["Number of Resources per vRM"].get<int>();
+	initvRMPerpSwitch = xx["Brokers"][k]["Number of vRMs per pSwitch"].get<int>();
+	initpSwitchPerpRouter = xx["Brokers"][k]["Number of pSwitch per pRouter"].get<int>();
+	pollIntervalCellM = xx["Brokers"][k]["Poll Interval Cell Manager"].get<int>();
+	pollIntervalpRouter = xx["Brokers"][k]["Poll Interval pRouter"].get<int>();
+	pollIntervalpSwitch = xx["Brokers"][k]["Poll Interval pSwitch"].get<int>();
+	pollIntervalvRM = xx["Brokers"][k]["Poll Interval vRM"].get<int>();
+	vRMdeploystrategy = xx["Brokers"][k]["vRM deployment strategy"].get<int>();
+/*
 	outname>>numOfFuncs;
 	Ws=new double[numOfFuncs];
 	for(i=0;i<numOfFuncs;i++)
@@ -144,6 +161,7 @@ void brinputs::parse(ifstream &outname)
 	outname>>pollIntervalpSwitch;
 	outname>>pollIntervalvRM;
 	outname>>vRMdeploystrategy;
+*/
 }
 
 void brinputs::printfile(const string &outname, const ios::openmode &mode)
@@ -1293,7 +1311,7 @@ void siminputs::parse(const string &fname, const string &bname)
 	bb >> pp;				//connect json object with file
 
 	//file.open(fname.c_str());
-	file2.open(bname.c_str());
+	//file2.open(bname.c_str());
 
 	maxTime = pp["Maximum Simulation Time"].get<int>();		//read maximum simulation time and assign to variable
 	upInterval = pp["Update Interval"].get<int>();			//read update interval and assign to variable
@@ -1309,7 +1327,7 @@ void siminputs::parse(const string &fname, const string &bname)
 	for(i=0;i<numOfCells;i++){
 		cinp[i].binp=new brinputs[1];
 		cinp[i].binp[0].alloc=1;
-		cinp[i].binp[0].parse(file2);
+		cinp[i].binp[0].parse(bname,i);
 		cinp[i].numOfTypes = pp["Cells"][i]["Number_of_HW_types"].get<int>();
 		cinp[i].alloc=1;
 		cinp[i].ID=i+1;
