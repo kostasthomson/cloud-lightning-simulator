@@ -25,12 +25,13 @@ Input and output JSON data files are located at the corresponding *input* and *o
 
 Navigate to the directory of the project, open the terminal and enter
 
-     $ make clean
-     $ make all
+     $ cmake .
+     $ make
+     $ make install
 
 ##Run the CL Simulator
 
-Change directory at the *bin* folder and enter
+Change directory to the *bin* folder and enter
 
      $ sh cl_sim.out
 
