@@ -302,7 +302,7 @@ void cell::updateStats(const double &tstep)
 {
 	int i,j;
 	double phyMem, phyProc, phySto, totMem, totProc, availProc, availMem, totSto, availSto, autilProc, autilMem;
-	int totAcc,availAcc,activeSrvs,numOfTasks;
+	int totAcc,availAcc,activeSrvs,numOfTasks, procActServs, procPerServ, memActServs, memPerServ, stoActServs, stoPerServ, accActServs, accPerServ;
 	int omp_thr=atoi(getenv("OMP_NUM_THREADS"));
 	for(i=0;i<numOfTypes;i++)
 	{
@@ -313,6 +313,15 @@ void cell::updateStats(const double &tstep)
 		stats[i].availNetw=network[0].gavailNetw();
 		stats[i].utilNetw=stats[i].totNetw-stats[i].availNetw;
 		stats[i].autilNetw=network[0].gautilNetw();
+
+		procPerServ=resources[i][0].gtotalProc(); 		// Processors per server, e.g. --> 44
+		memPerServ=resources[i][0].gtotalMem();			// Memory capacity per server, e.g. --> 128 GB
+		stoPerServ=resources[i][0].gtotalSto(); 		// Storage per server, e.g. --> 40 TBs
+		accPerServ=resources[i][0].gtotAcc();			// Accelerators per server, e.g. --> 4
+		procActServs=0;
+		memActServs=0;
+		stoActServs=0;
+		accActServs=0;
 
 		phyMem=0.0;
 		phyProc=0.0;
@@ -372,6 +381,16 @@ void cell::updateStats(const double &tstep)
 		stats[i].numOfTasks=numOfTasks;
 		stats[i].autilProc=autilProc;
 		stats[i].autilMem=autilMem;
+
+		procActServs=activeSrvs*procPerServ;
+		memActServs=activeSrvs*memPerServ;
+		stoActServs=activeSrvs*stoPerServ;
+		accActServs=activeSrvs*accPerServ;
+
+		stats[i].procActServs=procActServs;
+		stats[i].memActServs=memActServs;
+		stats[i].stoActServs=stoActServs;
+		stats[i].accActServs=accActServs;
 		
 	}
 }

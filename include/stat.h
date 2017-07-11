@@ -6,6 +6,10 @@ using namespace std;
 
 struct stat 
 {
+	int procActServs;
+	double memActServs;
+	double stoActServs;
+	int accActServs;
 	int alloc;
 	double currTstep;
 	double phyMem;

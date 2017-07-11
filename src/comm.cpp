@@ -305,6 +305,10 @@ void commStats(const gs *gates, const cell *clCell, const int &rank, const int &
 			{
 				MPI_Recv(&gates[0].gstats()[i][j].alloc,1,MPI_INT,i+1,i+1,Comm,&status);
 				MPI_Recv(&gates[0].gstats()[i][j].currTstep,1,MPI_DOUBLE,i+1,i+1,Comm,&status);
+				MPI_Recv(&gates[0].gstats()[i][j].procActServs,1,MPI_INT,i+1,i+1,Comm,&status);
+				MPI_Recv(&gates[0].gstats()[i][j].memActServs,1,MPI_DOUBLE,i+1,i+1,Comm,&status);
+				MPI_Recv(&gates[0].gstats()[i][j].stoActServs,1,MPI_DOUBLE,i+1,i+1,Comm,&status);
+				MPI_Recv(&gates[0].gstats()[i][j].accActServs,1,MPI_INT,i+1,i+1,Comm,&status);
 				MPI_Recv(&gates[0].gstats()[i][j].phyMem,1,MPI_DOUBLE,i+1,i+1,Comm,&status);
 				MPI_Recv(&gates[0].gstats()[i][j].phyProc,1,MPI_DOUBLE,i+1,i+1,Comm,&status);
 				MPI_Recv(&gates[0].gstats()[i][j].phySto,1,MPI_DOUBLE,i+1,i+1,Comm,&status);
@@ -360,6 +364,10 @@ void commStats(const gs *gates, const cell *clCell, const int &rank, const int &
 			
 			MPI_Send(&clCell[0].gstats()[i].alloc,1,MPI_INT,0,rank,Comm);
 			MPI_Send(&clCell[0].gstats()[i].currTstep,1,MPI_DOUBLE,0,rank,Comm);
+			MPI_Send(&clCell[0].gstats()[i].procActServs,1,MPI_INT,0,rank,Comm);
+			MPI_Send(&clCell[0].gstats()[i].memActServs,1,MPI_DOUBLE,0,rank,Comm);
+			MPI_Send(&clCell[0].gstats()[i].stoActServs,1,MPI_DOUBLE,0,rank,Comm);
+			MPI_Send(&clCell[0].gstats()[i].accActServs,1,MPI_INT,0,rank,Comm);	
 			MPI_Send(&clCell[0].gstats()[i].phyMem,1,MPI_DOUBLE,0,rank,Comm);
 			MPI_Send(&clCell[0].gstats()[i].phyProc,1,MPI_DOUBLE,0,rank,Comm);
 			MPI_Send(&clCell[0].gstats()[i].phySto,1,MPI_DOUBLE,0,rank,Comm);

@@ -19,6 +19,11 @@ nlohmann::json cl_list;
 //---------------------------------
 stat::stat()
 {
+	procActServs=0;
+	memActServs=0;
+	stoActServs=0;
+	accActServs=0;
+
 	alloc=0;
 	currTstep=0.0;
 	phyMem=0.0;
@@ -58,6 +63,10 @@ stat::stat(const stat &t)
 {
 	if(t.alloc)
 	{
+		procActServs=t.procActServs;
+		memActServs=t.memActServs;
+		stoActServs=t.stoActServs;
+		accActServs=t.accActServs;
 		alloc=t.alloc;
 		currTstep=t.currTstep;
 		phyMem=t.phyMem;
@@ -98,6 +107,10 @@ stat & stat::operator=(const stat &t)
 	{
 		if(alloc)
 		{
+			procActServs=0;
+			memActServs=0;
+			stoActServs=0;
+			accActServs=0;
 			alloc=0;
 			currTstep=0.0;
 			phyMem=0.0;
@@ -132,7 +145,11 @@ stat & stat::operator=(const stat &t)
 		}
 		alloc=t.alloc;
 		if(alloc)
-		{
+		{	
+			procActServs=t.procActServs;
+			memActServs=t.memActServs;
+			stoActServs=t.stoActServs;
+			accActServs=t.accActServs;
 			currTstep=t.currTstep;
 			phyMem=t.phyMem;
 			phyProc=t.phyProc;
@@ -172,6 +189,10 @@ stat::~stat()
 {
 	if(alloc)
 	{
+		procActServs=0;
+		memActServs=0;
+		stoActServs=0;
+		accActServs=0;
 		alloc=0;
 		currTstep=0.0;
 		phyMem=0.0;
@@ -213,6 +234,10 @@ void stat::print() const
 	{
 		cout<<"         Active Servers: "<<activeSrvs<<endl;
 		cout<<"         Time Step: "<<currTstep<<endl;
+		cout<<"         Total Processors over Active Servers: "<<procActServs<<endl;
+		cout<<"         Total Memory over Active Servers: "<<memActServs<<endl;
+		cout<<"         Total Storage over Active Servers: "<<stoActServs<<endl;
+		cout<<"         Total Accelerators over Active Servers: "<<accActServs<<endl;
 		cout<<"         Total Number of currently running VMs: "<<numOfTasks<<endl;
 		cout<<"         Total Number of accepted Tasks: "<<accTasks<<endl;
 		cout<<"         Total Number of rejected Tasks: "<<rejTasks<<endl;
@@ -244,11 +269,12 @@ void stat::print() const
 
 void stat::printfile(const string &outfile, const ios::openmode &mode)
 {
+	
 	fstream file;
 	if (alloc)
 	{
 		file.open(outfile.c_str(),mode);
-		file<<currTstep<<" "<<activeSrvs<<" "<<numOfTasks<<" "<<accTasks<<" "<<rejTasks<<" "<<availProc<<" "<<utilProc<<" "<<autilProc<<" "<<totProc<<" "<<phyProc<<" "<<availMem<<" "<<utilMem<<" "<<autilMem<<" "<<totMem<<" "<<phyMem<<" "<<availSto<<" "<<utilSto<<" "<<availSto<<" "<<phySto<<" "<<availNetw<<" "<<utilNetw<<" "<<autilNetw<<" "<<totNetw<<" "<<phyNetw<<" "<<availAcc<<" "<<utilAcc<<" "<<totAcc<<" "<<totPcons<<endl;
+		file<<currTstep<<" "<<activeSrvs<<" "<<procActServs<<" "<<memActServs<<" "<<stoActServs<<" "<<accActServs<<" "<<numOfTasks<<" "<<accTasks<<" "<<rejTasks<<" "<<availProc<<" "<<utilProc<<" "<<autilProc<<" "<<totProc<<" "<<phyProc<<" "<<availMem<<" "<<utilMem<<" "<<autilMem<<" "<<totMem<<" "<<phyMem<<" "<<availSto<<" "<<utilSto<<" "<<availSto<<" "<<phySto<<" "<<availNetw<<" "<<utilNetw<<" "<<autilNetw<<" "<<totNetw<<" "<<phyNetw<<" "<<availAcc<<" "<<utilAcc<<" "<<totAcc<<" "<<totPcons<<endl;
 		file.close();
 	}
 }
@@ -266,6 +292,10 @@ void stat::printfileJson(const string &outfile, const string &inputfile, const i
     {
     	file>>currTstep;
 		file>>activeSrvs;
+		file>>procActServs;
+		file>>memActServs;
+		file>>stoActServs;
+		file>>accActServs;
 		file>>numOfTasks;
 		file>>accTasks;
 		file>>rejTasks;
@@ -300,6 +330,10 @@ void stat::printfileJson(const string &outfile, const string &inputfile, const i
 				{"Total Energy Consumption",totPcons},
 			  	{"Active Servers", activeSrvs},
 				{"Total Number of currently running VMs",numOfTasks},
+				{"Total Processors over Active Servers",procActServs},
+				{"Total Memory over Active Servers",memActServs},
+				{"Total Storage over Active Servers",stoActServs},
+				{"Total Accelerators over Active Servers",accActServs},
 				{"Total Number of accepted Tasks",accTasks},
 				{"Total Number of rejected Tasks",rejTasks},
 				{"Total Physical Processors",phyProc},
