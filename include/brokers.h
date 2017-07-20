@@ -50,11 +50,19 @@ class vRM
   /// Computes the suitability index
   void computeSI();
 
-  // Updates the state information of the cell
+  /// Updates the state information of the cell
   void updateStateInfo(const double& tstep);
 
+  /// Removes the list of resources that satisfy the requested units from a vRM and adds them to the ores list
+  /// \param ores The resources list to store the resources removed from the vRM
+  /// \param remProc The number of requested processor cores
+  /// \param remMem The size of requested memory
+  /// \param remSto The size of requested storage
+  /// \param remAcc The number of requested accelerators
   void obtainresources(list<resource*>& ores, double& remProc, double& remMem, double& remSto, double& remAcc);
 
+  /// Adds the resources contained in the ores list to the vRM
+  /// \param The resources list to be attached to the vRM
   void attachresources(list<resource*>& ores);
 
   double assessfuncs(const int& choice);
@@ -64,6 +72,7 @@ class vRM
   /// Returns success if the task's processes, memory, storage and accelerator are less or equal than the vRM's
   int probe(const double& Proc, const double& Mem, const double& Sto, const int& Acc);
 
+  /// Defines the strategies used to position VMs on resources
   int deploy_strategy(list<resource*>::iterator* it, int* IDs, const int& nVMs, const double& Proc, const double& Mem,
                       const double& Sto, const int& Acc);
 
@@ -139,7 +148,7 @@ class pSwitch
   /// Computes the suitability index
   void computeSI();
 
-  // Updates the state information of the cell, by calling recursively the vRM::updateStateInfo method
+  /// Updates the state information of the cell, by calling recursively the vRM::updateStateInfo method
   void updateStateInfo(const double& tstep);
 
   double dassessfuncs(const double& dNu, const double& totNu, const double& dNmem, const double& totMem,
@@ -209,7 +218,7 @@ class pRouter
 
   pRouter& operator=(const pRouter& t);
 
-  // Updates the state information of the cell, by calling recursively the pSwitch::updateStateInfo method
+  /// Updates the state information of the cell, by calling recursively the pSwitch::updateStateInfo method
   void updateStateInfo(const double& tstep);
 
   /// Deploys the tasks to the appropriate vRMs, by calling recursively the pSwitch::deploy method
@@ -296,7 +305,7 @@ class broker
   /// Calculates the de-assessment functions
   double dassessfuncs(const double& dNu, const double& dNmem, const int& choice, const int& type);
 
-  // Updates the state information of the cell, by calling recursively the pRouter::updateStateInfo method
+  /// Updates the state information of the cell, by calling recursively the pRouter::updateStateInfo method
   void updateStateInfo(netw* network, const double& tstep);
 
   /// Deploys the tasks to the appropriate vRMs, by calling recursively the pRouter::deploy method

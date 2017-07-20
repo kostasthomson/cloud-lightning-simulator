@@ -90,8 +90,9 @@ pRouter::pRouter(const pRouter &t)
 		numOfFuncs=t.gnumOfFuncs();
 		pollIntervalpRouter=t.gpollIntervalpRouter();
 		pSwitches=new list<pSwitch*>[1];
-		for(list<pSwitch*>::iterator it = t.gpSwitches()->begin(); it != t.gpSwitches()->end(); it++)
+		for(list<pSwitch*>::iterator it = t.gpSwitches()->begin(); it != t.gpSwitches()->end(); it++) {
 			pSwitches->push_back(*it);
+		}
 		Ws=new double[numOfFuncs];
 		Fs=new double[numOfFuncs];
 		for(i=0;i<numOfFuncs;i++)
@@ -122,8 +123,9 @@ pRouter::pRouter(const pRouter &t)
 		}
 		SI=t.gSI();
 		sPMSA=new double[8];
-		for(i=0;i<8;i++)
+		for(i=0;i<8;i++) {
 			sPMSA[i]=t.gsPMSA()[i];
+		}
 		C=t.gC();
 		P=t.gP();
 		Pi=t.gPi();
@@ -320,19 +322,26 @@ void pRouter::deploy(resource **resources, netw *network, stat* stats, task * t)
 		int omp_thr=atoi(getenv("OMP_NUM_THREADS"));
 		int i,tid;
 		int choice=-1,*choices;
+
 		list<pSwitch*>::iterator itf;
 		choices=new int[omp_thr];
 		maxSIs=new double[omp_thr];
+
+		// Initialize the choices and maxSIs arrays
 		for(i=0;i<omp_thr;i++)
 		{
 			choices[i]=-1;
 			maxSIs[i]=0.0;
 		}
+
+		// The total requested units = number of task VMs * task units
 		double reqProc=L_numOfVMs*L_reqPMNS[0];
 		double reqMem=L_numOfVMs*L_reqPMNS[1];
 		double reqSto=L_numOfVMs*L_reqPMNS[3];
 		int reqAcc=L_numOfVMs*L_avAcc;
 
+		// Partition the list of pSwithces per thread. Then, for every pSwitch, determine their maximum SI. Set the
+		// index number of the switch with the maximum SI in the array choices[thread_number]
 		#pragma omp parallel default(shared) private(i,tid) num_threads(omp_thr)
 		{
 			tid=omp_get_thread_num();
@@ -349,6 +358,8 @@ void pRouter::deploy(resource **resources, netw *network, stat* stats, task * t)
 
 		choice=choices[0];
 		maxSI=maxSIs[0];
+
+		// From the list of pSwitches with the maximum SI per thread, selected the highest for the task deployment
 		for(i=1;i<omp_thr;i++)
 		{
 			if(maxSI<maxSIs[i])
@@ -359,14 +370,21 @@ void pRouter::deploy(resource **resources, netw *network, stat* stats, task * t)
 		}
 		delete[] choices;
 		delete[] maxSIs;
+
+		// If no suitable pSwitch was found, reject the task
 		if (choice==-1)
 		{
 			stats[t->gavailImpl()[0]].rejTasks++;
 			return;
 		}
+
+		// Set the pSwitch iterator to the position of the selected pSwitch
 		itf=pSwitches->begin();
-		for(i=0;i<choice;i++)
+		for(i=0;i<choice;i++) {
 			itf++;
+		}
+
+		// Reduce the task's units from the list of available units
 		availProc[choice]-=reqProc;
 		availMem[choice]-=reqMem;
 		availSto[choice]-=reqSto;
@@ -376,29 +394,37 @@ void pRouter::deploy(resource **resources, netw *network, stat* stats, task * t)
 		sPMSA[4]-=reqSto;
 		sPMSA[6]-=(double)reqAcc;
 
-		if (reqAcc>0)
+		// Re-compute the assessment functions
+		if (reqAcc>0) {
 			for(i=0;i<4;i++)
 			{
 				ssum+=Ws[i]*dassessfuncs(-(double)reqAcc,sPMSA[7],-reqMem,sPMSA[3],i);
 			}
-		else
+		}
+		else {
 			for(i=0;i<4;i++)
 			{
 				ssum+=Ws[i]*dassessfuncs(-reqProc,sPMSA[1],-reqMem,sPMSA[3],i);
 			}
+		}
 		SI+=ssum;
 		ssum=0.0;
-		if (sPMSA[7]>0)
+		if (sPMSA[7]>0) {
 			for(i=0;i<4;i++)
 			{
 				ssum+=Ws[i]*dassessfuncs(-(double)reqAcc,(double)totAcc[choice],-reqMem,totMem[choice],i);
 			}
-		else
+		}
+		else {
 			for(i=0;i<4;i++)
 			{
 				ssum+=Ws[i]*dassessfuncs(-reqProc,totProc[choice],-reqMem,totMem[choice],i);
 			}
+		}
+		// Re-compute the suitability index
 		SIs[choice]+=ssum;
+
+		// Call the pSwitch::deploy method recursively
 		(*itf)->deploy(resources,network,stats,t);
 	}
 }
@@ -408,11 +434,13 @@ void pRouter::updateStateInfo(const double &tstep)
 	int i;
 	if(alloc)
 	{
+		// On every time interval
 		if(((int)tstep%(int)pollIntervalpRouter)==0)
 		{
 			int len=(int)pSwitches->size();
-			for(i=0;i<8;i++)
+			for(i=0;i<8;i++) {
 				sPMSA[i]=0.0;
+			}
 			i=0;
 			for(list<pSwitch*>::iterator it=pSwitches->begin(); it!=pSwitches->end();it++)
 			{
@@ -446,14 +474,9 @@ void pRouter::updateStateInfo(const double &tstep)
 }
 
 
-//--------------------------
-// Derivatives used
-// for Taylor expansions
-// (principal linear part)
-//--------------------------
+// Derivatives used for Taylor expansions (principal linear part)
 double pRouter::dassessfuncs(const double &dNu,const double &totNu, const double &dNmem, const double &totMem,const int &choice)
 {
-
 	switch (choice)
 	{
 		case 0:
@@ -595,9 +618,6 @@ void pRouter::print() const
 	}
 }
 
-//---------------------------------
-//---- pSwitch --------------------
-//---------------------------------
 pSwitch::pSwitch()
 {
 	alloc=0;
@@ -632,8 +652,9 @@ pSwitch::pSwitch(const int &start, const int &end, const int &type, list<vRM> **
 	pollIntervalpSwitch=L_pollIntervalpSwitch;
 	list<vRM>::iterator it = LvRMs[type]->begin();
 	vRMs=new list<vRM*>[1];
-	for(i=0;i<start;i++)
+	for(i=0;i<start;i++) {
 		it++;
+	}
 	for(i=start;i<end;i++)
 	{
 		vRMs->push_back(&(*it));
@@ -670,8 +691,9 @@ pSwitch::pSwitch(const int &start, const int &end, const int &type, list<vRM> **
 	}
 	SI=0.0;
 	sPMSA=new double[8];
-	for(i=0;i<8;i++)
+	for(i=0;i<8;i++) {
 		sPMSA[i]=0.0;
+	}
 	C=L_C;
 	P=L_P;
 	Pi=L_Pi;
@@ -722,8 +744,9 @@ pSwitch::pSwitch(const pSwitch &t)
 		}
 		SI=t.gSI();
 		sPMSA=new double[8];
-		for(i=0;i<8;i++)
+		for(i=0;i<8;i++) {
 			sPMSA[i]=t.gsPMSA()[i];
+		}
 		C=t.gC();
 		P=t.gP();
 		Pi=t.gPi();
@@ -733,8 +756,8 @@ pSwitch::pSwitch(const pSwitch &t)
 pSwitch & pSwitch::operator=(const pSwitch & t)
 {
 	int i;
-    	if (this!=&t)
-    	{
+    if (this!=&t)
+    {
 		if (alloc)
 		{
 			alloc=0;
@@ -780,8 +803,9 @@ pSwitch & pSwitch::operator=(const pSwitch & t)
 			numOfFuncs=t.gnumOfFuncs();
 			pollIntervalpSwitch=t.gpollIntervalpSwitch();
 			vRMs=new list<vRM*>[1];
-			for(list<vRM*>::iterator it = t.gvRMs()->begin(); it != t.gvRMs()->end(); it++)
+			for(list<vRM*>::iterator it = t.gvRMs()->begin(); it != t.gvRMs()->end(); it++) {
 				vRMs->push_back(*it);
+			}
 			Ws=new double[numOfFuncs];
 			Fs=new double[numOfFuncs];
 			for(i=0;i<numOfFuncs;i++)
@@ -813,8 +837,9 @@ pSwitch & pSwitch::operator=(const pSwitch & t)
 			}
 			SI=t.gSI();
 			sPMSA=new double[8];
-			for(i=0;i<8;i++)
+			for(i=0;i<8;i++) {
 				sPMSA[i]=t.gsPMSA()[i];
+			}
 			C=t.gC();
 			P=t.gP();
 			Pi=t.gPi();
@@ -903,10 +928,12 @@ void pSwitch::updateStateInfo(const double &tstep)
 	int i;
 	if(alloc)
 	{
+		// On every time interval
 		if(((int)tstep%(int)pollIntervalpSwitch)==0)
 		{
-			for(i=0;i<8;i++)
+			for(i=0;i<8;i++) {
 				sPMSA[i]=0.0;
+			}
 			i=0;
 			for(list<vRM*>::iterator it=vRMs->begin(); it!=vRMs->end();it++)
 			{
@@ -962,12 +989,12 @@ double pSwitch::dassessfuncs(const double &dNu,const double &totNu, const double
 
 int pSwitch::probe(const double &Proc, const double &Mem, const double &Sto, const int &Acc)
 {
-	int res=-1;
-	if (Proc<=sPMSA[0] && Mem<=sPMSA[2] && Sto<=sPMSA[4] && Acc<=(int)sPMSA[6])
-	{
-		res=1;
+	if (Proc<=sPMSA[0] && Mem<=sPMSA[2] && Sto<=sPMSA[4] && Acc<=(int)sPMSA[6]) {
+		return 1;
 	}
-	return res;
+	else {
+		return -1;
+	}
 }
 
 void pSwitch::deploy(resource **resources, netw *network, stat* stats, task * t)
@@ -984,16 +1011,22 @@ void pSwitch::deploy(resource **resources, netw *network, stat* stats, task * t)
 		list<vRM*>::iterator itt=vRMs->begin(),itf,itff;
 		choices=new int[omp_thr];
 		maxSIs=new double[omp_thr];
+
+		// Initialize the choices and maxSIs arrays
 		for(i=0;i<omp_thr;i++)
 		{
 			choices[i]=-1;
 			maxSIs[i]=0.0;
 		}
+
+		// The total requested units = number of task VMs * task units
 		double reqProc=L_numOfVMs*L_reqPMNS[0];
 		double reqMem=L_numOfVMs*L_reqPMNS[1];
 		double reqSto=L_numOfVMs*L_reqPMNS[3];
 		int reqAcc=L_numOfVMs*L_avAcc;
 
+		// Partition the list of vRMs per thread. Then, for every vRM, determine their maximum SI. Set the
+        // index number of the vRM with the maximum SI in the array choices[thread_number]
 		#pragma omp parallel default(shared) private(i,tid) num_threads(omp_thr)
 		{
 			tid=omp_get_thread_num();
@@ -1009,6 +1042,8 @@ void pSwitch::deploy(resource **resources, netw *network, stat* stats, task * t)
 
 		choice=choices[0];
 		maxSI=maxSIs[0];
+
+		// From the list of vRMs with the maximum SI per thread, selected the highest for the task deployment
 		for(i=1;i<omp_thr;i++)
 		{
 			if(maxSI<maxSIs[i])
@@ -1018,11 +1053,12 @@ void pSwitch::deploy(resource **resources, netw *network, stat* stats, task * t)
 			}
 		}
 
-
-		//---------------------------------
-		// Self-Organization
-		//---------------------------------
-
+		// If no suitable vRM was found, begin Self-Organization and reorganize resources
+		// First step, locate the vRM with the highest suitability index (lets call this chosenvRM)
+		// Then, move resources from vRMs 0 - (chosenvRM - 1) to chosenvRM
+		// If there are still additional resources needed to satisfy the task, move them from vRMs
+		// (chosenvRM + 1) - numOfvRMs to chosenvRM
+		// If there are still additional resources needed, reject the task
 		if (choice==-1)
 		{
 			for(i=0;i<omp_thr;i++)
@@ -1030,6 +1066,7 @@ void pSwitch::deploy(resource **resources, netw *network, stat* stats, task * t)
 				choices[i]=-1;
 				maxSIs[i]=0.0;
 			}
+			//First, find a suitable vRM even if it does not satisfy all the task's requested units
 			#pragma omp parallel default(shared) private(i,tid) num_threads(omp_thr)
 			{
 				tid=omp_get_thread_num();
@@ -1052,30 +1089,41 @@ void pSwitch::deploy(resource **resources, netw *network, stat* stats, task * t)
 					choice=choices[i];
 				}
 			}
+
+			// Reduce the task's units from the list of available units
 			double remProc=reqProc-availProc[choice];
 			double remMem=reqMem-availMem[choice];
 			double remSto=reqSto-availSto[choice];
 			double remAcc=(double)reqAcc-availAcc[choice];
+
+			// The pores list contains the resources of all vRMs needed to satisfy the task's requirments
 			list<resource*> ores;
+
+			// The ores list contains the resources of the current vRM
 			list<resource*> pores;
+
 			itt=vRMs->begin();
 			for(i=0;i<choice;i++)
 			{
+				// Obtain the list of resources belonging to every vRM, until all the task's requested resources are satisfied
 				(*itt)->obtainresources(pores,remProc,remMem,remSto,remAcc);
+
+				// If the vRM has at least one resource, recalculate its suitability index
 				if(pores.size()>0)
 				{
-
 					ssum=0.0;
-					if (sPMSA[7]>0)
+					if (sPMSA[7]>0) {
 						for(j=0;j<4;j++)
 						{
 							ssum+=Ws[j]*dassessfuncs(-((double)pores.size())*((double)(*pores.begin())->gtotAcc()),(double)totAcc[i],-((double)pores.size())*((*pores.begin())->gtotalMem()),totMem[i],j);
 						}
-					else
+					}
+					else {
 						for(j=0;j<4;j++)
 						{
 							ssum+=Ws[j]*dassessfuncs(-((double)pores.size())*((*pores.begin())->gtotalProc()),totProc[i],-((double)pores.size())*((*pores.begin())->gtotalMem()),totMem[i],j);
 						}
+					}
 					totProc[i]-=((double)pores.size())*((*pores.begin())->gtotalProc());
 					totMem[i]-=((double)pores.size())*((*pores.begin())->gtotalMem());
 					totSto[i]-=((double)pores.size())*((*pores.begin())->gtotalSto());
@@ -1085,18 +1133,31 @@ void pSwitch::deploy(resource **resources, netw *network, stat* stats, task * t)
 					availSto[i]-=((double)pores.size())*((*pores.begin())->gtotalSto());
 					availAcc[i]-=((double)pores.size())*((double)(*pores.begin())->gtotAcc());
 					SIs[i]+=ssum;
+
+					// At the end of the ores list, add the pores list
 					ores.splice(ores.end(),pores);
 				}
-				if(remProc<=0.0 && remMem<=0.0 && remSto<=0.0 && remAcc<=0.0)
+				// If all remaining units are below 0, break the vRM loop
+				if(remProc<=0.0 && remMem<=0.0 && remSto<=0.0 && remAcc<=0.0) {
 					break;
+				}
+				// Move to the next vRM
 				itt++;
 			}
+			// Save the last vRM needed to satisfy the task's unit requirements to itff
 			itff=itt;
+
+			// Go to the next vRM
 			itt++;
+
+			// If there are still some of the task's requirements unsatisfied but we are already at the vRM with the
+			// highest suitability index
 			if (!(remProc<=0.0 && remMem<=0.0 && remSto<=0.0 && remAcc<=0.0))
 			{
+				// Iterate the list of the remaining vRMs until the last
 				for(i=choice+1;i<numOfvRMs;i++)
 				{
+					// Obtain the list of resources belonging to every vRM, until all the task's requested resources are satisfied
 					(*itt)->obtainresources(pores,remProc,remMem,remSto,remAcc);
 					if(pores.size()>0)
 					{
@@ -1121,17 +1182,23 @@ void pSwitch::deploy(resource **resources, netw *network, stat* stats, task * t)
 						availSto[i]-=((double)pores.size())*((*pores.begin())->gtotalSto());
 						availAcc[i]-=((double)pores.size())*((double)(*pores.begin())->gtotAcc());
 						SIs[i]+=ssum;
+						// At the end of the ores list, add the pores list
 						ores.splice(ores.end(),pores);
 					}
-					if(remProc<=0.0 && remMem<=0.0 && remSto<=0.0 && remAcc<=0.0)
+					if(remProc<=0.0 && remMem<=0.0 && remSto<=0.0 && remAcc<=0.0) {
 						break;
+					}
 
 					itt++;
 				}
 			}
+			// If there was a number of resources obtained that satisfy the task's unit requirements
 			if (ores.size()>0)
 			{
+				// Add these resources to the last vRM needed to satisfy the task's unit requirements
 				(*itff)->attachresources(ores);
+
+				// And then recalculate that vRMs assessment functions and suitability index
 				totProc[choice]-=((double)ores.size())*((*ores.begin())->gtotalProc());
 				totMem[choice]-=((double)ores.size())*((*ores.begin())->gtotalMem());
 				totSto[choice]-=((double)ores.size())*((*ores.begin())->gtotalSto());
@@ -1155,25 +1222,27 @@ void pSwitch::deploy(resource **resources, netw *network, stat* stats, task * t)
 				SIs[choice]+=ssum;
 				ores.clear();
 			}
-			else
+			else {
 				choice=-1;
+			}
 
 		}
 		delete[] choices;
 		delete[] maxSIs;
 
-		//----------------------------
-		//Self - Organization end
-		//----------------------------
-
+		// If after SOSM there is still no suitable vRM found, reject the task
 		if (choice==-1)
 		{
 			stats[t->gavailImpl()[0]].rejTasks++;
 			return;
 		}
+
+		// Compute again the assessment functions and suitability index of the modified vRM
 		itf=vRMs->begin();
-		for(i=0;i<choice;i++)
+		for(i=0;i<choice;i++) {
 			itf++;
+		}
+
 		availProc[choice]-=reqProc;
 		availMem[choice]-=reqMem;
 		availSto[choice]-=reqSto;
@@ -1182,16 +1251,19 @@ void pSwitch::deploy(resource **resources, netw *network, stat* stats, task * t)
 		sPMSA[2]-=reqMem;
 		sPMSA[4]-=reqSto;
 		sPMSA[6]-=(double)reqAcc;
-		if (sPMSA[7]>0)
+
+		if (sPMSA[7]>0) {
 			for(i=0;i<4;i++)
 			{
 				ssum+=Ws[i]*dassessfuncs(-reqAcc,sPMSA[7],-reqMem,sPMSA[3],i);
 			}
-		else
+		}
+		else {
 			for(i=0;i<4;i++)
 			{
 				ssum+=Ws[i]*dassessfuncs(-reqProc,sPMSA[1],-reqMem,sPMSA[3],i);
 			}
+		}
 		SI+=ssum;
 		ssum=0.0;
 		if (sPMSA[7]>0)
@@ -1199,13 +1271,15 @@ void pSwitch::deploy(resource **resources, netw *network, stat* stats, task * t)
 			{
 				ssum+=Ws[i]*dassessfuncs(-(double)reqAcc,(double)totAcc[choice],-reqMem,totMem[choice],i);
 			}
-		else
+		else {
 			for(i=0;i<4;i++)
 			{
 				ssum+=Ws[i]*dassessfuncs(-reqProc,totProc[choice],-reqMem,totMem[choice],i);
 			}
+		}
 		SIs[choice]+=ssum;
 
+		// Recursively call the vRM::deploy method of the selected vRM
 		(*itf)->deploy(resources,network,stats,t);
 
 	}
@@ -1316,17 +1390,13 @@ double pSwitch::gPi() const
 	return Pi;
 }
 
-
-//---------------------------------
-//-------- vRM --------------------
-//---------------------------------
-
 void vRM::print()
 {
 	if(alloc)
 	{
-		for(list<resource*>::iterator it = res->begin(); it != res->end(); it++)
+		for(list<resource*>::iterator it = res->begin(); it != res->end(); it++) {
 			(*it)->print();
+		}
 
 	}
 }
@@ -1384,8 +1454,9 @@ vRM::vRM(const int &start,const int &end,const int &type,resource** resources, c
 	availSto=new double[numOfRes];
 	totSto=new double[numOfRes];
 	sPMSA=new double[8];
-	for(i=0;i<8;i++)
+	for(i=0;i<8;i++) {
 		sPMSA[i]=0.0;
+	}
 	Fs=new double[numOfFuncs];
 	Ws=new double[numOfFuncs];
 	for(i=0;i<numOfFuncs;i++)
@@ -1414,10 +1485,12 @@ vRM::vRM(const vRM &t)
 		pollIntervalvRM=t.gpollIntervalvRM();
 		queue=new list<task>[1];
 		res=new list<resource*>[1];
-		for(list<task>::iterator it = t.gqueue()->begin(); it != t.gqueue()->end(); it++)
+		for(list<task>::iterator it = t.gqueue()->begin(); it != t.gqueue()->end(); it++) {
 			queue->push_back(*it);
-		for(list<resource*>::iterator it = t.gres()->begin(); it != t.gres()->end(); it++)
+		}
+		for(list<resource*>::iterator it = t.gres()->begin(); it != t.gres()->end(); it++) {
 			res->push_back(*it);
+		}
 		availProc=new double[numOfRes];
 		totProc=new double[numOfRes];
 		availMem=new double[numOfRes];
@@ -1438,8 +1511,9 @@ vRM::vRM(const vRM &t)
 			totAcc[i]=t.gtotAcc()[i];
 		}
 		sPMSA=new double[8];
-		for(i=0;i<8;i++)
+		for(i=0;i<8;i++) {
 			sPMSA[i]=t.gsPMSA()[i];
+		}
 		Fs=new double[numOfFuncs];
 		Ws=new double[numOfFuncs];
 		for(i=0;i<numOfFuncs;i++)
@@ -1510,11 +1584,13 @@ vRM & vRM::operator=(const vRM & t)
 			pollIntervalvRM=t.gpollIntervalvRM();
 			queue=new list<task>[1];
 			res=new list<resource*>[1];
-			for(list<task>::iterator it = t.gqueue()->begin(); it != t.gqueue()->end(); it++)
+			for(list<task>::iterator it = t.gqueue()->begin(); it != t.gqueue()->end(); it++) {
 				queue->push_back(*it);
+			}
 		//	queue[0]=t.gqueue()[0];
-			for(list<resource*>::iterator it = t.gres()->begin(); it != t.gres()->end(); it++)
+			for(list<resource*>::iterator it = t.gres()->begin(); it != t.gres()->end(); it++) {
 				res->push_back(*it);
+			}
 		//	res[0]=t.gres()[0];
 			availProc=new double[numOfRes];
 			totProc=new double[numOfRes];
@@ -1536,8 +1612,9 @@ vRM & vRM::operator=(const vRM & t)
 				totAcc[i]=t.gtotAcc()[i];
 			}
 			sPMSA=new double[8];
-			for(i=0;i<8;i++)
+			for(i=0;i<8;i++) {
 				sPMSA[i]=t.gsPMSA()[i];
+			}
 			Fs=new double[numOfFuncs];
 			Ws=new double[numOfFuncs];
 			for(i=0;i<numOfFuncs;i++)
@@ -1601,12 +1678,14 @@ void vRM::obtainresources(list<resource*> &ores, double &remProc, double &remMem
 {
 	if (alloc)
 	{
-		if (remProc<=0.0 && remMem<=0.0 && remSto<=0.0 && remAcc<=0)
+		if (remProc<=0.0 && remMem<=0.0 && remSto<=0.0 && remAcc<=0) {
 			return;
+		}
 		list <resource*>::iterator it=res->begin();
 		int i=0;
 		while (it!=res->end())
 		{
+			// If the resource is allowed to be movable to a different vRM
 			if((*it)->gmovable()==1)
 			{
 				ores.push_back(*it);
@@ -1685,8 +1764,9 @@ void vRM::obtainresources(list<resource*> &ores, double &remProc, double &remMem
 				computeFs();
 				computeSI();
 				it=res->erase(it);
-				if (remProc<=0.0 && remMem<=0.0 && remSto<=0.0 && remAcc<=0)
+				if (remProc<=0.0 && remMem<=0.0 && remSto<=0.0 && remAcc<=0) {
 					break;
+				}
 			}
 			else
 			{
@@ -1776,6 +1856,8 @@ void vRM::attachresources(list<resource*> &ores)
 		totAcc2=NULL;
 		availSto2=NULL;
 		totSto2=NULL;
+
+		// After the resources were attached to the vRM, re-compute the assessment functions and the suitability index
 		computeFs();
 		computeSI();
 
@@ -2065,6 +2147,7 @@ int vRM::deploy_strategy(list<resource*>::iterator *it, int *IDs, const int &nVM
 		list<resource*>::iterator itt;
 		switch (dep_strategy)
 		{
+			// Task compaction strategy
 			case 1:
 				for(i=0;i<nVMs;i++)
 				{
@@ -2113,8 +2196,8 @@ int vRM::deploy_strategy(list<resource*>::iterator *it, int *IDs, const int &nVM
 				}
 				return (1);
 
+			// Isotropy preservation strategy
 			case 2:
-
 				rem=nVMs;
 				j=0;i=0;
 				while (rem!=0 && i<nVMs)
@@ -2163,7 +2246,6 @@ int vRM::deploy_strategy(list<resource*>::iterator *it, int *IDs, const int &nVM
 		}
 	}
 	return (0);
-
 }
 
 void vRM::deploy(resource **resources, netw *network, stat* stats, task * t)
@@ -2180,8 +2262,10 @@ void vRM::deploy(resource **resources, netw *network, stat* stats, task * t)
 		int *IDs;
 		list<resource*>::iterator *it,itt;
 
-
+		// Check if the task's processes, memory, storage and accelerator are less or equal than the vRM's
 		L_ID=network[0].probe(L_reqPMNS[2]);
+
+		// If not, reject the task
 		if (L_ID==-1)
 		{
 			stats[type].rejTasks++;
@@ -2194,24 +2278,37 @@ void vRM::deploy(resource **resources, netw *network, stat* stats, task * t)
 			IDs[i]=-1;
 		}
 
-
+		// Position L_numOfVMs VMs on the vRM resources
 		L_ID=deploy_strategy(it, IDs, L_numOfVMs, L_reqPMNS[0], L_reqPMNS[1], L_reqPMNS[3], L_avAcc);
+
+		// If the VMs could not be positioned, reject the task
 		if(L_ID==-1)
 		{
 			stats[type].rejTasks++;
 		}
 		else
 		{
+			// Deploy task on a resource
+			// Set the ID of each VM as equal to the ID of the resource (match VMs to the appropriate resources)
 			for(i=0;i<L_numOfVMs;i++)
 			{
 				(*it[i])->deploy(t);
 				IDs[i]=(*it[i])->gID();
 			}
 
+			// Deploy task on network
 			network[0].deploy(t);
+
+			// Add the resources-VMs couples to the task
 			t->attachResources(IDs);
+
+			// Add the task to the list of tasks of the vRM
 			enque(t);
+
+			// Increase the number of active tasks of the vRM
 			stats[type].accTasks++;
+
+			// Update the assessment functions and the suitability index of the vRM
 			sPMSA[0]-=L_numOfVMs*L_reqPMNS[0];
 			sPMSA[2]-=L_numOfVMs*L_reqPMNS[1];
 			sPMSA[4]-=L_numOfVMs*L_reqPMNS[3];
@@ -2226,15 +2323,13 @@ void vRM::deploy(resource **resources, netw *network, stat* stats, task * t)
 
 		delete[] IDs;
 		delete[] it;
-
 	}
 }
 
 int vRM::probe(const double &Proc, const double &Mem, const double &Sto, const int &Acc)
 {
 	int rs=-1;
-	if (Proc<=sPMSA[0] && Mem<=sPMSA[2] && Sto<=sPMSA[4] && Acc<=(int)sPMSA[6])
-	{
+	if (Proc<=sPMSA[0] && Mem<=sPMSA[2] && Sto<=sPMSA[4] && Acc<=(int)sPMSA[6]) {
 		rs=1;
 	}
 
@@ -2249,10 +2344,6 @@ void vRM::enque(const task *t)
 	}
 }
 
-
-//---------------------------------
-//-------- broker -----------------
-//---------------------------------
 
 broker::broker()
 {

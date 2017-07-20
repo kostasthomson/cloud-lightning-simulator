@@ -81,8 +81,8 @@ struct powinputs
     powinputs();
     powinputs(const powinputs & t);
     ~powinputs();
-    powinputs & operator=(const powinputs & t);   
-    
+    powinputs & operator=(const powinputs & t);
+
 };
 
 struct resinputs
