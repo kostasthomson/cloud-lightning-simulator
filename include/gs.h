@@ -43,6 +43,8 @@ class gs
   int findCell(const int* rImpl, const int& numImpl, const int& rVM, const double& rvProc, const double& rMem,
                const double& rNet, const double& rSto, const int* rAcc) const;
 
+  std::string num2str(int num);
+
   // Gateways
   int galloc() const;
 

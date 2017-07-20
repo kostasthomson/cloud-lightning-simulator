@@ -1,7 +1,6 @@
 #include <cell.h>
 #include <gs.h>
 #include <inputs.h>
-#include <misc.h>
 #include <netw.h>
 #include <power.h>
 #include <stat.h>
@@ -183,6 +182,13 @@ void gs::printfile(const string& outfile, const ios::openmode& mode)
     si->printfile(outfile, ios::out | ios::app);
     ai->printfile(outfile, ios::out | ios::app);
   }
+}
+
+std::string gs::num2str(int num)
+{
+	stringstream s;
+	s << num;
+	return s.str();
 }
 
 void gs::printStats()
