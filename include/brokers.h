@@ -11,21 +11,21 @@ class vRM
 {
  private:
   int alloc;
-  int numOfRes;
-  int numOfFuncs;
+  int numberOfResources;
+  int numberOfFunctions;
   int optNumOfRes;
   double pollIntervalvRM;
   list<task>* queue;
   list<resource*>* res;
   double *Fs, *Ws;
-  double* availProc;
-  double* totProc;
-  double* availMem;
-  double* totMem;
-  double* availAcc;
-  double* totAcc;
-  double* availSto;
-  double* totSto;
+  double* availableProcessors;
+  double* totalProcessors;
+  double* availableMemory;
+  double* totalMemory;
+  double* availableAccelerators;
+  double* totalAccelerators;
+  double* availableStorage;
+  double* totalStorage;
   double* sPMSA;
   double C, P, Pi;
   double SI;
@@ -37,7 +37,7 @@ class vRM
   ~vRM();
 
   vRM(const int& start, const int& end, const int& type, resource** resources, const double& L_pollIntervalvRM,
-      const double& L_C, const double& L_P, const double& L_Pi, const int& L_optNumOfRes, const int& L_numOfFuncs,
+      const double& L_C, const double& L_P, const double& L_Pi, const int& L_optNumOfRes, const int& L_numberOfFunctions,
       const double* L_Ws, const int& L_dep_strategy);
 
   vRM(const vRM& t);
@@ -67,7 +67,7 @@ class vRM
 
   double assessfuncs(const int& choice);
 
-  double dassessfuncs(const double& dNu, const double& dNmem, const int& choice);
+  double deassessmentFunctions(const double& dNu, const double& dNmem, const int& choice);
 
   /// Returns success if the task's processes, memory, storage and accelerator are less or equal than the vRM's
   int probe(const double& Proc, const double& Mem, const double& Sto, const int& Acc);
@@ -84,19 +84,19 @@ class vRM
   void print();
 
   int galloc() const;
-  int gnumOfRes() const;
+  int getNumberOfResources() const;
   int goptNumOfRes() const;
   double gpollIntervalvRM() const;
   list<task>* gqueue() const;
   list<resource*>* gres() const;
-  double* gavailProc() const;
-  double* gtotProc() const;
-  double* gavailMem() const;
-  double* gtotMem() const;
-  double* gavailAcc() const;
-  double* gtotAcc() const;
-  double* gavailSto() const;
-  double* gtotSto() const;
+  double* getAvailableProcessors() const;
+  double* getTotalProcessors() const;
+  double* getAvailableMemory() const;
+  double* getTotalMemory() const;
+  double* getAvailableAccelerators() const;
+  double* getTotalAccelerators() const;
+  double* getAvailableStorage() const;
+  double* getTotalStorage() const;
   double* gsPMSA() const;
   double* gFs() const;
   double* gWs() const;
@@ -105,27 +105,27 @@ class vRM
   double gPi() const;
   double gSI() const;
   int gdep_strategy() const;
-  int gnumOfFuncs() const;
+  int getNumberOfFunctions() const;
 };
 
 class pSwitch
 {
  private:
   int alloc;
-  int numOfvRMs;
-  int numOfFuncs;
+  int numberOfvRMs;
+  int numberOfFunctions;
   double pollIntervalpSwitch;
   list<vRM*>* vRMs;
   double* Fs;
   double* Ws;
-  double* availProc;
-  double* totProc;
-  double* availMem;
-  double* totMem;
-  double* availAcc;
-  double* totAcc;
-  double* availSto;
-  double* totSto;
+  double* availableProcessors;
+  double* totalProcessors;
+  double* availableMemory;
+  double* totalMemory;
+  double* availableAccelerators;
+  double* totalAccelerators;
+  double* availableStorage;
+  double* totalStorage;
   double* sPMSA;
   double SI, *SIs;
   double C, P, Pi;
@@ -136,7 +136,7 @@ class pSwitch
   ~pSwitch();
 
   pSwitch(const int& start, const int& end, const int& type, list<vRM>** LvRMs, const double& pollIntervalpSwitch,
-          const double& L_C, const double& L_P, const double& L_Pi, const int& L_numOfFuncs, const double* L_Ws);
+          const double& L_C, const double& L_P, const double& L_Pi, const int& L_numberOfFunctions, const double* L_Ws);
 
   pSwitch(const pSwitch& t);
 
@@ -151,7 +151,7 @@ class pSwitch
   /// Updates the state information of the cell, by calling recursively the vRM::updateStateInfo method
   void updateStateInfo(const double& tstep);
 
-  double dassessfuncs(const double& dNu, const double& totNu, const double& dNmem, const double& totMem,
+  double deassessmentFunctions(const double& dNu, const double& totNu, const double& dNmem, const double& totalMemory,
                       const int& choice);
 
   /// Returns success if the task's processes, memory, storage and accelerator are less or equal than the pSwitch's
@@ -161,20 +161,20 @@ class pSwitch
   void deploy(resource** resources, netw* network, stat* stats, task* t);
 
   int galloc() const;
-  int gnumOfvRMs() const;
-  int gnumOfFuncs() const;
+  int getNumberOfvRMs() const;
+  int getNumberOfFunctions() const;
   double* gFs() const;
   double* gWs() const;
   double gpollIntervalpSwitch() const;
-  list<vRM*>* gvRMs() const;
-  double* gavailProc() const;
-  double* gtotProc() const;
-  double* gavailMem() const;
-  double* gtotMem() const;
-  double* gavailAcc() const;
-  double* gtotAcc() const;
-  double* gavailSto() const;
-  double* gtotSto() const;
+  list<vRM*>* getvRMs() const;
+  double* getAvailableProcessors() const;
+  double* getTotalProcessors() const;
+  double* getAvailableMemory() const;
+  double* getTotalMemory() const;
+  double* getAvailableAccelerators() const;
+  double* getTotalAccelerators() const;
+  double* getAvailableStorage() const;
+  double* getTotalStorage() const;
   double* gsPMSA() const;
   double gSI() const;
   double* gSIs() const;
@@ -187,20 +187,20 @@ class pRouter
 {
  private:
   int alloc;
-  int numOfpSwitches;
-  int numOfFuncs;
+  int numberOfpSwitches;
+  int numberOfFunctions;
   double pollIntervalpRouter;
   list<pSwitch*>* pSwitches;
   double* Fs;
   double* Ws;
-  double* availProc;
-  double* totProc;
-  double* availMem;
-  double* totMem;
-  double* availAcc;
-  double* totAcc;
-  double* availSto;
-  double* totSto;
+  double* availableProcessors;
+  double* totalProcessors;
+  double* availableMemory;
+  double* totalMemory;
+  double* availableAccelerators;
+  double* totalAccelerators;
+  double* availableStorage;
+  double* totalStorage;
   double* sPMSA;
   double SI, *SIs;
   double C, P, Pi;
@@ -212,7 +212,7 @@ class pRouter
 
   pRouter(const int& start, const int& end, const int& type, list<pSwitch>** LpSwitches,
           const double& pollIntervalpRouter, const double& L_C, const double& L_P, const double& L_Pi,
-          const int& L_numOfFuncs, const double* L_Ws);
+          const int& L_numberOfFunctions, const double* L_Ws);
 
   pRouter(const pRouter& t);
 
@@ -224,7 +224,7 @@ class pRouter
   /// Deploys the tasks to the appropriate vRMs, by calling recursively the pSwitch::deploy method
   void deploy(resource** resources, netw* network, stat* stats, task* t);
 
-  double dassessfuncs(const double& dNu, const double& totNu, const double& dNmem, const double& totMem,
+  double deassessmentFunctions(const double& dNu, const double& totNu, const double& dNmem, const double& totalMemory,
                       const int& choice);
 
   /// Returns success if the task's processes, memory, storage and accelerator are less or equal than the pRouter's
@@ -239,20 +239,20 @@ class pRouter
   void print() const;
 
   int galloc() const;
-  int gnumOfpSwitches() const;
-  int gnumOfFuncs() const;
+  int gnumberOfpSwitches() const;
+  int getNumberOfFunctions() const;
   double gpollIntervalpRouter() const;
   list<pSwitch*>* gpSwitches() const;
   double* gFs() const;
   double* gWs() const;
-  double* gavailProc() const;
-  double* gtotProc() const;
-  double* gavailMem() const;
-  double* gtotMem() const;
-  double* gavailAcc() const;
-  double* gtotAcc() const;
-  double* gavailSto() const;
-  double* gtotSto() const;
+  double* getAvailableProcessors() const;
+  double* getTotalProcessors() const;
+  double* getAvailableMemory() const;
+  double* getTotalMemory() const;
+  double* getAvailableAccelerators() const;
+  double* getTotalAccelerators() const;
+  double* getAvailableStorage() const;
+  double* getTotalStorage() const;
   double* gsPMSA() const;
   double gSI() const;
   double* gSIs() const;
@@ -265,12 +265,12 @@ class broker
 {
  private:
   int alloc;
-  int numOfTypes;
+  int numberOfTypes;
   int* types;
-  int* numOfResourcesPerType;
-  int numOfvRMs;
-  int numOfpSwitches;
-  int numOfpRouters;
+  int* numberOfResourcesPerType;
+  int numberOfvRMs;
+  int numberOfpSwitches;
+  int numberOfpRouters;
   double pollIntervalCellM;
   double pollIntervalpRouter;
   double pollIntervalpSwitch;
@@ -279,8 +279,8 @@ class broker
   double* SIs;
   double *Cs, *Ps, *Pis;
   double* Ws;
-  int numOfFuncs;
-  double availNetw, totNetw;
+  int numberOfFunctions;
+  double availableNetwork, totalNetwork;
   list<vRM>** vRMs;
   list<pSwitch>** pSwitches;
   list<pRouter>** pRouters;
@@ -288,10 +288,10 @@ class broker
  public:
   broker();
 
-  void initbroker(const int& L_numOfTypes, const int* L_types, const int* L_numOfResourcesPerType, resource** resources,
+  void initBroker(const int& L_numberOfTypes, const int* L_types, const int* L_numberOfResourcesPerType, resource** resources,
                   power* powerComp, netw* network, const brinputs& binp);
 
-  /*broker(const int& L_numOfTypes, const int* L_types, const int* L_numOfResourcesPerType, resource** resources,
+  /*broker(const int& L_numberOfTypes, const int* L_types, const int* L_numberOfResourcesPerType, resource** resources,
          power* powerComp, netw* network, const brinputs& binp);*/
 
   broker(const broker& t);
@@ -303,7 +303,7 @@ class broker
   void print() const;
 
   /// Calculates the de-assessment functions
-  double dassessfuncs(const double& dNu, const double& dNmem, const int& choice, const int& type);
+  double deassessmentFunctions(const double& dNu, const double& dNmem, const int& choice, const int& type);
 
   /// Updates the state information of the cell, by calling recursively the pRouter::updateStateInfo method
   void updateStateInfo(netw* network, const double& tstep);
@@ -315,32 +315,32 @@ class broker
   void timestep(resource** resources, netw* network, stat* stats, power* powerComp);
 
   int galloc() const;
-  int gnumOfTypes() const;
-  int* gtypes() const;
-  int* gnumOfResourcesPerType() const;
-  int gnumOfvRMs() const;
-  int gnumOfpSwitches() const;
-  int gnumOfpRouters() const;
+  int getNumberOfTypes() const;
+  int* getTypes() const;
+  int* getNumberOfResourcesPerType() const;
+  int getNumberOfvRMs() const;
+  int gnumberOfpSwitches() const;
+  int gnumberOfpRouters() const;
   double gpollIntervalCellM() const;
   double gpollIntervalpRouter() const;
   double gpollIntervalpSwitch() const;
   double gpollIntervalvRM() const;
   double** gsPMSA() const;
   double* gSIs() const;
-  double gavailNetw() const;
-  double gtotNetw() const;
+  double getAvailableNetwork() const;
+  double getTotalNetworkork() const;
   double* gCs() const;
   double* gPs() const;
   double* gPis() const;
   double* gWs() const;
-  int gnumOfFuncs() const;
+  int getNumberOfFunctions() const;
 
-  list<vRM>** gvRMs() const;
+  list<vRM>** getvRMs() const;
   list<pSwitch>** gpSwitches() const;
   list<pRouter>** gpRouters() const;
 };
 
-class brokerNOsosm
+class traditionalBroker
 {
   private:
     int alloc;
@@ -360,11 +360,11 @@ class brokerNOsosm
     double totNetw;
     list<task> *queue;
   public:
-    brokerNOsosm();
-    brokerNOsosm(const int &L_numOfTypes, const int *L_types, const int *L_numOfResourcesPerType, const double & L_pollInterval);
-    brokerNOsosm(const brokerNOsosm &t);
-    brokerNOsosm & operator=(const brokerNOsosm & t);
-    ~brokerNOsosm();
+    traditionalBroker();
+    traditionalBroker(const int &L_numOfTypes, const int *L_types, const int *L_numOfResourcesPerType, const double & L_pollInterval);
+    traditionalBroker(const traditionalBroker &t);
+    traditionalBroker & operator=(const traditionalBroker & t);
+    ~traditionalBroker();
 
     int galloc() const;
     int gnumOfTypes() const;

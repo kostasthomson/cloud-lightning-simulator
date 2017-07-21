@@ -6,133 +6,124 @@
 #include <list>
 #define MY_MIN(a, b) ((a) <= (b) ? (a) : (b))
 #define MY_MAX(a, b) ((a) >= (b) ? (a) : (b))
-using namespace std;
+
+using std::cout;
+using std::endl;
 
 resource::resource()
+  : alloc(0),
+    active(0),
+    movable(0),
+    type(-1),
+    ID(-1),
+    totalProcessors(0.0),
+    availableProcessors(0.0),
+    utilizedProcessors(0.0),
+    totalMemory(0.0),
+    availableMemory(0.0),
+    utilizedMemory(0.0),
+    totalStorage(0.0),
+    availableStorage(0.0),
+    utilizedStorage(0.0),
+    physicalProcessors(0.0),
+    physicalMemory(0.0),
+    physicalStorage(0.0),
+    computeCapability(0.0),
+    accelerator(0),
+    totalAccelerators(0),
+    availableAccelerators(0),
+    utilizedAccelerators(0),
+    acceleratorComputeCapability(0.0),
+    overcommitmentProcessors(1.0),
+    overcommitmentMemory(1.0),
+    actualUtilizedProcessors(0.0),
+    actualUtilizedMemory(0.0),
+    actualRhoAccelerators(0.0),
+    numberOfTasks(0),
+    currentCompCapPerProc(0.0),
+    currentCompCapPerAcc(0.0)
 {
-  alloc = 0;
-  active = 0;
-  movable = 0;
-  type = -1;
-  ID = -1;
-
-  totalProc = 0.0;
-  availProc = 0.0;
-  utilProc = 0.0;
-
-  totalMem = 0.0;
-  availMem = 0.0;
-  utilMem = 0.0;
-
-  totalSto = 0.0;
-  availSto = 0.0;
-  utilSto = 0.0;
-
-  physProc = 0.0;
-  physMem = 0.0;
-  physSto = 0.0;
-
-  compCap = 0.0;
-
-  accelerator = 0;
-  totAcc = 0;
-  availAcc = 0;
-  utilAcc = 0;
-  accCompCap = 0.0;
-
-  overCommitProc = 1.0;
-  overCommitMem = 1.0;
-
-  autilProc = 0.0;
-  autilMem = 0.0;
-  arhoAcc = 0.0;
-
-  numOfTasks = 0;
-  cCompCapPerProc = 0.0;
-  cCompCapPerAcc = 0.0;
 }
 
 resource::resource(const resinputs& setup, const int& _ID)
+  : alloc(1),
+    active(0),
+    movable(1),
+    utilizedProcessors(0.0),
+    utilizedMemory(0.0),
+    utilizedStorage(0.0),
+    utilizedAccelerators(0),
+    actualUtilizedProcessors(0.0),
+    actualUtilizedMemory(0.0),
+    actualRhoAccelerators(0.0),
+    numberOfTasks(0),
+    currentCompCapPerProc(0.0),
+    currentCompCapPerAcc(0.0)
 {
-  alloc = 1;
-  active = 0;
-  movable = 1;
   type = setup.type;
   ID = _ID;
 
-  physProc = setup.numOfProcUnits;
-  physMem = setup.totMem;
-  physSto = setup.totSto;
+  physicalProcessors = setup.numOfProcUnits;
+  physicalMemory = setup.totalMemory;
+  physicalStorage = setup.totalStorage;
 
-  overCommitProc = setup.overCommitProc;
-  totalProc = ((double)setup.numOfProcUnits) * overCommitProc;
-  availProc = totalProc;
-  utilProc = 0.0;
+  overcommitmentProcessors = setup.overcommitmentProcessors;
+  totalProcessors = ((double)setup.numOfProcUnits) * overcommitmentProcessors;
+  availableProcessors = totalProcessors;
 
-  overCommitMem = setup.overCommitMem;
-  totalMem = ((double)setup.totMem) * overCommitMem;
-  availMem = totalMem;
-  utilMem = 0.0;
+  overcommitmentMemory = setup.overcommitmentMemory;
+  totalMemory = ((double)setup.totalMemory) * overcommitmentMemory;
+  availableMemory = totalMemory;
 
-  totalSto = ((double)setup.totSto);
-  availSto = totalSto;
-  utilSto = 0.0;
+  totalStorage = ((double)setup.totalStorage);
+  availableStorage = totalStorage;
 
-  compCap = setup.compCap;
+  computeCapability = setup.computeCapability;
 
   accelerator = setup.accelerator;
-  accCompCap = setup.accCompCap;
-  totAcc = setup.totAcc;
-  availAcc = totAcc;
-  utilAcc = 0;
-
-  autilProc = 0.0;
-  autilMem = 0.0;
-  arhoAcc = 0.0;
-
-  numOfTasks = 0;
-  cCompCapPerProc = 0.0;
-  cCompCapPerAcc = 0.0;
+  acceleratorComputeCapability = setup.acceleratorComputeCapability;
+  totalAccelerators = setup.totalAccelerators;
+  availableAccelerators = totalAccelerators;
 }
 
 resource::resource(const resource& t)
 {
   if (t.galloc()) {
     alloc = t.galloc();
-    active = t.gactive();
-    movable = t.gmovable();
-    type = t.gtype();
+    active = t.getActive();
+    movable = t.getMovable();
+    type = t.getType();
     ID = t.gID();
 
-    totalProc = t.gtotalProc();
-    availProc = t.gavailProc();
-    utilProc = t.gutilProc();
+    totalProcessors = t.getTotalProcessors();
+    availableProcessors = t.getAvailableProcessors();
+    utilizedProcessors = t.getUtilizedProcessors();
 
-    totalMem = t.gtotalMem();
-    availMem = t.gavailMem();
-    utilMem = t.gutilMem();
+    totalMemory = t.getTotalMemory();
+    availableMemory = t.getAvailableMemory();
+    utilizedMemory = t.getUtilizedMemory();
 
-    physProc = t.gphysProc();
-    physMem = t.gphysMem();
+    physicalProcessors = t.getPhysicalProcessors();
+    physicalMemory = t.getPhysicalMemory();
 
-    compCap = t.gcompCap();
+    computeCapability = t.getComputeCapability();
 
-    accelerator = t.gaccelerator();
-    totAcc = t.gtotAcc();
-    utilAcc = t.gutilAcc();
-    availAcc = t.gavailAcc();
-    accCompCap = t.gaccCompCap();
+    accelerator = t.getAccelerator();
+    totalAccelerators = t.getTotalAccelerators();
+    utilizedAccelerators = t.getUtilizedAccelerators();
+    availableAccelerators = t.getAvailableAccelerators();
+    acceleratorComputeCapability = t.getAcceleratorComputeCapability();
 
-    overCommitProc = t.goverCommitProc();
-    overCommitMem = t.goverCommitMem();
+    overcommitmentProcessors = t.getOvercommitmentProcessors();
+    overcommitmentMemory = t.getOvercommitmentMemory();
 
-    autilProc = t.gautilProc();
-    autilMem = t.gautilMem();
-    arhoAcc = t.garhoAcc();
+    actualUtilizedProcessors = t.getActualUtilizedProcessors();
+    actualUtilizedMemory = t.getActualUtilizedMemory();
+    actualRhoAccelerators = t.getActualRhoAccelerators();
 
-    numOfTasks = t.gnumOfTasks();
-    cCompCapPerProc = t.gcCompCapPerProc();
-    cCompCapPerAcc = t.gcCompCapPerAcc();
+    numberOfTasks = t.getNumberOfTasks();
+    currentCompCapPerProc = t.getCurrentCompCapPerProc();
+    currentCompCapPerAcc = t.getCurrentCompCapPerAcc();
   }
 }
 
@@ -146,82 +137,82 @@ resource& resource::operator=(const resource& t)
       type = -1;
       ID = -1;
 
-      totalProc = 0.0;
-      availProc = 0.0;
-      utilProc = 0.0;
+      totalProcessors = 0.0;
+      availableProcessors = 0.0;
+      utilizedProcessors = 0.0;
 
-      totalMem = 0.0;
-      availMem = 0.0;
-      utilMem = 0.0;
+      totalMemory = 0.0;
+      availableMemory = 0.0;
+      utilizedMemory = 0.0;
 
-      totalSto = 0.0;
-      availSto = 0.0;
-      utilSto = 0.0;
+      totalStorage = 0.0;
+      availableStorage = 0.0;
+      utilizedStorage = 0.0;
 
-      physProc = 0.0;
-      physMem = 0.0;
-      physSto = 0.0;
+      physicalProcessors = 0.0;
+      physicalMemory = 0.0;
+      physicalStorage = 0.0;
 
-      compCap = 0.0;
+      computeCapability = 0.0;
 
       accelerator = 0;
-      totAcc = 0;
-      utilAcc = 0;
-      availAcc = 0;
-      accCompCap = 0.0;
+      totalAccelerators = 0;
+      utilizedAccelerators = 0;
+      availableAccelerators = 0;
+      acceleratorComputeCapability = 0.0;
 
-      overCommitProc = 1.0;
-      overCommitMem = 1.0;
+      overcommitmentProcessors = 1.0;
+      overcommitmentMemory = 1.0;
 
-      autilProc = 0.0;
-      autilMem = 0.0;
-      arhoAcc = 0.0;
+      actualUtilizedProcessors = 0.0;
+      actualUtilizedMemory = 0.0;
+      actualRhoAccelerators = 0.0;
 
-      numOfTasks = 0;
-      cCompCapPerProc = 0.0;
-      cCompCapPerAcc = 0.0;
+      numberOfTasks = 0;
+      currentCompCapPerProc = 0.0;
+      currentCompCapPerAcc = 0.0;
     }
     alloc = t.galloc();
     if (alloc) {
-      active = t.gactive();
-      movable = t.gmovable();
-      type = t.gtype();
+      active = t.getActive();
+      movable = t.getMovable();
+      type = t.getType();
       ID = t.gID();
 
-      totalProc = t.gtotalProc();
-      availProc = t.gavailProc();
-      utilProc = t.gutilProc();
+      totalProcessors = t.getTotalProcessors();
+      availableProcessors = t.getAvailableProcessors();
+      utilizedProcessors = t.getUtilizedProcessors();
 
-      totalMem = t.gtotalMem();
-      availMem = t.gavailMem();
-      utilMem = t.gutilMem();
+      totalMemory = t.getTotalMemory();
+      availableMemory = t.getAvailableMemory();
+      utilizedMemory = t.getUtilizedMemory();
 
-      totalSto = t.gtotalSto();
-      availSto = t.gavailSto();
-      utilSto = t.gutilSto();
+      totalStorage = t.getTotalStorage();
+      availableStorage = t.getAvailableStorage();
+      utilizedStorage = t.getUtilizedStorage();
 
-      physProc = t.gphysProc();
-      physMem = t.gphysMem();
-      physSto = t.gphysSto();
+      physicalProcessors = t.getPhysicalProcessors();
+      physicalMemory = t.getPhysicalMemory();
+      physicalStorage = t.getPhysicalStorage();
 
-      compCap = t.gcompCap();
+      computeCapability = t.getComputeCapability();
 
-      accelerator = t.gaccelerator();
-      totAcc = t.gtotAcc();
-      availAcc = t.gavailAcc();
-      utilAcc = t.gutilAcc();
-      accCompCap = t.gaccCompCap();
+      accelerator = t.getAccelerator();
+      totalAccelerators = t.getTotalAccelerators();
+      availableAccelerators = t.getAvailableAccelerators();
+      utilizedAccelerators = t.getUtilizedAccelerators();
+      acceleratorComputeCapability = t.getAcceleratorComputeCapability();
 
-      overCommitProc = t.goverCommitProc();
-      overCommitMem = t.goverCommitMem();
+      overcommitmentProcessors = t.getOvercommitmentProcessors();
+      overcommitmentMemory = t.getOvercommitmentMemory();
 
-      autilProc = t.gautilProc();
-      autilMem = t.gautilMem();
-      arhoAcc = t.garhoAcc();
+      actualUtilizedProcessors = t.getActualUtilizedProcessors();
+      actualUtilizedMemory = t.getActualUtilizedMemory();
+      actualRhoAccelerators = t.getActualRhoAccelerators();
 
-      numOfTasks = t.gnumOfTasks();
-      cCompCapPerProc = t.gcCompCapPerProc();
-      cCompCapPerAcc = t.gcCompCapPerAcc();
+      numberOfTasks = t.getNumberOfTasks();
+      currentCompCapPerProc = t.getCurrentCompCapPerProc();
+      currentCompCapPerAcc = t.getCurrentCompCapPerAcc();
     }
   }
   return *this;
@@ -236,147 +227,155 @@ resource::~resource()
     type = -1;
     ID = -1;
 
-    totalProc = 0.0;
-    availProc = 0.0;
-    utilProc = 0.0;
+    totalProcessors = 0.0;
+    availableProcessors = 0.0;
+    utilizedProcessors = 0.0;
 
-    totalMem = 0.0;
-    availMem = 0.0;
-    utilMem = 0.0;
+    totalMemory = 0.0;
+    availableMemory = 0.0;
+    utilizedMemory = 0.0;
 
-    totalSto = 0.0;
-    availSto = 0.0;
-    utilSto = 0.0;
+    totalStorage = 0.0;
+    availableStorage = 0.0;
+    utilizedStorage = 0.0;
 
-    physProc = 0.0;
-    physMem = 0.0;
-    physSto = 0.0;
+    physicalProcessors = 0.0;
+    physicalMemory = 0.0;
+    physicalStorage = 0.0;
 
-    compCap = 0.0;
+    computeCapability = 0.0;
 
     accelerator = 0;
-    totAcc = 0;
-    utilAcc = 0;
-    availAcc = 0;
-    accCompCap = 0.0;
+    totalAccelerators = 0;
+    utilizedAccelerators = 0;
+    availableAccelerators = 0;
+    acceleratorComputeCapability = 0.0;
 
-    overCommitProc = 1.0;
-    overCommitMem = 1.0;
+    overcommitmentProcessors = 1.0;
+    overcommitmentMemory = 1.0;
 
-    autilProc = 0.0;
-    autilMem = 0.0;
-    arhoAcc = 0.0;
+    actualUtilizedProcessors = 0.0;
+    actualUtilizedMemory = 0.0;
+    actualRhoAccelerators = 0.0;
 
-    numOfTasks = 0;
-    cCompCapPerProc = 0.0;
-    cCompCapPerAcc = 0.0;
+    numberOfTasks = 0;
+    currentCompCapPerProc = 0.0;
+    currentCompCapPerAcc = 0.0;
   }
 }
 
-void resource::initRunQuan()
+void resource::initializeRunningQuantities()
 {
   if (alloc) {
-    autilProc = 0.0;
-    autilMem = 0.0;
-    arhoAcc = 0.0;
+    actualUtilizedProcessors = 0.0;
+    actualUtilizedMemory = 0.0;
+    actualRhoAccelerators = 0.0;
   }
 }
 
-void resource::incrRunQuan(const double& uProc, const double& uMem, const double& rAcc)
+void resource::incrementRunningQuantities(const double& uProc, const double& uMem, const double& rAcc)
 {
   if (alloc) {
-    autilProc += uProc;
-    autilMem += uMem;
-    arhoAcc += rAcc;
+    actualUtilizedProcessors += uProc;
+    actualUtilizedMemory += uMem;
+    actualRhoAccelerators += rAcc;
   }
 }
 
-void resource::compcCompCapPerProc()
+void resource::compcurrentCompCapPerProc()
 {
   double ratio;
   if (alloc) {
-    ratio = (MY_MAX(utilProc, 1.0) / physProc);
-    cCompCapPerProc = (compCap / physProc) / ratio;
+    ratio = (MY_MAX(utilizedProcessors, 1.0) / physicalProcessors);
+    currentCompCapPerProc = (computeCapability / physicalProcessors) / ratio;
   }
   // cap = (processor MIPS/physical processors) / (util processors/physical processsors)
 }
 
-void resource::compcCompCapPerAcc()
+void resource::compcurrentCompCapPerAcc()
 {
   double ratio;
   if (alloc && accelerator) {
-    ratio = ceil(MY_MAX(utilProc, 1.0) / physProc);
-    cCompCapPerAcc = (accCompCap / ratio);
+    ratio = ceil(MY_MAX(utilizedProcessors, 1.0) / physicalProcessors);
+    currentCompCapPerAcc = (acceleratorComputeCapability / ratio);
   }
 }
 
 void resource::deploy(const task* t)
 {
-  numOfTasks++;
+  numberOfTasks++;
   active = 1;
-  availProc -= t->greqPMNS()[0];
-  availMem -= t->greqPMNS()[1];
-  availSto -= t->greqPMNS()[3];
-  availAcc -= t->gavAcc()[0];
-  utilMem = totalMem - availMem;
-  utilProc = totalProc - availProc;
-  utilSto = totalSto - availSto;
-  utilAcc = totAcc - availAcc;
 
-  // If the task requests more than 1 VMs, dont allow the resource to be moved
-  if (t->gnumOfVMs() > 1) {
+  availableProcessors -= t->greqPMNS()[0];
+  availableMemory -= t->greqPMNS()[1];
+  availableStorage -= t->greqPMNS()[3];
+  availableAccelerators -= t->gavAcc()[0];
+
+  utilizedMemory = totalMemory - availableMemory;
+  utilizedProcessors = totalProcessors - availableProcessors;
+  utilizedStorage = totalStorage - availableStorage;
+  utilizedAccelerators = totalAccelerators - availableAccelerators;
+
+  // If the task requests more than 1 VMs, dont allow the resource to be moved for SOSM
+  if (t->getNumberOfVMs() > 1) {
     movable = 0;
   }
 }
 
 void resource::unload(const list<task>::iterator& t)
 {
-  numOfTasks--;
-  if (numOfTasks == 0) {
-    active = 0;
-    availProc = totalProc;
-    availMem = totalMem;
-    availSto = totalSto;
-    availAcc = totAcc;
-    utilMem = 0.0;
-    utilProc = 0.0;
-    utilSto = 0.0;
-    utilAcc = 0;
-    autilProc = 0.0;
-    autilMem = 0.0;
-    arhoAcc = 0.0;
-    cCompCapPerProc = 0.0;
-    cCompCapPerAcc = 0.0;
+  numberOfTasks--;
 
-    // If there are no remaining tasks assigned on a resource, allowed it to be moved to a different vRM during the
-    // Self-Organization phase
+  // There are no remaining tasks assigned on the resource
+  if (numberOfTasks == 0) {
+    active = 0;
+
+    availableProcessors = totalProcessors;
+    availableMemory = totalMemory;
+    availableStorage = totalStorage;
+    availableAccelerators = totalAccelerators;
+
+    utilizedMemory = 0.0;
+    utilizedProcessors = 0.0;
+    utilizedStorage = 0.0;
+    utilizedAccelerators = 0;
+
+    actualUtilizedProcessors = 0.0;
+    actualUtilizedMemory = 0.0;
+    actualRhoAccelerators = 0.0;
+
+    currentCompCapPerProc = 0.0;
+    currentCompCapPerAcc = 0.0;
+
+    // The resource is allowed to be moved to a different vRM during the Self-Organization phase
     movable = 1;
   } else {
-    availProc += t->greqPMNS()[0];
-    availMem += t->greqPMNS()[1];
-    availSto += t->greqPMNS()[3];
-    availAcc += t->gavAcc()[0];
-    utilMem = totalMem - availMem;
-    utilProc = totalProc - availProc;
-    utilSto = totalSto - availSto;
-    utilAcc = totAcc - availAcc;
-    autilProc -= t->gcUtilPMNr()[0];
-    autilMem -= t->gcUtilPMNr()[1];
-    arhoAcc -= t->gcUtilPMNr()[3];
+    // There are still tasks assigned on the resource
+    availableProcessors += t->greqPMNS()[0];
+    availableMemory += t->greqPMNS()[1];
+    availableStorage += t->greqPMNS()[3];
+    availableAccelerators += t->gavAcc()[0];
+
+    utilizedMemory = totalMemory - availableMemory;
+    utilizedProcessors = totalProcessors - availableProcessors;
+    utilizedStorage = totalStorage - availableStorage;
+    utilizedAccelerators = totalAccelerators - availableAccelerators;
+
+    actualUtilizedProcessors -= t->gcUtilPMNr()[0];
+    actualUtilizedMemory -= t->gcUtilPMNr()[1];
+    actualRhoAccelerators -= t->gcUtilPMNr()[3];
   }
 }
 
 int resource::probe(const double& reqProc, const double& reqMem, const double& reqSto, const int& reqAcc)
 {
   int choice = -1;
-  if (reqProc <= availProc && reqMem <= availMem && reqSto <= availSto && reqAcc <= availAcc)
+  if (reqProc <= availableProcessors && reqMem <= availableMemory && reqSto <= availableStorage &&
+      reqAcc <= availableAccelerators)
     choice = ID;
   return choice;
 }
 
-//---------------------------------
-//        PRINT
-//---------------------------------
 void resource::print() const
 {
   if (alloc) {
@@ -385,71 +384,71 @@ void resource::print() const
     cout << "Movable: " << movable << endl;
     cout << "Type: " << type << endl;
 
-    cout << "Total Proc: " << totalProc << endl;
-    cout << "Avail Proc: " << availProc << endl;
-    cout << "Util Proc: " << utilProc << endl;
+    cout << "Total Processors: " << totalProcessors << endl;
+    cout << "Available Processors: " << availableProcessors << endl;
+    cout << "Utilized Processors: " << utilizedProcessors << endl;
 
-    cout << "Total Memory: " << totalMem << endl;
-    cout << "Avail Memory: " << availMem << endl;
-    cout << "Util Memory: " << utilMem << endl;
+    cout << "Total Memory: " << totalMemory << endl;
+    cout << "Available Memory: " << availableMemory << endl;
+    cout << "Utilized Memory: " << utilizedMemory << endl;
 
-    cout << "Total Storage: " << totalSto << endl;
-    cout << "Avail Storage: " << availSto << endl;
-    cout << "Util Storage: " << utilSto << endl;
+    cout << "Total Storage: " << totalStorage << endl;
+    cout << "Available Storage: " << availableStorage << endl;
+    cout << "Utilized Storage: " << utilizedStorage << endl;
 
-    cout << "Physical Proc: " << physProc << endl;
-    cout << "Physical Memory: " << physMem << endl;
-    cout << "Physical Storage: " << physSto << endl;
+    cout << "Physical Processors: " << physicalProcessors << endl;
+    cout << "Physical Memory: " << physicalMemory << endl;
+    cout << "Physical Storage: " << physicalStorage << endl;
 
-    cout << "Proc Computational Capability: " << compCap << endl;
+    cout << "Processors Computational Capability: " << computeCapability << endl;
 
     cout << "Accelerator Availability: " << accelerator << endl;
-    cout << "Total number of accelerators: " << totAcc << endl;
-    cout << "Utilized accelerators: " << utilAcc << endl;
-    cout << "Available accelerators: " << availAcc << endl;
-    cout << "Accelerator Computational Capability: " << accCompCap << endl;
+    cout << "Total number of accelerators: " << totalAccelerators << endl;
+    cout << "Utilized accelerators: " << utilizedAccelerators << endl;
+    cout << "Available accelerators: " << availableAccelerators << endl;
+    cout << "Accelerator Computational Capability: " << acceleratorComputeCapability << endl;
 
-    cout << "Proc overcommitment ratio: " << overCommitProc << endl;
-    cout << "Memory overcommitment ratio: " << overCommitMem << endl;
+    cout << "Processors overcommitment ratio: " << overcommitmentProcessors << endl;
+    cout << "Memory overcommitment ratio: " << overcommitmentMemory << endl;
 
-    cout << "Actual Processor Utilization: " << autilProc << endl;
-    cout << "Actual Memory Utilization: " << autilMem << endl;
-    cout << "Actual rho of Accelerators: " << arhoAcc << endl;
+    cout << "Actual Processor Utilization: " << actualUtilizedProcessors << endl;
+    cout << "Actual Memory Utilization: " << actualUtilizedMemory << endl;
+    cout << "Actual rho of Accelerators: " << actualRhoAccelerators << endl;
 
-    cout << "Number of Tasks: " << numOfTasks << endl;
-    cout << "Current Proc Computational Capability (per unit): " << cCompCapPerProc << endl;
-    cout << "Current Acc Computational Capability (per unit): " << cCompCapPerAcc << endl;
+    cout << "Number of Tasks: " << numberOfTasks << endl;
+    cout << "Current Processors Computational Capability (per unit): " << currentCompCapPerProc << endl;
+    cout << "Current Acc Computational Capability (per unit): " << currentCompCapPerAcc << endl;
   }
 }
 
 int resource::galloc() const { return alloc; }
-int resource::gactive() const { return active; }
-int resource::gmovable() const { return movable; }
-int resource::gtype() const { return type; }
+int resource::getActive() const { return active; }
+int resource::getMovable() const { return movable; }
+int resource::getType() const { return type; }
 int resource::gID() const { return ID; }
-double resource::gtotalProc() const { return totalProc; }
-double resource::gavailProc() const { return availProc; }
-double resource::gutilProc() const { return utilProc; }
-double resource::gtotalMem() const { return totalMem; }
-double resource::gavailMem() const { return availMem; }
-double resource::gutilMem() const { return utilMem; }
-double resource::gtotalSto() const { return totalSto; }
-double resource::gavailSto() const { return availSto; }
-double resource::gutilSto() const { return utilSto; }
-double resource::gphysProc() const { return physProc; }
-double resource::gphysMem() const { return physMem; }
-double resource::gphysSto() const { return physSto; }
-double resource::gcompCap() const { return compCap; }
-int resource::gaccelerator() const { return accelerator; }
-int resource::gtotAcc() const { return totAcc; }
-int resource::gavailAcc() const { return availAcc; }
-int resource::gutilAcc() const { return utilAcc; }
-double resource::gaccCompCap() const { return accCompCap; }
-double resource::goverCommitProc() const { return overCommitProc; }
-double resource::goverCommitMem() const { return overCommitMem; }
-double resource::gautilProc() const { return autilProc; }
-double resource::gautilMem() const { return autilMem; }
-double resource::garhoAcc() const { return arhoAcc; }
-int resource::gnumOfTasks() const { return numOfTasks; }
-double resource::gcCompCapPerProc() const { return cCompCapPerProc; }
-double resource::gcCompCapPerAcc() const { return cCompCapPerAcc; }
+double resource::getTotalProcessors() const { return totalProcessors; }
+double resource::getAvailableProcessors() const { return availableProcessors; }
+double resource::getUtilizedProcessors() const { return utilizedProcessors; }
+double resource::getTotalMemory() const { return totalMemory; }
+double resource::getAvailableMemory() const { return availableMemory; }
+double resource::getUtilizedMemory() const { return utilizedMemory; }
+double resource::getTotalStorage() const { return totalStorage; }
+double resource::getAvailableStorage() const { return availableStorage; }
+double resource::getUtilizedStorage() const { return utilizedStorage; }
+double resource::getPhysicalProcessors() const { return physicalProcessors; }
+double resource::getPhysicalMemory() const { return physicalMemory; }
+double resource::getPhysicalStorage() const { return physicalStorage; }
+double resource::getComputeCapability() const { return computeCapability; }
+int resource::getAccelerator() const { return accelerator; }
+int resource::getTotalAccelerators() const { return totalAccelerators; }
+int resource::getAvailableAccelerators() const { return availableAccelerators; }
+int resource::getUtilizedAccelerators() const { return utilizedAccelerators; }
+double resource::getAcceleratorComputeCapability() const { return acceleratorComputeCapability; }
+double resource::getOvercommitmentProcessors() const { return overcommitmentProcessors; }
+double resource::getOvercommitmentMemory() const { return overcommitmentMemory; }
+double resource::getActualUtilizedProcessors() const { return actualUtilizedProcessors; }
+double resource::getActualUtilizedMemory() const { return actualUtilizedMemory; }
+double resource::getActualRhoAccelerators() const { return actualRhoAccelerators; }
+int resource::getNumberOfTasks() const { return numberOfTasks; }
+double resource::getCurrentCompCapPerProc() const { return currentCompCapPerProc; }
+double resource::getCurrentCompCapPerAcc() const { return currentCompCapPerAcc; }

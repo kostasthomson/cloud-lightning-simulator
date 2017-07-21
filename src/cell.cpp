@@ -8,68 +8,70 @@
 #include <cstdlib>
 #include <iostream>
 #include <vector>
-using namespace std;
 
 cell::cell()
+  : ID(0),
+    alloc(0),
+    types(NULL),
+    numberOfTypes(0),
+    sosmIntegration(0),
+    numberOfResourcesPerType(NULL),
+    resources(NULL),
+    powerComp(NULL),
+    network(NULL),
+    brok(NULL),
+    traditionalBrok(NULL),
+    stats(NULL)
 {
-  ID = 0;
-  alloc = 0;
-  types = NULL;
-  numOfTypes = 0;
-  sosmIntegration=0;
-  numOfResourcesPerType = NULL;
-  resources = NULL;
-  powerComp = NULL;
-  network = NULL;
-  brok = NULL;
-  brokNOsosm=NULL;
-  stats = NULL;
 }
 
-cell::cell(const cellinputs& setup, int L_sosmIntegration)
+cell::cell(const cellinputs& setup, int L_sosmIntegration) : alloc(1)
 {
-  int i, j;
-  alloc = 1;
   ID = setup.ID;
-  numOfTypes = setup.numOfTypes;
+  numberOfTypes = setup.numberOfTypes;
   sosmIntegration=L_sosmIntegration;
-  types = new int[numOfTypes];
-  numOfResourcesPerType = new int[numOfTypes];
-  for (i = 0; i < numOfTypes; i++) {
+  types = new int[numberOfTypes];
+  numberOfResourcesPerType = new int[numberOfTypes];
+
+  for (int i = 0; i < numberOfTypes; i++) {
     types[i] = setup.types[i];
-    numOfResourcesPerType[i] = setup.numOfResourcesPerType[i];
+    numberOfResourcesPerType[i] = setup.numberOfResourcesPerType[i];
   }
-  resources = new resource*[numOfTypes];
-  for (i = 0; i < numOfTypes; i++) {
-    resources[i] = new resource[numOfResourcesPerType[i]];
+
+  resources = new resource*[numberOfTypes];
+  for (int i = 0; i < numberOfTypes; i++) {
+    resources[i] = new resource[numberOfResourcesPerType[i]];
   }
-  for (i = 0; i < numOfTypes; i++) {
-    for (j = 0; j < numOfResourcesPerType[i]; j++) {
+  for (int i = 0; i < numberOfTypes; i++) {
+    for (int j = 0; j < numberOfResourcesPerType[i]; j++) {
       // Copy information about computer resources in the resources[hardware type][resource] array
       resources[i][j] = resource(setup.rinp[i], j);
     }
   }
-  powerComp = new power[numOfTypes];
-  for (i = 0; i < numOfTypes; i++) {
+
+  powerComp = new power[numberOfTypes];
+  for (int i = 0; i < numberOfTypes; i++) {
     powerComp[i] = power(setup.pinp[i]);
   }
   network = new netw[1];
   network[0] = netw(setup.ninp[0]);
 
   brok = new broker[1];
-  brokNOsosm=new brokerNOsosm[1];
-  
-  if (sosmIntegration==0)
-    brokNOsosm[0]=brokerNOsosm(numOfTypes,types,numOfResourcesPerType,setup.binp[0].pollIntervalCellM);
-  //	brok[0]=broker(numOfTypes,types,numOfResourcesPerType,resources,powerComp,network,setup.binp[0]);
+  traditionalBrok=new traditionalBroker[1];
 
-  stats = new stat[numOfTypes];
-  for (i = 0; i < numOfTypes; i++) {
+  if (! sosmIntegration) {
+    traditionalBrok[0]=traditionalBroker(numberOfTypes,types,numberOfResourcesPerType,setup.binp[0].pollIntervalCellM);
+  }
+    //	brok[0]=broker(numberOfTypes,types,numberOfResourcesPerType,resources,powerComp,network,setup.binp[0]);
+
+  stats = new stat[numberOfTypes];
+  for (int i = 0; i < numberOfTypes; i++) {
     stats[i] = stat();
   }
 
-  if (sosmIntegration==0)
-    brokNOsosm[0].updateStateInfo(resources,network,0.0);
+  if (! sosmIntegration) {
+    traditionalBrok[0].updateStateInfo(resources,network,0.0);
+  }
 
   // brok->updateStateInfo(network,0.0);
   updateStats(0.0);
@@ -77,104 +79,115 @@ cell::cell(const cellinputs& setup, int L_sosmIntegration)
 
 cell::cell(const cell& t)
 {
-  int i, j;
   if (t.galloc()) {
     ID = t.gID();
     alloc = t.galloc();
-    numOfTypes = t.gnumOfTypes();
+    numberOfTypes = t.getNumberOfTypes();
     sosmIntegration=t.getSosmIntegration();
-    types = new int[numOfTypes];
-    numOfResourcesPerType = new int[numOfTypes];
-    for (i = 0; i < numOfTypes; i++) {
-      types[i] = t.gtypes()[i];
-      numOfResourcesPerType[i] = t.gnumOfResourcesPerType()[i];
+    types = new int[numberOfTypes];
+    numberOfResourcesPerType = new int[numberOfTypes];
+
+    for (int i = 0; i < numberOfTypes; i++) {
+      types[i] = t.getTypes()[i];
+      numberOfResourcesPerType[i] = t.getNumberOfResourcesPerType()[i];
     }
-    resources = new resource*[numOfTypes];
-    for (i = 0; i < numOfTypes; i++) {
-      resources[i] = new resource[numOfResourcesPerType[i]];
+
+    resources = new resource*[numberOfTypes];
+    for (int i = 0; i < numberOfTypes; i++) {
+      resources[i] = new resource[numberOfResourcesPerType[i]];
     }
-    for (i = 0; i < numOfTypes; i++) {
-      for (j = 0; j < numOfResourcesPerType[i]; j++)
-        resources[i][j] = t.gresources()[i][j];
+    for (int i = 0; i < numberOfTypes; i++) {
+      for (int j = 0; j < numberOfResourcesPerType[i]; j++)
+        resources[i][j] = t.getResources()[i][j];
     }
-    powerComp = new power[numOfTypes];
-    for (i = 0; i < numOfTypes; i++) {
-      powerComp[i] = t.gpowerComp()[i];
+
+    powerComp = new power[numberOfTypes];
+    for (int i = 0; i < numberOfTypes; i++) {
+      powerComp[i] = t.getPowerConsumption()[i];
     }
+
     network = new netw[1];
-    network[0] = t.gnetwork()[0];
+    network[0] = t.getNetwork()[0];
     brok = new broker[1];
-    brok[0] = t.gbrok()[0];
-    brokNOsosm=new brokerNOsosm[1];
-    brokNOsosm[0]=t.getBrokNOsosm()[0];
-    stats = new stat[numOfTypes];
-    for (i = 0; i < numOfTypes; i++) {
-      stats[i] = t.gstats()[i];
+    brok[0] = t.getBroker()[0];
+    traditionalBrok=new traditionalBroker[1];
+    traditionalBrok[0]=t.getTraditionalBroker()[0];
+    stats = new stat[numberOfTypes];
+
+    for (int i = 0; i < numberOfTypes; i++) {
+      stats[i] = t.getStats()[i];
     }
   }
 }
 
 cell& cell::operator=(const cell& t)
 {
-  int i, j;
   if (this != &t) {
     if (alloc) {
       ID = 0;
       alloc = 0;
       delete[] types;
       types = NULL;
-      delete[] numOfResourcesPerType;
-      numOfResourcesPerType = NULL;
-      for (i = 0; i < numOfTypes; i++) {
+      delete[] numberOfResourcesPerType;
+      numberOfResourcesPerType = NULL;
+
+      for (int i = 0; i < numberOfTypes; i++) {
         delete[] resources[i];
       }
+
       delete[] resources;
       delete[] powerComp;
       delete[] network;
       delete[] brok;
-      delete[] brokNOsosm;
+      delete[] traditionalBrok;
       delete[] stats;
       resources = NULL;
       powerComp = NULL;
       network = NULL;
       brok = NULL;
-      brokNOsosm=NULL;
+      traditionalBrok=NULL;
       stats = NULL;
-      numOfTypes = 0;
+      numberOfTypes = 0;
       sosmIntegration=0;
     }
     alloc = t.galloc();
     if (alloc) {
       ID = t.gID();
-      numOfTypes = t.gnumOfTypes();
+      numberOfTypes = t.getNumberOfTypes();
       sosmIntegration=t.getSosmIntegration();
-      types = new int[numOfTypes];
-      numOfResourcesPerType = new int[numOfTypes];
-      for (i = 0; i < numOfTypes; i++) {
-        types[i] = t.gtypes()[i];
-        numOfResourcesPerType[i] = t.gnumOfResourcesPerType()[i];
+      types = new int[numberOfTypes];
+
+      numberOfResourcesPerType = new int[numberOfTypes];
+      for (int i = 0; i < numberOfTypes; i++) {
+        types[i] = t.getTypes()[i];
+        numberOfResourcesPerType[i] = t.getNumberOfResourcesPerType()[i];
       }
 
-      resources = new resource*[numOfTypes];
-      for (i = 0; i < numOfTypes; i++) {
-        resources[i] = new resource[numOfResourcesPerType[i]];
+      resources = new resource*[numberOfTypes];
+      for (int i = 0; i < numberOfTypes; i++) {
+        resources[i] = new resource[numberOfResourcesPerType[i]];
       }
-      for (i = 0; i < numOfTypes; i++) {
-        for (j = 0; j < numOfResourcesPerType[i]; j++)
-          resources[i][j] = t.gresources()[i][j];
+      for (int i = 0; i < numberOfTypes; i++) {
+        for (int j = 0; j < numberOfResourcesPerType[i]; j++)
+          resources[i][j] = t.getResources()[i][j];
       }
-      powerComp = new power[numOfTypes];
-      for (i = 0; i < numOfTypes; i++)
-        powerComp[i] = t.gpowerComp()[i];
+
+      powerComp = new power[numberOfTypes];
+      for (int i = 0; i < numberOfTypes; i++) {
+        powerComp[i] = t.getPowerConsumption()[i];
+      }
+
       network = new netw[1];
-      network[0] = t.gnetwork()[0];
+      network[0] = t.getNetwork()[0];
       brok = new broker[1];
-      brok[0] = t.gbrok()[0];
-      brokNOsosm=new brokerNOsosm[1];
-      brokNOsosm[0]=t.getBrokNOsosm()[0];
-      stats = new stat[numOfTypes];
-      for (i = 0; i < numOfTypes; i++)
-        stats[i] = t.gstats()[i];
+      brok[0] = t.getBroker()[0];
+      traditionalBrok=new traditionalBroker[1];
+      traditionalBrok[0]=t.getTraditionalBroker()[0];
+
+      stats = new stat[numberOfTypes];
+      for (int i = 0; i < numberOfTypes; i++) {
+        stats[i] = t.getStats()[i];
+      }
     }
   }
   return *this;
@@ -182,31 +195,30 @@ cell& cell::operator=(const cell& t)
 
 cell::~cell()
 {
-  int i;
   if (alloc) {
     ID = 0;
     alloc = 0;
 
     delete[] types;
-    delete[] numOfResourcesPerType;
+    delete[] numberOfResourcesPerType;
     types = NULL;
-    numOfResourcesPerType = NULL;
-    for (i = 0; i < numOfTypes; i++) {
+    numberOfResourcesPerType = NULL;
+    for (int i = 0; i < numberOfTypes; i++) {
       delete[] resources[i];
     }
     delete[] resources;
     delete[] powerComp;
     delete[] network;
     delete[] brok;
-    delete[] brokNOsosm;
+    delete[] traditionalBrok;
     delete[] stats;
     resources = NULL;
     powerComp = NULL;
     network = NULL;
     brok = NULL;
-    brokNOsosm=NULL;
+    traditionalBrok=NULL;
     stats = NULL;
-    numOfTypes = 0;
+    numberOfTypes = 0;
     sosmIntegration=0;
   }
 }
@@ -219,25 +231,25 @@ void cell::timestep(const double& tstep)
       brok->updateStateInfo(network, tstep);
     }
     else{
-      brokNOsosm[0].timestep(resources,network,stats,powerComp);
-      brokNOsosm[0].updateStateInfo(resources,network,tstep);
-    }   
+      traditionalBrok[0].timestep(resources,network,stats,powerComp);
+      traditionalBrok[0].updateStateInfo(resources,network,tstep);
+    }
     updateStats(tstep);
   }
 }
 
 int cell::gID() const { return ID; }
 int cell::galloc() const { return alloc; }
-int cell::gnumOfTypes() const { return numOfTypes; }
+int cell::getNumberOfTypes() const { return numberOfTypes; }
 int cell::getSosmIntegration() const { return sosmIntegration; }
-int* cell::gtypes() const { return types; }
-int* cell::gnumOfResourcesPerType() const { return numOfResourcesPerType; }
-resource** cell::gresources() const { return resources; }
-power* cell::gpowerComp() const { return powerComp; }
-broker* cell::gbrok() const { return brok; }
-brokerNOsosm *cell::getBrokNOsosm() const { return brokNOsosm; }
-netw* cell::gnetwork() const { return network; }
-stat* cell::gstats() const { return stats; }
+int* cell::getTypes() const { return types; }
+int* cell::getNumberOfResourcesPerType() const { return numberOfResourcesPerType; }
+resource** cell::getResources() const { return resources; }
+power* cell::getPowerConsumption() const { return powerComp; }
+broker* cell::getBroker() const { return brok; }
+traditionalBroker *cell::getTraditionalBroker() const { return traditionalBrok; }
+netw* cell::getNetwork() const { return network; }
+stat* cell::getStats() const { return stats; }
 
 void cell::deploy(list<task>* jobs)
 {
@@ -250,105 +262,112 @@ void cell::deploy(list<task>* jobs)
     }
     else{
       for (it = jobs->begin(); it != jobs->end(); it++){
-        brokNOsosm[0].deploy(resources,network,stats,&(*it));
+        traditionalBrok[0].deploy(resources,network,stats,&(*it));
       }
-    }    
+    }
   }
 }
 
 void cell::updateStats(const double& tstep)
 {
   int i, j;
-  double phyMem, phyProc, phySto, totMem, totProc, availProc, availMem, totSto, availSto, autilProc, autilMem;
-  int totAcc, availAcc, activeSrvs, numOfTasks, procActServs, procPerServ, memActServs, memPerServ, stoActServs,
-    stoPerServ, accActServs, accPerServ;
+  double physicalMemory, physicalProcessors, physicalStorage, totalMemory, totalProcessors, availableProcessors,
+    availableMemory, totalStorage, availableStorage, actualUtilizedProcessors, actualUtilizedMemory;
+  int totalAccelerators, availableAccelerators, activeServers, numberOfTasks, processorsOverActiveServers,
+    processorsPerServer, memoryOverActiveServers, memoryPerServer, storageOverActiveServers, storagePerServer,
+    acceleratorsOverActiveServers, acceleratorsPerServer;
   int omp_thr = atoi(getenv("OMP_NUM_THREADS"));
-  for (i = 0; i < numOfTypes; i++) {
+  for (i = 0; i < numberOfTypes; i++) {
     stats[i].alloc = 1;
-    stats[i].currTstep = tstep;
+    stats[i].currentTimestep = tstep;
 
-    stats[i].totNetw = network[0].gtotalNetw();
-    stats[i].availNetw = network[0].gavailNetw();
-    stats[i].utilNetw = stats[i].totNetw - stats[i].availNetw;
-    stats[i].autilNetw = network[0].gautilNetw();
+    stats[i].totalNetwork = network[0].getTotalNetwork();
+    stats[i].availableNetwork = network[0].getAvailableNetwork();
+    stats[i].utilizedNetwork = stats[i].totalNetwork - stats[i].availableNetwork;
+    stats[i].actualUtilizedNetwork = network[0].getActualUtilizedNetwork();
 
-    procPerServ = resources[i][0].gtotalProc(); // Processors per server, e.g. --> 44
-    memPerServ = resources[i][0].gtotalMem();   // Memory capacity per server, e.g. --> 128 GB
-    stoPerServ = resources[i][0].gtotalSto();   // Storage per server, e.g. --> 40 TBs
-    accPerServ = resources[i][0].gtotAcc();     // Accelerators per server, e.g. --> 4
-    procActServs = 0;
-    memActServs = 0;
-    stoActServs = 0;
-    accActServs = 0;
+    processorsPerServer = resources[i][0].getTotalProcessors();
+    memoryPerServer = resources[i][0].getTotalMemory();
+    storagePerServer = resources[i][0].getTotalStorage();
+    acceleratorsPerServer = resources[i][0].getTotalAccelerators();
 
-    phyMem = 0.0;
-    phyProc = 0.0;
-    phySto = 0.0;
-    totMem = 0.0;
-    totProc = 0.0;
-    availProc = 0.0;
-    availMem = 0.0;
+    processorsOverActiveServers = 0;
+    memoryOverActiveServers = 0;
+    storageOverActiveServers = 0;
+    acceleratorsOverActiveServers = 0;
 
-    totSto = 0.0;
-    availSto = 0.0;
-    totAcc = 0;
-    availAcc = 0;
-    activeSrvs = 0;
-    numOfTasks = 0;
+    availableMemory = 0.0;
+    physicalMemory = 0.0;
+    totalMemory = 0.0;
 
-    autilProc = 0.0;
-    autilMem = 0.0;
+    availableProcessors = 0.0;
+    physicalProcessors = 0.0;
+    totalProcessors = 0.0;
 
-#pragma omp parallel for default(shared) private(j) num_threads(omp_thr) schedule(static)                          \
-  reduction(+ : phyProc, totProc, availProc, phyMem, totMem, availMem, phySto, totSto, availSto, totAcc, availAcc, \
-            activeSrvs, numOfTasks, autilProc, autilMem)
-    for (j = 0; j < numOfResourcesPerType[i]; j++) {
-      phyProc += resources[i][j].gphysProc();
-      totProc += resources[i][j].gtotalProc();
-      availProc += resources[i][j].gavailProc();
-      phyMem += resources[i][j].gphysMem();
-      totMem += resources[i][j].gtotalMem();
-      availMem += resources[i][j].gavailMem();
-      phySto += resources[i][j].gphysSto();
-      totSto += resources[i][j].gtotalSto();
-      availSto += resources[i][j].gavailSto();
-      totAcc += resources[i][j].gtotAcc();
-      availAcc += resources[i][j].gavailAcc();
-      activeSrvs += resources[i][j].gactive();
-      numOfTasks += resources[i][j].gnumOfTasks();
+    availableStorage = 0.0;
+    physicalStorage = 0.0;
+    totalStorage = 0.0;
 
-      autilProc += resources[i][j].gautilProc();
-      autilMem += resources[i][j].gautilMem();
+    availableAccelerators = 0;
+    totalAccelerators = 0;
+
+    activeServers = 0;
+    numberOfTasks = 0;
+
+    actualUtilizedProcessors = 0.0;
+    actualUtilizedMemory = 0.0;
+
+#pragma omp parallel for default(shared) private(j) num_threads(omp_thr) schedule(static)              \
+  reduction(+ : physicalProcessors, totalProcessors, availableProcessors, physicalMemory, totalMemory, \
+            availableMemory, physicalStorage, totalStorage, availableStorage, totalAccelerators,       \
+            availableAccelerators, activeServers, numberOfTasks, actualUtilizedProcessors, actualUtilizedMemory)
+    for (j = 0; j < numberOfResourcesPerType[i]; j++) {
+      physicalProcessors += resources[i][j].getPhysicalProcessors();
+      totalProcessors += resources[i][j].getTotalProcessors();
+      availableProcessors += resources[i][j].getAvailableProcessors();
+      physicalMemory += resources[i][j].getPhysicalMemory();
+      totalMemory += resources[i][j].getTotalMemory();
+      availableMemory += resources[i][j].getAvailableMemory();
+      physicalStorage += resources[i][j].getPhysicalStorage();
+      totalStorage += resources[i][j].getTotalStorage();
+      availableStorage += resources[i][j].getAvailableStorage();
+      totalAccelerators += resources[i][j].getTotalAccelerators();
+      availableAccelerators += resources[i][j].getAvailableAccelerators();
+      activeServers += resources[i][j].getActive();
+      numberOfTasks += resources[i][j].getNumberOfTasks();
+
+      actualUtilizedProcessors += resources[i][j].getActualUtilizedProcessors();
+      actualUtilizedMemory += resources[i][j].getActualUtilizedMemory();
     }
-    stats[i].phyProc = phyProc;
-    stats[i].totProc = totProc;
-    stats[i].availProc = availProc;
-    stats[i].utilProc = totProc - availProc;
-    stats[i].phyMem = phyMem;
-    stats[i].totMem = totMem;
-    stats[i].availMem = availMem;
-    stats[i].utilMem = totMem - availMem;
-    stats[i].phySto = phySto;
-    stats[i].totSto = totSto;
-    stats[i].availSto = availSto;
-    stats[i].utilSto = totSto - availSto;
-    stats[i].totAcc = totAcc;
-    stats[i].availAcc = availAcc;
-    stats[i].utilAcc = totAcc - availAcc;
-    stats[i].activeSrvs = activeSrvs;
-    stats[i].numOfTasks = numOfTasks;
-    stats[i].autilProc = autilProc;
-    stats[i].autilMem = autilMem;
+    stats[i].physicalProcessors = physicalProcessors;
+    stats[i].totalProcessors = totalProcessors;
+    stats[i].availableProcessors = availableProcessors;
+    stats[i].utilizedProcessors = totalProcessors - availableProcessors;
+    stats[i].physicalMemory = physicalMemory;
+    stats[i].totalMemory = totalMemory;
+    stats[i].availableMemory = availableMemory;
+    stats[i].utilizedMemory = totalMemory - availableMemory;
+    stats[i].physicalStorage = physicalStorage;
+    stats[i].totalStorage = totalStorage;
+    stats[i].availableStorage = availableStorage;
+    stats[i].utilizedStorage = totalStorage - availableStorage;
+    stats[i].totalAccelerators = totalAccelerators;
+    stats[i].availableAccelerators = availableAccelerators;
+    stats[i].utilizedAccelerators = totalAccelerators - availableAccelerators;
+    stats[i].activeServers = activeServers;
+    stats[i].numberOfTasks = numberOfTasks;
+    stats[i].actualUtilizedProcessors = actualUtilizedProcessors;
+    stats[i].actualUtilizedMemory = actualUtilizedMemory;
 
-    procActServs = activeSrvs * procPerServ;
-    memActServs = activeSrvs * memPerServ;
-    stoActServs = activeSrvs * stoPerServ;
-    accActServs = activeSrvs * accPerServ;
+    processorsOverActiveServers = activeServers * processorsPerServer;
+    memoryOverActiveServers = activeServers * memoryPerServer;
+    storageOverActiveServers = activeServers * storagePerServer;
+    acceleratorsOverActiveServers = activeServers * acceleratorsPerServer;
 
-    stats[i].procActServs = procActServs;
-    stats[i].memActServs = memActServs;
-    stats[i].stoActServs = stoActServs;
-    stats[i].accActServs = accActServs;
+    stats[i].processorsOverActiveServers = processorsOverActiveServers;
+    stats[i].memoryOverActiveServers = memoryOverActiveServers;
+    stats[i].storageOverActiveServers = storageOverActiveServers;
+    stats[i].acceleratorsOverActiveServers = acceleratorsOverActiveServers;
   }
 }
 
@@ -357,23 +376,23 @@ void cell::print()
   if (alloc) {
     cout << endl;
     cout << "Cell ID: " << ID << endl;
-    cout << "Number of HW types: " << numOfTypes << endl;
+    cout << "Number of HW types: " << numberOfTypes << endl;
     cout << "HW types: ";
-    for (int i = 0; i < numOfTypes; i++) {
+    for (int i = 0; i < numberOfTypes; i++) {
       cout << types[i] << " ";
     }
     cout << endl;
     cout << "Number of Resources Per Type: ";
-    for (int i = 0; i < numOfTypes; i++) {
-      cout << numOfResourcesPerType[i] << " ";
+    for (int i = 0; i < numberOfTypes; i++) {
+      cout << numberOfResourcesPerType[i] << " ";
     }
     cout << endl;
     cout << "---------------------------------------------" << endl;
 
     network[0].print();
     brok[0].print();
-    brokNOsosm[0].print();
-    for (int i = 0; i < numOfTypes; i++) {
+		traditionalBrok[0].print();
+    for (int i = 0; i < numberOfTypes; i++) {
       cout << "     Resource Type: " << types[i] << endl;
       powerComp[i].print();
       stats[i].print();

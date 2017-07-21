@@ -1,7 +1,6 @@
 #ifndef POWER_H
 #define POWER_H
 #include <inputs.h>
-using namespace std;
 
 class power
 {
@@ -20,7 +19,6 @@ class power
   double *a, *b, *c, *d;
 
  public:
-
   power();
 
   ~power();
@@ -37,12 +35,13 @@ class power
   /// Defines the accelerator power models of the simulator. A single composite accelerator power model is included
   double modelACC(double& rho, int& numAcc);
 
-  double cpCons(double& u, double& rho, int& active, int& numAcc);
+  /// Returns the total consumption of the system
+  double consumption(double& u, double& rho, int& active, int& numAcc);
 
   int galloc() const;
-  int gtypeCpu() const;
-  int gtypeAcc() const;
-  int gaccelerator() const;
+  int getTypeCpu() const;
+  int getTypeAccelerator() const;
+  int getAccelerator() const;
   int gnumOfPoints() const;
 
   double gcpuPmin() const;

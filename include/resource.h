@@ -4,7 +4,8 @@
 #include <task.h>
 #include <iterator>
 #include <list>
-using namespace std;
+
+using std::list;
 
 class resource
 {
@@ -15,43 +16,42 @@ class resource
   int type;
   int ID;
 
-  double totalProc;
-  double availProc;
-  double utilProc;
+  double totalProcessors;
+  double availableProcessors;
+  double utilizedProcessors;
 
-  double totalMem;
-  double availMem;
-  double utilMem;
+  double totalMemory;
+  double availableMemory;
+  double utilizedMemory;
 
-  double totalSto;
-  double availSto;
-  double utilSto;
+  double totalStorage;
+  double availableStorage;
+  double utilizedStorage;
 
-  double physProc;
-  double physMem;
-  double physSto;
+  double physicalProcessors;
+  double physicalMemory;
+  double physicalStorage;
 
-  double compCap;
+  double computeCapability;
 
   int accelerator;
-  int totAcc;
-  int availAcc;
-  int utilAcc;
-  double accCompCap;
+  int totalAccelerators;
+  int availableAccelerators;
+  int utilizedAccelerators;
+  double acceleratorComputeCapability;
 
-  double overCommitProc;
-  double overCommitMem;
+  double overcommitmentProcessors;
+  double overcommitmentMemory;
 
-  double autilProc;
-  double autilMem;
-  double arhoAcc;
-  double cCompCapPerProc;
-  double cCompCapPerAcc;
+  double actualUtilizedProcessors;
+  double actualUtilizedMemory;
+  double actualRhoAccelerators;
+  double currentCompCapPerProc;
+  double currentCompCapPerAcc;
 
-  int numOfTasks;
+  int numberOfTasks;
 
  public:
-
   resource();
   resource(const resinputs& setup, const int& iD);
   resource(const resource& t);
@@ -61,16 +61,16 @@ class resource
   ~resource();
 
   /// Initializes the running quantities of a resource
-  void initRunQuan();
+  void initializeRunningQuantities();
 
   /// Calculates the compute capability of each processor
-  void compcCompCapPerProc();
+  void compcurrentCompCapPerProc();
 
   /// Calculates the compute capability of each accelerator
-  void compcCompCapPerAcc();
+  void compcurrentCompCapPerAcc();
 
   /// Increments the running quantities of a resource by the provided values for processors, memory and accelerators
-  void incrRunQuan(const double& uProc, const double& uMem, const double& rAcc);
+  void incrementRunningQuantities(const double& uProc, const double& uMem, const double& rAcc);
 
   /// Assigns a task to a resource: Increments the number of tasks variable, reduces the resources' available
   /// processors, memory, storage and accelerators and calculates the utilized units
@@ -80,50 +80,50 @@ class resource
   int probe(const double& reqProc, const double& reqMem, const double& reqSto, const int& reqAcc);
 
   /// Dissociates a task from a resource by reversing the actions of the deploy method
-  /// \param t The iterator for a list of tasks that points to the task to be dissociated
+  /// \param t The iterator of a list of tasks that points to the task to be dissociated
   void unload(const list<task>::iterator& t);
 
   int galloc() const;
-  int gactive() const;
-  int gmovable() const;
-  int gtype() const;
+  int getActive() const;
+  int getMovable() const;
+  int getType() const;
   int gID() const;
 
-  double gtotalProc() const;
-  double gavailProc() const;
-  double gutilProc() const;
+  double getTotalProcessors() const;
+  double getAvailableProcessors() const;
+  double getUtilizedProcessors() const;
 
-  double gtotalMem() const;
-  double gavailMem() const;
-  double gutilMem() const;
+  double getTotalMemory() const;
+  double getAvailableMemory() const;
+  double getUtilizedMemory() const;
 
-  double gtotalSto() const;
-  double gavailSto() const;
-  double gutilSto() const;
+  double getTotalStorage() const;
+  double getAvailableStorage() const;
+  double getUtilizedStorage() const;
 
-  double gphysProc() const;
-  double gphysMem() const;
-  double gphysSto() const;
+  double getPhysicalProcessors() const;
+  double getPhysicalMemory() const;
+  double getPhysicalStorage() const;
 
-  double gcompCap() const;
+  double getComputeCapability() const;
 
-  int gaccelerator() const;
-  int gtotAcc() const;
-  int gavailAcc() const;
-  int gutilAcc() const;
-  double gaccCompCap() const;
+  int getAccelerator() const;
+  int getTotalAccelerators() const;
+  int getAvailableAccelerators() const;
+  int getUtilizedAccelerators() const;
+  double getAcceleratorComputeCapability() const;
 
-  double goverCommitProc() const;
-  double goverCommitMem() const;
+  double getOvercommitmentProcessors() const;
+  double getOvercommitmentMemory() const;
 
-  double gautilProc() const;
-  double gautilMem() const;
-  double garhoAcc() const;
+  double getActualUtilizedProcessors() const;
+  double getActualUtilizedMemory() const;
+  double getActualRhoAccelerators() const;
 
-  double gcCompCapPerProc() const;
-  double gcCompCapPerAcc() const;
+  double getCurrentCompCapPerProc() const;
+  double getCurrentCompCapPerAcc() const;
 
-  int gnumOfTasks() const;
+  int getNumberOfTasks() const;
   void print() const;
 };
 

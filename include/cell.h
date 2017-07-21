@@ -7,28 +7,27 @@
 #include <resource.h>
 #include <stat.h>
 #include <task.h>
-using namespace std;
 
 class cell
 {
  private:
   int ID;
   int alloc;
-  int numOfTypes;             //! Number of hardware types
-  int sosmIntegration;
-  int* types;                 //! Hardware type
-  int* numOfResourcesPerType; //! Number of resources that correspond to each hardware type
+  int numberOfTypes;             //! Number of hardware types
+  int sosmIntegration;          //! Select resource allocation mechanism
+  int* types;                    //! Hardware type
+  int* numberOfResourcesPerType; //! Number of resources that correspond to each hardware type
   power* powerComp;
   netw* network;
   broker* brok;
-  brokerNOsosm *brokNOsosm;
+  traditionalBroker* traditionalBrok;
   resource** resources; //! Two-dimensional array of computer resources (servers)
   stat* stats;          //! Array to keep cell statistics
 
  public:
   cell();
 
-  /// Creates cell based on user-supplied configuration
+  /// Creates a cell based on user-supplied configuration
   /// \param setup Stores cell-related configuration from the CellData file
   cell(const cellinputs& setup, int L_sosmIntegration);
 
@@ -38,10 +37,10 @@ class cell
 
   ~cell();
 
-  /// Calls broker::timestep to perform simulation phase, update state information and update cell statistics
+  /// Calls broker::timestep to perform the simulation phase, update the state information and update cell statistics
   void timestep(const double& tstep);
 
-  /// Deploys the tasks to the appropriate vRMs, by calling recursively the broker::deploy method
+  /// Deploys the tasks to the appropriate vRMs by calling recursively the broker::deploy method
   void deploy(list<task>* jobs);
 
   /// Updates cell-related statistics. The statistics are gathered per resource and summed.
@@ -52,16 +51,16 @@ class cell
 
   int gID() const;
   int galloc() const;
-  int gnumOfTypes() const;
+  int getNumberOfTypes() const;
   int getSosmIntegration() const;
-  int* gtypes() const;
-  int* gnumOfResourcesPerType() const;
-  resource** gresources() const;
-  broker* gbrok() const;
-  brokerNOsosm *getBrokNOsosm() const;
-  power* gpowerComp() const;
-  netw* gnetwork() const;
-  stat* gstats() const;
+  int* getTypes() const;
+  int* getNumberOfResourcesPerType() const;
+  traditionalBroker* getTraditionalBroker() const;
+  resource** getResources() const;
+  broker* getBroker() const;
+  power* getPowerConsumption() const;
+  netw* getNetwork() const;
+  stat* getStats() const;
 };
 
 #endif

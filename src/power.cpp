@@ -2,106 +2,29 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
-using namespace std;
 
-double power::modelCPU(double& u)
-{
-  double pcons = 0.0, Pmid;
-  int i;
-  switch (typeCpu) {
-    // Global models
-    case -1:
-      pcons = cpuPmin + (cpuPmax - cpuPmin) * u;
-      break;
-    case -2:
-      pcons = cpuPmin + (cpuPmax - cpuPmin) * u * u;
-      break;
-    case -3:
-      pcons = cpuPmin + (cpuPmax - cpuPmin) * u * u * u;
-      break;
-    case -4:
-      Pmid = cpuPmin + (cpuPmax - cpuPmin) / 2;
-      pcons =
-        (4.0 / 3.0 * Pmid - cpuPmin / 6.0 - cpuPmax / 3.0) +
-        (4.0 / 3.0 * Pmid - 2.0 * cpuPmin / 3.0 - cpuPmax / 3.0) * u +
-        (2.0 * cpuPmax + 2.0 * cpuPmin - 4.0 * Pmid) * u * u +
-        (4.0 / 3.0 * Pmid - 7.0 / 6.0 * cpuPmin - cpuPmax / 3.0) * (2.0 * u - 1.0) * (2.0 * u - 1.0) * (2.0 * u - 1.0);
-      break;
-    case -5:
-      Pmid = 5.0 * cpuPmax / 9.0;
-      pcons =
-        (4.0 / 3.0 * Pmid - cpuPmin / 6.0 - cpuPmax / 3.0) +
-        (4.0 / 3.0 * Pmid - 2.0 * cpuPmin / 3.0 - cpuPmax / 3.0) * u +
-        (2.0 * cpuPmax + 2.0 * cpuPmin - 4.0 * Pmid) * u * u +
-        (4.0 / 3.0 * Pmid - 7.0 / 6.0 * cpuPmin - cpuPmax / 3.0) * (2.0 * u - 1.0) * (2.0 * u - 1.0) * (2.0 * u - 1.0);
-      break;
-    // Piecewise models
-    case 1:
-      if (u < cpubins[0])
-        pcons = cpuP[0] + (cpuP[1] - cpuP[0]) * (u - cpubins[0]) / (cpubins[1] - cpubins[0]);
-      else if (u > cpubins[numOfPoints - 1])
-        pcons = cpuP[numOfPoints - 2] +
-                (cpuP[numOfPoints - 1] - cpuP[numOfPoints - 2]) * (u - cpubins[numOfPoints - 2]) /
-                  (cpubins[numOfPoints - 1] - cpubins[numOfPoints - 2]);
-      else {
-        for (i = 1; i < numOfPoints; i++)
-          if (u <= cpubins[i])
-            break;
-        pcons = cpuP[i - 1] + (cpuP[i] - cpuP[i - 1]) * (u - cpubins[i - 1]) / (cpubins[i] - cpubins[i - 1]);
-      }
-      break;
-    case 2:
-      if (u < cpubins[0])
-        pcons = a[0] + b[0] * (u - cpubins[0]) + c[0] * (u - cpubins[0]) * (u - cpubins[0]) +
-                d[0] * (u - cpubins[0]) * (u - cpubins[0]) * (u - cpubins[0]);
-      else if (u > cpubins[numOfPoints - 1])
-        pcons = a[numOfPoints - 2] + b[numOfPoints - 2] * (u - cpubins[numOfPoints - 2]) +
-                c[numOfPoints - 2] * (u - cpubins[numOfPoints - 2]) * (u - cpubins[numOfPoints - 2]) +
-                d[numOfPoints - 2] * (u - cpubins[numOfPoints - 2]) * (u - cpubins[numOfPoints - 2]) *
-                  (u - cpubins[numOfPoints - 2]);
-      else {
-        for (i = 1; i < numOfPoints; i++)
-          if (u <= cpubins[i])
-            break;
-        i--;
-        pcons = a[i] + b[i] * (u - cpubins[i]) + c[i] * (u - cpubins[i]) * (u - cpubins[i]) +
-                d[i] * (u - cpubins[i]) * (u - cpubins[i]) * (u - cpubins[i]);
-      }
-      break;
-  }
-  return pcons;
-}
-
-double power::modelACC(double& rho, int& numAcc)
-{
-  double pcons = 0.0;
-  switch (typeAcc) {
-    case -1:
-      pcons = accPmin * numAcc + (rho) * (accPmax - accPmin) * numAcc;
-      break;
-  }
-  return pcons;
-}
+using std::cout;
+using std::endl;
 
 power::power()
+  : alloc(0),
+    typeCpu(0),
+    typeAcc(0),
+    accelerator(0),
+    cpuPmin(0.0),
+    cpuPmax(0.0),
+    cpuC(0.0),
+    numOfPoints(0),
+    cpubins(NULL),
+    cpuP(NULL),
+    accPmin(0.0),
+    accPmax(0.0),
+    accC(0.0),
+    a(NULL),
+    b(NULL),
+    c(NULL),
+    d(NULL)
 {
-  alloc = 0;
-  typeCpu = 0;
-  typeAcc = 0;
-  accelerator = 0;
-  cpuPmin = 0.0;
-  cpuPmax = 0.0;
-  cpuC = 0.0;
-  numOfPoints = 0;
-  cpubins = NULL;
-  cpuP = NULL;
-  accPmin = 0.0;
-  accPmax = 0.0;
-  accC = 0.0;
-  a = NULL;
-  b = NULL;
-  c = NULL;
-  d = NULL;
 }
 
 power::power(const powinputs& t)
@@ -113,6 +36,7 @@ power::power(const powinputs& t)
   cpuPmin = t.cpuPmin;
   cpuPmax = t.cpuPmax;
   cpuC = t.cpuC;
+
   if (typeCpu < 0) {
     cpubins = NULL;
     cpuP = NULL;
@@ -125,10 +49,12 @@ power::power(const powinputs& t)
     numOfPoints = t.numOfPoints;
     cpubins = new double[numOfPoints];
     cpuP = new double[numOfPoints];
+
     for (i = 0; i < numOfPoints; i++) {
       cpubins[i] = t.cpubins[i];
       cpuP[i] = t.cpuP[i];
     }
+
     if (typeCpu == 2) {
       a = new double[numOfPoints - 1];
       b = new double[numOfPoints - 1];
@@ -139,10 +65,12 @@ power::power(const powinputs& t)
       tc = new double[numOfPoints];
       s = new double[numOfPoints - 1];
       h = new double[numOfPoints - 1];
-      for (i = 0; i < numOfPoints - 1; i++)
+      for (i = 0; i < numOfPoints - 1; i++) {
         a[i] = cpuP[i];
-      for (i = 0; i < numOfPoints - 1; i++)
+      }
+      for (i = 0; i < numOfPoints - 1; i++) {
         h[i] = cpubins[i + 1] - cpubins[i];
+      }
 
       // Eliminate exceeding terms to form tridiagonal
       s[0] = 0;
@@ -167,20 +95,25 @@ power::power(const powinputs& t)
 
       // Thomas algorithm
       tc[0] = tc[0] / tb[0];
-      for (i = 1; i < numOfPoints - 1; i++)
+      for (i = 1; i < numOfPoints - 1; i++) {
         tc[i] = tc[i] / (tb[i] - ta[i] * tc[i - 1]);
+      }
 
       s[0] = s[0] / tb[0];
-      for (i = 1; i < numOfPoints; i++)
+      for (i = 1; i < numOfPoints; i++) {
         s[i] = (s[i] - ta[i] * s[i - 1]) / (tb[i] - ta[i] * tc[i]);
+      }
 
       c[numOfPoints - 1] = s[numOfPoints - 1];
-      for (i = numOfPoints - 2; i >= 0; i--)
+      for (i = numOfPoints - 2; i >= 0; i--) {
         c[i] = s[i] - tc[i] * c[i + 1];
-      for (i = 0; i < numOfPoints - 1; i++)
+      }
+      for (i = 0; i < numOfPoints - 1; i++) {
         d[i] = (c[i + 1] - c[i]) / (3.0 * h[i]);
-      for (i = 0; i < numOfPoints - 1; i++)
+      }
+      for (i = 0; i < numOfPoints - 1; i++) {
         b[i] = (cpuP[i + 1] - cpuP[i]) / h[i] - c[i] * h[i] - d[i] * h[i] * h[i];
+      }
 
       delete[] h;
       delete[] ta;
@@ -198,12 +131,11 @@ power::power(const powinputs& t)
 
 power::power(const power& t)
 {
-  int i;
   if (t.galloc()) {
     alloc = 1;
-    typeCpu = t.gtypeCpu();
-    typeAcc = t.gtypeAcc();
-    accelerator = t.gaccelerator();
+    typeCpu = t.getTypeCpu();
+    typeAcc = t.getTypeAccelerator();
+    accelerator = t.getAccelerator();
     cpuPmin = t.gcpuPmin();
     cpuPmax = t.gcpuPmax();
     cpuC = t.gcpuC();
@@ -217,16 +149,19 @@ power::power(const power& t)
     if (numOfPoints > 0) {
       cpubins = new double[numOfPoints];
       cpuP = new double[numOfPoints];
-      for (i = 0; i < numOfPoints; i++) {
+
+      for (int i = 0; i < numOfPoints; i++) {
         cpubins[i] = *(t.gcpubins() + i);
         cpuP[i] = *(t.gcpuP() + i);
       }
+
       if (typeCpu == 2) {
         a = new double[numOfPoints - 1];
         b = new double[numOfPoints - 1];
         c = new double[numOfPoints];
         d = new double[numOfPoints - 1];
-        for (i = 0; i < numOfPoints - 1; i++) {
+
+        for (int i = 0; i < numOfPoints - 1; i++) {
           a[i] = *(t.ga() + i);
           b[i] = *(t.gb() + i);
           c[i] = *(t.gc() + i);
@@ -298,9 +233,9 @@ power& power::operator=(const power& t)
     alloc = t.galloc();
     if (alloc) {
       alloc = t.galloc();
-      typeCpu = t.gtypeCpu();
-      typeAcc = t.gtypeAcc();
-      accelerator = t.gaccelerator();
+      typeCpu = t.getTypeCpu();
+      typeAcc = t.getTypeAccelerator();
+      accelerator = t.getAccelerator();
       cpuPmin = t.gcpuPmin();
       cpuPmax = t.gcpuPmax();
       cpuC = t.gcpuC();
@@ -340,18 +275,102 @@ power& power::operator=(const power& t)
   return *this;
 }
 
-double power::cpCons(double& u, double& rho, int& active, int& numAcc)
+double power::modelCPU(double& u)
 {
-  if (active)
+  double pcons = 0.0, Pmid;
+  int i;
+  switch (typeCpu) {
+    // Global models
+    case -1:
+      pcons = cpuPmin + (cpuPmax - cpuPmin) * u;
+      break;
+    case -2:
+      pcons = cpuPmin + (cpuPmax - cpuPmin) * u * u;
+      break;
+    case -3:
+      pcons = cpuPmin + (cpuPmax - cpuPmin) * u * u * u;
+      break;
+    case -4:
+      Pmid = cpuPmin + (cpuPmax - cpuPmin) / 2;
+      pcons =
+        (4.0 / 3.0 * Pmid - cpuPmin / 6.0 - cpuPmax / 3.0) +
+        (4.0 / 3.0 * Pmid - 2.0 * cpuPmin / 3.0 - cpuPmax / 3.0) * u +
+        (2.0 * cpuPmax + 2.0 * cpuPmin - 4.0 * Pmid) * u * u +
+        (4.0 / 3.0 * Pmid - 7.0 / 6.0 * cpuPmin - cpuPmax / 3.0) * (2.0 * u - 1.0) * (2.0 * u - 1.0) * (2.0 * u - 1.0);
+      break;
+    case -5:
+      Pmid = 5.0 * cpuPmax / 9.0;
+      pcons =
+        (4.0 / 3.0 * Pmid - cpuPmin / 6.0 - cpuPmax / 3.0) +
+        (4.0 / 3.0 * Pmid - 2.0 * cpuPmin / 3.0 - cpuPmax / 3.0) * u +
+        (2.0 * cpuPmax + 2.0 * cpuPmin - 4.0 * Pmid) * u * u +
+        (4.0 / 3.0 * Pmid - 7.0 / 6.0 * cpuPmin - cpuPmax / 3.0) * (2.0 * u - 1.0) * (2.0 * u - 1.0) * (2.0 * u - 1.0);
+      break;
+    // Piecewise models
+    case 1:
+      if (u < cpubins[0])
+        pcons = cpuP[0] + (cpuP[1] - cpuP[0]) * (u - cpubins[0]) / (cpubins[1] - cpubins[0]);
+      else if (u > cpubins[numOfPoints - 1])
+        pcons = cpuP[numOfPoints - 2] +
+                (cpuP[numOfPoints - 1] - cpuP[numOfPoints - 2]) * (u - cpubins[numOfPoints - 2]) /
+                  (cpubins[numOfPoints - 1] - cpubins[numOfPoints - 2]);
+      else {
+        for (i = 1; i < numOfPoints; i++) {
+          if (u <= cpubins[i]) {
+            break;
+          }
+        }
+        pcons = cpuP[i - 1] + (cpuP[i] - cpuP[i - 1]) * (u - cpubins[i - 1]) / (cpubins[i] - cpubins[i - 1]);
+      }
+      break;
+    case 2:
+      if (u < cpubins[0]) {
+        pcons = a[0] + b[0] * (u - cpubins[0]) + c[0] * (u - cpubins[0]) * (u - cpubins[0]) +
+                d[0] * (u - cpubins[0]) * (u - cpubins[0]) * (u - cpubins[0]);
+      } else if (u > cpubins[numOfPoints - 1]) {
+        pcons = a[numOfPoints - 2] + b[numOfPoints - 2] * (u - cpubins[numOfPoints - 2]) +
+                c[numOfPoints - 2] * (u - cpubins[numOfPoints - 2]) * (u - cpubins[numOfPoints - 2]) +
+                d[numOfPoints - 2] * (u - cpubins[numOfPoints - 2]) * (u - cpubins[numOfPoints - 2]) *
+                  (u - cpubins[numOfPoints - 2]);
+      } else {
+        for (i = 1; i < numOfPoints; i++) {
+          if (u <= cpubins[i]) {
+            break;
+          }
+        }
+        i--;
+        pcons = a[i] + b[i] * (u - cpubins[i]) + c[i] * (u - cpubins[i]) * (u - cpubins[i]) +
+                d[i] * (u - cpubins[i]) * (u - cpubins[i]) * (u - cpubins[i]);
+      }
+      break;
+  }
+  return pcons;
+}
+
+double power::modelACC(double& rho, int& numAcc)
+{
+  double pcons = 0.0;
+  switch (typeAcc) {
+    case -1:
+      pcons = accPmin * numAcc + (rho) * (accPmax - accPmin) * numAcc;
+      break;
+  }
+  return pcons;
+}
+
+double power::consumption(double& u, double& rho, int& active, int& numAcc)
+{
+  if (active) {
     return (modelCPU(u) + modelACC(rho, numAcc)) * (1.0e-9) / 3600;
-  else
+  } else {
     return (cpuC + numAcc * accC) * (1.0e-9) / 3600;
+  }
 }
 
 int power::galloc() const { return alloc; }
-int power::gtypeCpu() const { return typeCpu; }
-int power::gtypeAcc() const { return typeAcc; }
-int power::gaccelerator() const { return accelerator; }
+int power::getTypeCpu() const { return typeCpu; }
+int power::getTypeAccelerator() const { return typeAcc; }
+int power::getAccelerator() const { return accelerator; }
 double power::gcpuPmin() const { return cpuPmin; }
 double power::gcpuPmax() const { return cpuPmax; }
 double power::gcpuC() const { return cpuC; }
@@ -367,7 +386,6 @@ double* power::gc() const { return c; }
 double* power::gd() const { return d; }
 void power::print() const
 {
-  int j;
   if (alloc) {
     cout << "         CPU Power Consumption model: " << typeCpu << endl;
     if (typeCpu < 0) {
@@ -376,12 +394,12 @@ void power::print() const
     } else if (typeCpu > 0) {
       cout << "            CPU Number of Points for Interpolation:  " << numOfPoints << endl;
       cout << "            CPU Utilization Bins: ";
-      for (j = 0; j < numOfPoints; j++) {
+      for (int j = 0; j < numOfPoints; j++) {
         cout << cpubins[j] << " ";
       }
       cout << endl;
       cout << "            CPU Power Consumption: ";
-      for (j = 0; j < numOfPoints; j++) {
+      for (int j = 0; j < numOfPoints; j++) {
         cout << cpuP[j] << " ";
       }
       cout << endl;

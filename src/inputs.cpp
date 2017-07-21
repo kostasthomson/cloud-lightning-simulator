@@ -7,32 +7,37 @@
 #include <jsoncons/json.hpp>
 #include <string>
 #include <vector>
-using namespace std;
+
+using std::cout;
+using std::endl;
+using std::setprecision;
 
 brinputs::brinputs()
+  : alloc(0),
+    numberOfFunctions(0),
+    Ws(NULL),
+    initResPervRM(0),
+    initvRMPerpSwitch(0),
+    initpSwitchPerpRouter(0),
+    pollIntervalCellM(0.0),
+    pollIntervalpRouter(0.0),
+    pollIntervalpSwitch(0.0),
+    pollIntervalvRM(0.0),
+    vRMdeploystrategy(0)
 {
-  alloc = 0;
-  numOfFuncs = 0;
-  Ws = NULL;
-  initResPervRM = 0;
-  initvRMPerpSwitch = 0;
-  initpSwitchPerpRouter = 0;
-  pollIntervalCellM = 0.0;
-  pollIntervalpRouter = 0.0;
-  pollIntervalpSwitch = 0.0;
-  pollIntervalvRM = 0.0;
-  vRMdeploystrategy = 0;
 }
 
 brinputs::brinputs(const brinputs& t)
 {
-  int i;
   if (t.alloc) {
     alloc = t.alloc;
-    numOfFuncs = t.numOfFuncs;
-    Ws = new double[numOfFuncs];
-    for (i = 0; i < numOfFuncs; i++)
+    numberOfFunctions = t.numberOfFunctions;
+    Ws = new double[numberOfFunctions];
+
+    for (int i = 0; i < numberOfFunctions; i++) {
       Ws[i] = t.Ws[i];
+    }
+
     initResPervRM = t.initResPervRM;
     initvRMPerpSwitch = t.initvRMPerpSwitch;
     initpSwitchPerpRouter = t.initpSwitchPerpRouter;
@@ -46,11 +51,10 @@ brinputs::brinputs(const brinputs& t)
 
 brinputs& brinputs::operator=(const brinputs& t)
 {
-  int i;
   if (this != &t) {
     if (alloc) {
       alloc = 0;
-      numOfFuncs = 0;
+      numberOfFunctions = 0;
       delete[] Ws;
       Ws = NULL;
       initResPervRM = 0;
@@ -64,10 +68,13 @@ brinputs& brinputs::operator=(const brinputs& t)
     }
     alloc = t.alloc;
     if (alloc) {
-      numOfFuncs = t.numOfFuncs;
-      Ws = new double[numOfFuncs];
-      for (i = 0; i < numOfFuncs; i++)
+      numberOfFunctions = t.numberOfFunctions;
+      Ws = new double[numberOfFunctions];
+
+      for (int i = 0; i < numberOfFunctions; i++) {
         Ws[i] = t.Ws[i];
+      }
+
       initResPervRM = t.initResPervRM;
       initvRMPerpSwitch = t.initvRMPerpSwitch;
       initpSwitchPerpRouter = t.initpSwitchPerpRouter;
@@ -85,7 +92,7 @@ brinputs::~brinputs()
 {
   if (alloc) {
     alloc = 0;
-    numOfFuncs = 0;
+    numberOfFunctions = 0;
     delete[] Ws;
     Ws = NULL;
     initResPervRM = 0;
@@ -101,13 +108,13 @@ brinputs::~brinputs()
 
 void brinputs::print()
 {
-  int i;
   if (alloc) {
     cout << "    =========== Broker ===========" << endl;
-    cout << "        Number of Assessment Functions: " << numOfFuncs << endl;
+    cout << "        Number of Assessment Functions: " << numberOfFunctions << endl;
     cout << "        Weights: ";
-    for (i = 0; i < numOfFuncs; i++)
+    for (int i = 0; i < numberOfFunctions; i++) {
       cout << Ws[i] << " ";
+    }
     cout << endl;
     cout << "        Initial number of Resources per vRM: " << initResPervRM << endl;
     cout << "        Initial number of vRMs per pSwitch: " << initvRMPerpSwitch << endl;
@@ -131,9 +138,9 @@ void brinputs::parse(const string& outname, int i)
   int k = i;
   int j;
   alloc = 1;
-  numOfFuncs = b["Brokers"][k]["Number of functions"].as<int>();
-  Ws=new double[numOfFuncs];
-  for(j=0;j<numOfFuncs;j++){
+  numberOfFunctions = b["Brokers"][k]["Number of functions"].as<int>();
+  Ws=new double[numberOfFunctions];
+  for(j=0;j<numberOfFunctions;j++){
     Ws[j] = b["Brokers"][k]["Weights of functions"][j].as<double>();
   }
   initResPervRM = b["Brokers"][k]["Number of Resources per vRM"].as<int>();
@@ -146,9 +153,9 @@ void brinputs::parse(const string& outname, int i)
   vRMdeploystrategy = b["Brokers"][k]["vRM deployment strategy"].as<int>();
 
   /*
-    outname>>numOfFuncs;
-    Ws=new double[numOfFuncs];
-    for(i=0;i<numOfFuncs;i++)
+    outname>>numberOfFunctions;
+    Ws=new double[numberOfFunctions];
+    for(i=0;i<numberOfFunctions;i++)
       outname>>Ws[i];
     outname>>initResPervRM;
     outname>>initvRMPerpSwitch;
@@ -169,9 +176,9 @@ void brinputs::printfile(const string& outname, const ios::openmode& mode, int s
     file.open(outname.c_str(), mode);
     file << "    =========== Broker ===========" << endl;
     if (sosmIntegration){
-      file << "        Number of Assessment Functions: " << numOfFuncs << endl;
+      file << "        Number of Assessment Functions: " << numberOfFunctions << endl;
       file << "        Weights: ";
-      for (i = 0; i < numOfFuncs; i++) {
+      for (i = 0; i < numberOfFunctions; i++) {
           file << Ws[i] << " ";
       }
       file << endl;
@@ -185,8 +192,8 @@ void brinputs::printfile(const string& outname, const ios::openmode& mode, int s
       file << "        vRM deployment strategy: " << vRMdeploystrategy << endl;
     }
     else {
-      file<<"        Poll Interval for the Cell Manager: "<<pollIntervalCellM<<endl;
-    } 
+      file << "        Poll Interval for the Cell Manager: "<<pollIntervalCellM<<endl;
+    }
     file << endl;
     file.close();
   }
@@ -197,8 +204,8 @@ appinputs::appinputs()
   alloc = 0;
   minmaxJobsPerSec = NULL;
   numOfApps = 0;
-  numOfAvailImplPerApp = NULL;
-  availImplPerApp = NULL;
+  numberOfAvailableImplementationsPerApp = NULL;
+  availableImplementationsPerApp = NULL;
   minmaxInsPerApp = NULL;
   minmaxVMPerApp = NULL;
   minmaxProcPerVM = NULL;
@@ -225,18 +232,18 @@ appinputs::appinputs(const appinputs& t)
       minmaxJobsPerSec[i] = t.minmaxJobsPerSec[i];
     }
     numOfApps = t.numOfApps;
-    numOfAvailImplPerApp = new int[numOfApps];
+    numberOfAvailableImplementationsPerApp = new int[numOfApps];
     typeOfActP = new int[numOfApps];
     typeOfActM = new int[numOfApps];
     typeOfActN = new int[numOfApps];
     for (i = 0; i < numOfApps; i++) {
-      numOfAvailImplPerApp[i] = t.numOfAvailImplPerApp[i];
+      numberOfAvailableImplementationsPerApp[i] = t.numberOfAvailableImplementationsPerApp[i];
       typeOfActP[i] = t.typeOfActP[i];
       typeOfActM[i] = t.typeOfActM[i];
       typeOfActN[i] = t.typeOfActN[i];
     }
 
-    availImplPerApp = new int*[numOfApps];
+    availableImplementationsPerApp = new int*[numOfApps];
     minmaxInsPerApp = new double*[numOfApps];
     minmaxVMPerApp = new int*[numOfApps];
     minmaxProcPerVM = new double*[numOfApps];
@@ -250,11 +257,11 @@ appinputs::appinputs(const appinputs& t)
     rhoAcc = new double*[numOfApps];
 
     for (i = 0; i < numOfApps; i++) {
-      availImplPerApp[i] = new int[numOfAvailImplPerApp[i]];
-      accelerator[i] = new int[numOfAvailImplPerApp[i]];
-      rhoAcc[i] = new double[numOfAvailImplPerApp[i]];
-      for (j = 0; j < numOfAvailImplPerApp[i]; j++) {
-        availImplPerApp[i][j] = t.availImplPerApp[i][j];
+      availableImplementationsPerApp[i] = new int[numberOfAvailableImplementationsPerApp[i]];
+      accelerator[i] = new int[numberOfAvailableImplementationsPerApp[i]];
+      rhoAcc[i] = new double[numberOfAvailableImplementationsPerApp[i]];
+      for (j = 0; j < numberOfAvailableImplementationsPerApp[i]; j++) {
+        availableImplementationsPerApp[i][j] = t.availableImplementationsPerApp[i][j];
         accelerator[i][j] = t.accelerator[i][j];
         rhoAcc[i][j] = t.rhoAcc[i][j];
       }
@@ -289,12 +296,12 @@ appinputs& appinputs::operator=(const appinputs& t)
     if (alloc) {
       alloc = 0;
       delete[] minmaxJobsPerSec;
-      delete[] numOfAvailImplPerApp;
+      delete[] numberOfAvailableImplementationsPerApp;
       delete[] typeOfActP;
       delete[] typeOfActM;
       delete[] typeOfActN;
       for (i = 0; i < numOfApps; i++) {
-        delete[] availImplPerApp[i];
+        delete[] availableImplementationsPerApp[i];
         delete[] minmaxInsPerApp[i];
         delete[] minmaxVMPerApp[i];
         delete[] minmaxProcPerVM[i];
@@ -307,7 +314,7 @@ appinputs& appinputs::operator=(const appinputs& t)
         delete[] rhoAcc[i];
         delete[] accelerator[i];
       }
-      delete[] availImplPerApp;
+      delete[] availableImplementationsPerApp;
       delete[] minmaxInsPerApp;
       delete[] minmaxVMPerApp;
       delete[] minmaxProcPerVM;
@@ -319,8 +326,8 @@ appinputs& appinputs::operator=(const appinputs& t)
       delete[] minmaxActN;
       delete[] accelerator;
       delete[] rhoAcc;
-      numOfAvailImplPerApp = NULL;
-      availImplPerApp = NULL;
+      numberOfAvailableImplementationsPerApp = NULL;
+      availableImplementationsPerApp = NULL;
       minmaxInsPerApp = NULL;
       minmaxVMPerApp = NULL;
       minmaxProcPerVM = NULL;
@@ -343,18 +350,18 @@ appinputs& appinputs::operator=(const appinputs& t)
       for (i = 0; i < 2; i++)
         minmaxJobsPerSec[i] = t.minmaxJobsPerSec[i];
       numOfApps = t.numOfApps;
-      numOfAvailImplPerApp = new int[numOfApps];
+      numberOfAvailableImplementationsPerApp = new int[numOfApps];
       typeOfActP = new int[numOfApps];
       typeOfActM = new int[numOfApps];
       typeOfActN = new int[numOfApps];
       for (i = 0; i < numOfApps; i++) {
-        numOfAvailImplPerApp[i] = t.numOfAvailImplPerApp[i];
+        numberOfAvailableImplementationsPerApp[i] = t.numberOfAvailableImplementationsPerApp[i];
         typeOfActP[i] = t.typeOfActP[i];
         typeOfActM[i] = t.typeOfActM[i];
         typeOfActN[i] = t.typeOfActN[i];
       }
 
-      availImplPerApp = new int*[numOfApps];
+      availableImplementationsPerApp = new int*[numOfApps];
       minmaxInsPerApp = new double*[numOfApps];
       minmaxVMPerApp = new int*[numOfApps];
       minmaxProcPerVM = new double*[numOfApps];
@@ -368,11 +375,11 @@ appinputs& appinputs::operator=(const appinputs& t)
       rhoAcc = new double*[numOfApps];
 
       for (i = 0; i < numOfApps; i++) {
-        availImplPerApp[i] = new int[numOfAvailImplPerApp[i]];
-        accelerator[i] = new int[numOfAvailImplPerApp[i]];
-        rhoAcc[i] = new double[numOfAvailImplPerApp[i]];
-        for (j = 0; j < numOfAvailImplPerApp[i]; j++) {
-          availImplPerApp[i][j] = t.availImplPerApp[i][j];
+        availableImplementationsPerApp[i] = new int[numberOfAvailableImplementationsPerApp[i]];
+        accelerator[i] = new int[numberOfAvailableImplementationsPerApp[i]];
+        rhoAcc[i] = new double[numberOfAvailableImplementationsPerApp[i]];
+        for (j = 0; j < numberOfAvailableImplementationsPerApp[i]; j++) {
+          availableImplementationsPerApp[i][j] = t.availableImplementationsPerApp[i][j];
           accelerator[i][j] = t.accelerator[i][j];
           rhoAcc[i][j] = t.rhoAcc[i][j];
         }
@@ -413,12 +420,12 @@ void appinputs::parse(const string& fname)
   numOfApps = a["Number of Applications"].as<int>();  //read number of applications and assign to variable
   minmaxJobsPerSec=new double[2];
   for(i=0;i<2;i++){
-    minmaxJobsPerSec[i] = a["Minimum and Maximum Jobs Per Second"][i].as<double>(); 
+    minmaxJobsPerSec[i] = a["Minimum and Maximum Jobs Per Second"][i].as<double>();
   }
 
   // Initialization of application characteristics
-  numOfAvailImplPerApp = new int[numOfApps];
-  availImplPerApp = new int*[numOfApps];
+  numberOfAvailableImplementationsPerApp = new int[numOfApps];
+  availableImplementationsPerApp = new int*[numOfApps];
   minmaxInsPerApp = new double*[numOfApps];
   minmaxVMPerApp = new int*[numOfApps];
   minmaxProcPerVM = new double*[numOfApps];
@@ -435,11 +442,11 @@ void appinputs::parse(const string& fname)
   typeOfActN = new int[numOfApps];
 
   for(i=0;i<numOfApps;i++){
-    
-    numOfAvailImplPerApp[i] = a["Applications"][i]["Number of Available Implementations"].as<int>();
-    availImplPerApp[i]=new int[numOfAvailImplPerApp[i]];
-    for(j=0;j<numOfAvailImplPerApp[i];j++){
-        availImplPerApp[i][j] = a["Applications"][i]["Available Implementations"][j].as<int>() ;
+
+    numberOfAvailableImplementationsPerApp[i] = a["Applications"][i]["Number of Available Implementations"].as<int>();
+    availableImplementationsPerApp[i]=new int[numberOfAvailableImplementationsPerApp[i]];
+    for(j=0;j<numberOfAvailableImplementationsPerApp[i];j++){
+        availableImplementationsPerApp[i][j] = a["Applications"][i]["Available Implementations"][j].as<int>() ;
       }
     minmaxInsPerApp[i]=new double[2];
     minmaxVMPerApp[i]=new int[2];
@@ -466,7 +473,7 @@ void appinputs::parse(const string& fname)
       for(j=0;j<2;j++){
         minmaxNetPerApp[i][j] = a["Applications"][i]["Minimum - Maximum Network Per VM"][j].as<double>();
       }
-      
+
       typeOfActP[i] = a["Applications"][i]["Type of Actual Utilization (vCPU,Memory,Network)"][0].as<int>();
       typeOfActM[i] = a["Applications"][i]["Type of Actual Utilization (vCPU,Memory,Network)"][1].as<int>();
       typeOfActN[i] = a["Applications"][i]["Type of Actual Utilization (vCPU,Memory,Network)"][2].as<int>();
@@ -483,12 +490,12 @@ void appinputs::parse(const string& fname)
       for(j=0;j<2;j++){
         minmaxActN[i][j] = a["Applications"][i]["Minimum - Maximum Actual Network Utilization"][j].as<double>();
       }
-      accelerator[i]=new int[numOfAvailImplPerApp[i]];
-      for(j=0;j<numOfAvailImplPerApp[i];j++){
+      accelerator[i]=new int[numberOfAvailableImplementationsPerApp[i]];
+      for(j=0;j<numberOfAvailableImplementationsPerApp[i];j++){
         accelerator[i][j] = a["Applications"][i]["Accelerator support"][j].as<int>();
-      }     
-      rhoAcc[i]=new double[numOfAvailImplPerApp[i]];
-      for(j=0;j<numOfAvailImplPerApp[i];j++){
+      }
+      rhoAcc[i]=new double[numberOfAvailableImplementationsPerApp[i]];
+      for(j=0;j<numberOfAvailableImplementationsPerApp[i];j++){
         rhoAcc[i][j] = a["Applications"][i]["Rho for accelerator execution per Implementation"][j].as<double>();
       }
     }
@@ -502,8 +509,8 @@ void appinputs::parse(const string& fname)
     for(i=0;i<2;i++)
       file>>minmaxJobsPerSec[i];
     file>>numOfApps;
-    numOfAvailImplPerApp=new int[numOfApps];
-    availImplPerApp=new int*[numOfApps];
+    numberOfAvailableImplementationsPerApp=new int[numOfApps];
+    availableImplementationsPerApp=new int*[numOfApps];
     minmaxInsPerApp=new double*[numOfApps];
     minmaxVMPerApp=new int*[numOfApps];
     minmaxProcPerVM=new double*[numOfApps];
@@ -521,11 +528,11 @@ void appinputs::parse(const string& fname)
     for(i=0;i<numOfApps;i++)
     {
 
-      file>>numOfAvailImplPerApp[i];
-      availImplPerApp[i]=new int[numOfAvailImplPerApp[i]];
-      for(j=0;j<numOfAvailImplPerApp[i];j++)
+      file>>numberOfAvailableImplementationsPerApp[i];
+      availableImplementationsPerApp[i]=new int[numberOfAvailableImplementationsPerApp[i]];
+      for(j=0;j<numberOfAvailableImplementationsPerApp[i];j++)
       {
-        file>>availImplPerApp[i][j];
+        file>>availableImplementationsPerApp[i][j];
       }
 
       minmaxInsPerApp[i]=new double[2];
@@ -577,13 +584,13 @@ void appinputs::parse(const string& fname)
       {
         file>>minmaxActN[i][j];
       }
-      accelerator[i]=new int[numOfAvailImplPerApp[i]];
-      for(j=0;j<numOfAvailImplPerApp[i];j++)
+      accelerator[i]=new int[numberOfAvailableImplementationsPerApp[i]];
+      for(j=0;j<numberOfAvailableImplementationsPerApp[i];j++)
       {
         file>>accelerator[i][j];
       }
-      rhoAcc[i]=new double[numOfAvailImplPerApp[i]];
-      for(j=0;j<numOfAvailImplPerApp[i];j++)
+      rhoAcc[i]=new double[numberOfAvailableImplementationsPerApp[i]];
+      for(j=0;j<numberOfAvailableImplementationsPerApp[i];j++)
       {
         file>>rhoAcc[i][j];
       }
@@ -604,10 +611,10 @@ void appinputs::print()
     cout << "-----------------------------------" << endl;
     for (i = 0; i < numOfApps; i++) {
       cout << "     Application: " << i + 1 << endl;
-      cout << "     Number of Available Implementations: " << numOfAvailImplPerApp[i] << endl;
+      cout << "     Number of Available Implementations: " << numberOfAvailableImplementationsPerApp[i] << endl;
       cout << "     Available Implementations: ";
-      for (j = 0; j < numOfAvailImplPerApp[i]; j++)
-        cout << availImplPerApp[i][j] << " ";
+      for (j = 0; j < numberOfAvailableImplementationsPerApp[i]; j++)
+        cout << availableImplementationsPerApp[i][j] << " ";
       cout << endl;
       cout << "     Minimum - Maximum Instructions Per App: ";
       for (j = 0; j < 2; j++) {
@@ -657,12 +664,12 @@ void appinputs::print()
       }
       cout << endl;
       cout << "     Accelerator support: ";
-      for (j = 0; j < numOfAvailImplPerApp[i]; j++) {
+      for (j = 0; j < numberOfAvailableImplementationsPerApp[i]; j++) {
         cout << accelerator[i][j] << " ";
       }
       cout << endl;
       cout << "     Rho for accelerator execution per Implementation: ";
-      for (j = 0; j < numOfAvailImplPerApp[i]; j++) {
+      for (j = 0; j < numberOfAvailableImplementationsPerApp[i]; j++) {
         cout << rhoAcc[i][j] << " ";
       }
       cout << endl;
@@ -686,10 +693,10 @@ void appinputs::printfile(const string& outname, const ios::openmode& mode)
     file << "-----------------------------------" << endl;
     for (i = 0; i < numOfApps; i++) {
       file << "     Application: " << i + 1 << endl;
-      file << "     Number of Available Implementations: " << numOfAvailImplPerApp[i] << endl;
+      file << "     Number of Available Implementations: " << numberOfAvailableImplementationsPerApp[i] << endl;
       file << "     Available Implementations: ";
-      for (j = 0; j < numOfAvailImplPerApp[i]; j++)
-        file << availImplPerApp[i][j] << " ";
+      for (j = 0; j < numberOfAvailableImplementationsPerApp[i]; j++)
+        file << availableImplementationsPerApp[i][j] << " ";
       file << endl;
       file << "     Minimum - Maximum Instructions Per App: ";
       for (j = 0; j < 2; j++) {
@@ -739,12 +746,12 @@ void appinputs::printfile(const string& outname, const ios::openmode& mode)
       }
       file << endl;
       file << "     Accelerator support: ";
-      for (j = 0; j < numOfAvailImplPerApp[i]; j++) {
+      for (j = 0; j < numberOfAvailableImplementationsPerApp[i]; j++) {
         file << accelerator[i][j] << " ";
       }
       file << endl;
       file << "     Rho for accelerator execution per Implementation: ";
-      for (j = 0; j < numOfAvailImplPerApp[i]; j++) {
+      for (j = 0; j < numberOfAvailableImplementationsPerApp[i]; j++) {
         file << rhoAcc[i][j] << " ";
       }
       file << endl;
@@ -760,12 +767,12 @@ appinputs::~appinputs()
   if (alloc) {
     alloc = 0;
     delete[] minmaxJobsPerSec;
-    delete[] numOfAvailImplPerApp;
+    delete[] numberOfAvailableImplementationsPerApp;
     delete[] typeOfActP;
     delete[] typeOfActM;
     delete[] typeOfActN;
     for (i = 0; i < numOfApps; i++) {
-      delete[] availImplPerApp[i];
+      delete[] availableImplementationsPerApp[i];
       delete[] minmaxInsPerApp[i];
       delete[] minmaxVMPerApp[i];
       delete[] minmaxProcPerVM[i];
@@ -778,7 +785,7 @@ appinputs::~appinputs()
       delete[] accelerator[i];
       delete[] rhoAcc[i];
     }
-    delete[] availImplPerApp;
+    delete[] availableImplementationsPerApp;
     delete[] minmaxInsPerApp;
     delete[] minmaxVMPerApp;
     delete[] minmaxProcPerVM;
@@ -790,8 +797,8 @@ appinputs::~appinputs()
     delete[] minmaxActN;
     delete[] accelerator;
     delete[] rhoAcc;
-    numOfAvailImplPerApp = NULL;
-    availImplPerApp = NULL;
+    numberOfAvailableImplementationsPerApp = NULL;
+    availableImplementationsPerApp = NULL;
     minmaxInsPerApp = NULL;
     minmaxVMPerApp = NULL;
     minmaxProcPerVM = NULL;
@@ -814,7 +821,7 @@ netinputs::netinputs()
 {
   alloc = 0;
   netBW = 0.0;
-  overCommitNet = 1.0;
+  overCommitmentNetwork = 1.0;
 }
 
 netinputs::netinputs(const netinputs& t)
@@ -822,7 +829,7 @@ netinputs::netinputs(const netinputs& t)
   if (t.alloc) {
     alloc = t.alloc;
     netBW = t.netBW;
-    overCommitNet = t.overCommitNet;
+    overCommitmentNetwork = t.overCommitmentNetwork;
   }
 }
 
@@ -832,12 +839,12 @@ netinputs& netinputs::operator=(const netinputs& t)
     if (alloc) {
       alloc = 0;
       netBW = 0.0;
-      overCommitNet = 1.0;
+      overCommitmentNetwork = 1.0;
     }
     alloc = t.alloc;
     if (alloc) {
       netBW = t.netBW;
-      overCommitNet = t.overCommitNet;
+      overCommitmentNetwork = t.overCommitmentNetwork;
     }
   }
   return *this;
@@ -848,7 +855,7 @@ void netinputs::print()
   if (alloc) {
     cout << "=====Network Interconnection=====" << endl;
     cout << "     Interconnection Bandwidth: " << netBW << " Gbps" << endl;
-    cout << "     Bandwidth Over Commitment Ration: " << overCommitNet << endl;
+    cout << "     Bandwidth Over Commitment Ration: " << overCommitmentNetwork << endl;
     cout << "=================================" << endl;
   }
 }
@@ -858,7 +865,7 @@ netinputs::~netinputs()
   if (alloc) {
     alloc = 0;
     netBW = 0.0;
-    overCommitNet = 1.0;
+    overCommitmentNetwork = 1.0;
   }
 }
 
@@ -982,14 +989,14 @@ resinputs::resinputs()
 {
   alloc = 0;
   numOfProcUnits = 0.0;
-  totMem = 0.0;
-  totSto = 0.0;
-  overCommitProc = 0.0;
-  overCommitMem = 0.0;
-  compCap = 0.0;
+  totalMemory = 0.0;
+  totalStorage = 0.0;
+  overcommitmentProcessors = 0.0;
+  overcommitmentMemory = 0.0;
+  computeCapability = 0.0;
   accelerator = 0;
-  accCompCap = 0.0;
-  totAcc = 0;
+  acceleratorComputeCapability = 0.0;
+  totalAccelerators = 0;
   type = 0;
 }
 
@@ -998,14 +1005,14 @@ resinputs::resinputs(const resinputs& t)
   if (t.alloc) {
     alloc = t.alloc;
     numOfProcUnits = t.numOfProcUnits;
-    totMem = t.totMem;
-    totSto = t.totSto;
-    overCommitProc = t.overCommitProc;
-    overCommitMem = t.overCommitMem;
-    compCap = t.compCap;
+    totalMemory = t.totalMemory;
+    totalStorage = t.totalStorage;
+    overcommitmentProcessors = t.overcommitmentProcessors;
+    overcommitmentMemory = t.overcommitmentMemory;
+    computeCapability = t.computeCapability;
     accelerator = t.accelerator;
-    accCompCap = t.accCompCap;
-    totAcc = t.totAcc;
+    acceleratorComputeCapability = t.acceleratorComputeCapability;
+    totalAccelerators = t.totalAccelerators;
     type = t.type;
   }
 }
@@ -1016,27 +1023,27 @@ resinputs& resinputs::operator=(const resinputs& t)
     if (alloc) {
       alloc = 0;
       numOfProcUnits = 0.0;
-      totMem = 0.0;
-      totSto = 0.0;
-      overCommitProc = 0.0;
-      compCap = 0.0;
+      totalMemory = 0.0;
+      totalStorage = 0.0;
+      overcommitmentProcessors = 0.0;
+      computeCapability = 0.0;
       accelerator = 0;
-      accCompCap = 0.0;
-      totAcc = 0;
+      acceleratorComputeCapability = 0.0;
+      totalAccelerators = 0;
       type = 0;
     }
     alloc = t.alloc;
     if (alloc) {
       alloc = t.alloc;
       numOfProcUnits = t.numOfProcUnits;
-      totMem = t.totMem;
-      totSto = t.totSto;
-      overCommitProc = t.overCommitProc;
-      overCommitMem = t.overCommitMem;
-      compCap = t.compCap;
+      totalMemory = t.totalMemory;
+      totalStorage = t.totalStorage;
+      overcommitmentProcessors = t.overcommitmentProcessors;
+      overcommitmentMemory = t.overcommitmentMemory;
+      computeCapability = t.computeCapability;
       accelerator = t.accelerator;
-      accCompCap = t.accCompCap;
-      totAcc = t.totAcc;
+      acceleratorComputeCapability = t.acceleratorComputeCapability;
+      totalAccelerators = t.totalAccelerators;
       type = t.type;
     }
   }
@@ -1048,13 +1055,13 @@ resinputs::~resinputs()
   if (alloc) {
     alloc = 0;
     numOfProcUnits = 0.0;
-    totMem = 0.0;
-    totSto = 0.0;
-    overCommitProc = 0.0;
-    compCap = 0.0;
+    totalMemory = 0.0;
+    totalStorage = 0.0;
+    overcommitmentProcessors = 0.0;
+    computeCapability = 0.0;
     accelerator = 0;
-    accCompCap = 0.0;
-    totAcc = 0;
+    acceleratorComputeCapability = 0.0;
+    totalAccelerators = 0;
     type = 0;
   }
 }
@@ -1063,9 +1070,9 @@ cellinputs::cellinputs()
 {
   alloc = 0;
   ID = 0;
-  numOfTypes = 0;
+  numberOfTypes = 0;
   types = NULL;
-  numOfResourcesPerType = NULL;
+  numberOfResourcesPerType = NULL;
   rinp = NULL;
   pinp = NULL;
   ninp = NULL;
@@ -1078,18 +1085,18 @@ cellinputs::cellinputs(const cellinputs& t)
   if (t.alloc) {
     ID = t.ID;
     alloc = t.alloc;
-    numOfTypes = t.numOfTypes;
-    types = new int[numOfTypes];
-    numOfResourcesPerType = new int[numOfTypes];
-    rinp = new resinputs[numOfTypes];
-    pinp = new powinputs[numOfTypes];
+    numberOfTypes = t.numberOfTypes;
+    types = new int[numberOfTypes];
+    numberOfResourcesPerType = new int[numberOfTypes];
+    rinp = new resinputs[numberOfTypes];
+    pinp = new powinputs[numberOfTypes];
     ninp = new netinputs[1];
     binp = new brinputs[1];
     ninp[0] = t.ninp[0];
     binp[0] = t.binp[0];
-    for (i = 0; i < numOfTypes; i++) {
+    for (i = 0; i < numberOfTypes; i++) {
       types[i] = t.types[i];
-      numOfResourcesPerType[i] = t.numOfResourcesPerType[i];
+      numberOfResourcesPerType[i] = t.numberOfResourcesPerType[i];
       rinp[i] = t.rinp[i];
       pinp[i] = t.pinp[i];
     }
@@ -1101,9 +1108,9 @@ cellinputs::~cellinputs()
   if (alloc) {
     alloc = 0;
     ID = 0;
-    numOfTypes = 0;
+    numberOfTypes = 0;
     delete[] types;
-    delete[] numOfResourcesPerType;
+    delete[] numberOfResourcesPerType;
     delete[] rinp;
     delete[] pinp;
     delete[] ninp;
@@ -1118,9 +1125,9 @@ cellinputs& cellinputs::operator=(const cellinputs& t)
     if (alloc) {
       alloc = 0;
       ID = 0;
-      numOfTypes = 0;
+      numberOfTypes = 0;
       delete[] types;
-      delete[] numOfResourcesPerType;
+      delete[] numberOfResourcesPerType;
       delete[] rinp;
       delete[] pinp;
       delete[] ninp;
@@ -1129,18 +1136,18 @@ cellinputs& cellinputs::operator=(const cellinputs& t)
     alloc = t.alloc;
     if (alloc) {
       ID = t.ID;
-      numOfTypes = t.numOfTypes;
-      types = new int[numOfTypes];
-      numOfResourcesPerType = new int[numOfTypes];
-      rinp = new resinputs[numOfTypes];
-      pinp = new powinputs[numOfTypes];
+      numberOfTypes = t.numberOfTypes;
+      types = new int[numberOfTypes];
+      numberOfResourcesPerType = new int[numberOfTypes];
+      rinp = new resinputs[numberOfTypes];
+      pinp = new powinputs[numberOfTypes];
       ninp = new netinputs[1];
       binp = new brinputs[1];
       ninp[0] = t.ninp[0];
       binp[0] = t.binp[0];
-      for (i = 0; i < numOfTypes; i++) {
+      for (i = 0; i < numberOfTypes; i++) {
         types[i] = t.types[i];
-        numOfResourcesPerType[i] = t.numOfResourcesPerType[i];
+        numberOfResourcesPerType[i] = t.numberOfResourcesPerType[i];
         rinp[i] = t.rinp[i];
         pinp[i] = t.pinp[i];
       }
@@ -1154,8 +1161,8 @@ siminputs::siminputs()
   alloc = 0;
   numOfCells = 0;
   maxTime = 0.0;
-  sosmIntegration = 0;
-  upInterval = 0.0;
+	sosmIntegration = 0;
+  updateInterval = 0.0;
   cinp = NULL;
 }
 
@@ -1166,8 +1173,8 @@ siminputs::siminputs(const siminputs& t)
     alloc = t.alloc;
     numOfCells = t.numOfCells;
     maxTime = t.maxTime;
-    sosmIntegration = t.sosmIntegration;
-    upInterval = t.upInterval;
+		sosmIntegration = t.sosmIntegration;
+    updateInterval = t.updateInterval;
     cinp = new cellinputs[numOfCells];
     for (i = 0; i < numOfCells; i++)
       cinp[i] = t.cinp[i];
@@ -1180,8 +1187,8 @@ siminputs::~siminputs()
     alloc = 0;
     numOfCells = 0;
     maxTime = 0.0;
-    sosmIntegration = 0;
-    upInterval = 0.0;
+		sosmIntegration = 0;
+    updateInterval = 0.0;
     delete[] cinp;
   }
 }
@@ -1195,15 +1202,15 @@ siminputs& siminputs::operator=(const siminputs& t)
       numOfCells = 0;
       maxTime = 0.0;
       sosmIntegration = 0;
-      upInterval = 0.0;
+      updateInterval = 0.0;
       delete[] cinp;
     }
     alloc = t.alloc;
     if (alloc) {
       numOfCells = t.numOfCells;
       maxTime = t.maxTime;
-      sosmIntegration = t.sosmIntegration;
-      upInterval = t.upInterval;
+			sosmIntegration = t.sosmIntegration;
+      updateInterval = t.updateInterval;
       cinp = new cellinputs[numOfCells];
       for (i = 0; i < numOfCells; i++)
         cinp[i] = t.cinp[i];
@@ -1215,55 +1222,55 @@ siminputs& siminputs::operator=(const siminputs& t)
 void siminputs::parse(const string& fname, const string& bname)
 {
   int i, j, k;
-  double dummy;
-  
+  //double dummy;
+
   std::ifstream is(fname);
   jsoncons::json c;
   is >> c;
-  
+
   sosmIntegration = c["SOSM Integration"].as<int>();  //0 for traditional , 1 for SOSM
   maxTime = c["Maximum Simulation Time"].as<int>();   //read maximum simulation time and assign to variable
-  upInterval = c["Update Interval"].as<int>();      //read update interval and assign to variable
+  updateInterval = c["Update Interval"].as<int>();      //read update interval and assign to variable
   numOfCells = c["Number of Cells"].as<int>();      //read number of cells and assign to variable
   cinp=new cellinputs[numOfCells];
   alloc=1;
 
   //---------------------------------------------
   // For each cell and for each hardware type,
-  // initialization of characteristics and reading 
+  // initialization of characteristics and reading
   // data from file
   //---------------------------------------------
   for(i=0;i<numOfCells;i++){
     cinp[i].binp=new brinputs[1];
     cinp[i].binp[0].alloc=1;
     cinp[i].binp[0].parse(bname,i);
-    cinp[i].numOfTypes = c["Cells"][i]["Number_of_HW_types"].as<int>();
+    cinp[i].numberOfTypes = c["Cells"][i]["Number_of_HW_types"].as<int>();
     cinp[i].alloc=1;
     cinp[i].ID=i+1;
-    cinp[i].types=new int[cinp[i].numOfTypes];
-    cinp[i].numOfResourcesPerType=new int[cinp[i].numOfTypes];
-    cinp[i].rinp=new resinputs[cinp[i].numOfTypes];
-    cinp[i].pinp=new powinputs[cinp[i].numOfTypes];
+    cinp[i].types=new int[cinp[i].numberOfTypes];
+    cinp[i].numberOfResourcesPerType=new int[cinp[i].numberOfTypes];
+    cinp[i].rinp=new resinputs[cinp[i].numberOfTypes];
+    cinp[i].pinp=new powinputs[cinp[i].numberOfTypes];
     cinp[i].ninp=new netinputs[1];
     cinp[i].ninp[0].alloc=1;
     cinp[i].ninp[0].netBW = c["Cells"][i]["Cell_Interconnection_Bandwidth"].as<int>();
-    cinp[i].ninp[0].overCommitNet = c["Cells"][i]["Network_Bandwidth_Overcommitment_ratio"].as<double>();
+    cinp[i].ninp[0].overCommitmentNetwork = c["Cells"][i]["Network_Bandwidth_Overcommitment_ratio"].as<double>();
 
-    for(j=0;j<cinp[i].numOfTypes;j++)
+    for(j=0;j<cinp[i].numberOfTypes;j++)
     {
         cinp[i].types[j] = c["Cells"][i]["HW_types"][j]["HW_type_ID"].as<int>();
-        cinp[i].numOfResourcesPerType[j] = c["Cells"][i]["HW_types"][j]["Number of Servers"].as<int>();
+        cinp[i].numberOfResourcesPerType[j] = c["Cells"][i]["HW_types"][j]["Number of Servers"].as<int>();
         cinp[i].rinp[j].alloc=1;
-        cinp[i].rinp[j].type=cinp[i].types[j];  
+        cinp[i].rinp[j].type=cinp[i].types[j];
         cinp[i].rinp[j].numOfProcUnits = c["Cells"][i]["HW_types"][j]["Number_of_Proc_Units_per_Server"].as<int>();
-        cinp[i].rinp[j].totMem = c["Cells"][i]["HW_types"][j]["Memory_per_Server"].as<int>();
-        cinp[i].rinp[j].totSto = c["Cells"][i]["HW_types"][j]["Storage_per_Server"].as<int>();
-        cinp[i].rinp[j].overCommitProc = c["Cells"][i]["HW_types"][j]["Proc_Overcommitment_ratio"].as<double>();
-        cinp[i].rinp[j].overCommitMem = c["Cells"][i]["HW_types"][j]["Memory_Overcommitment_ratio"].as<double>();
-        cinp[i].rinp[j].compCap = c["Cells"][i]["HW_types"][j]["Compute_Capability"].as<double>();
+        cinp[i].rinp[j].totalMemory = c["Cells"][i]["HW_types"][j]["Memory_per_Server"].as<int>();
+        cinp[i].rinp[j].totalStorage = c["Cells"][i]["HW_types"][j]["Storage_per_Server"].as<int>();
+        cinp[i].rinp[j].overcommitmentProcessors = c["Cells"][i]["HW_types"][j]["Proc_Overcommitment_ratio"].as<double>();
+        cinp[i].rinp[j].overcommitmentMemory = c["Cells"][i]["HW_types"][j]["Memory_Overcommitment_ratio"].as<double>();
+        cinp[i].rinp[j].computeCapability = c["Cells"][i]["HW_types"][j]["Compute_Capability"].as<double>();
         cinp[i].rinp[j].accelerator = c["Cells"][i]["HW_types"][j]["Accelerators"].as<int>();
-        cinp[i].rinp[j].totAcc = c["Cells"][i]["HW_types"][j]["Total_Number_of_Accelerators_per_Server"].as<int>();
-        cinp[i].rinp[j].accCompCap = c["Cells"][i]["HW_types"][j]["Accelerator_Compute_Capability"].as<double>();
+        cinp[i].rinp[j].totalAccelerators = c["Cells"][i]["HW_types"][j]["Total_Number_of_Accelerators_per_Server"].as<int>();
+        cinp[i].rinp[j].acceleratorComputeCapability = c["Cells"][i]["HW_types"][j]["Accelerator_Compute_Capability"].as<double>();
         cinp[i].pinp[j].alloc=1;
         cinp[i].pinp[j].accelerator=cinp[i].rinp[j].accelerator;
         cinp[i].pinp[j].typeCpu = c["Cells"][i]["HW_types"][j]["Type_of_CPU_model"].as<int>();
@@ -1281,11 +1288,11 @@ void siminputs::parse(const string& fname, const string& bname)
         }
         else
         {
-          dummy = 0.0;
-          dummy = 0.0;
+          //dummy = 0.0;
+          //dummy = 0.0;
         }
         cinp[i].pinp[j].cpuC = c["Cells"][i]["HW_types"][j]["CPU Sleep Power Consumption"].as<double>();
-        cinp[i].pinp[j].typeAcc = c["Cells"][i]["HW_types"][j]["Type of Accelerator Model"].as<int>();        
+        cinp[i].pinp[j].typeAcc = c["Cells"][i]["HW_types"][j]["Type of Accelerator Model"].as<int>();
         cinp[i].pinp[j].accPmin = c["Cells"][i]["HW_types"][j]["Accelerator Idle Power Consumption"].as<double>();
         cinp[i].pinp[j].accPmax = c["Cells"][i]["HW_types"][j]["Accelerator Max Power Consumption"].as<double>();
         cinp[i].pinp[j].accC = c["Cells"][i]["HW_types"][j]["Accelerator Sleep Power Consumption"].as<double>();
@@ -1296,7 +1303,7 @@ void siminputs::parse(const string& fname, const string& bname)
   if (file && file2)
   {
     file>>maxTime;
-    file>>upInterval;
+    file>>updateInterval;
     file>>numOfCells;
 
     cinp=new cellinputs[numOfCells];
@@ -1308,32 +1315,32 @@ void siminputs::parse(const string& fname, const string& bname)
       cinp[i].binp=new brinputs[1];
       cinp[i].binp[0].alloc=1;
       cinp[i].binp[0].parse(file2);
-      file>>cinp[i].numOfTypes;
+      file>>cinp[i].numberOfTypes;
       cinp[i].alloc=1;
       cinp[i].ID=i+1;
-      cinp[i].types=new int[cinp[i].numOfTypes];
-      cinp[i].numOfResourcesPerType=new int[cinp[i].numOfTypes];
-      cinp[i].rinp=new resinputs[cinp[i].numOfTypes];
-      cinp[i].pinp=new powinputs[cinp[i].numOfTypes];
+      cinp[i].types=new int[cinp[i].numberOfTypes];
+      cinp[i].numberOfResourcesPerType=new int[cinp[i].numberOfTypes];
+      cinp[i].rinp=new resinputs[cinp[i].numberOfTypes];
+      cinp[i].pinp=new powinputs[cinp[i].numberOfTypes];
       cinp[i].ninp=new netinputs[1];
       cinp[i].ninp[0].alloc=1;
       file>>cinp[i].ninp[0].netBW;
-      file>>cinp[i].ninp[0].overCommitNet;
-      for(j=0;j<cinp[i].numOfTypes;j++)
+      file>>cinp[i].ninp[0].overCommitmentNetwork;
+      for(j=0;j<cinp[i].numberOfTypes;j++)
       {
         file>>cinp[i].types[j];
-        file>>cinp[i].numOfResourcesPerType[j];
+        file>>cinp[i].numberOfResourcesPerType[j];
         cinp[i].rinp[j].alloc=1;
         cinp[i].rinp[j].type=cinp[i].types[j];
         file>>cinp[i].rinp[j].numOfProcUnits;
-        file>>cinp[i].rinp[j].totMem;
-        file>>cinp[i].rinp[j].totSto;
-        file>>cinp[i].rinp[j].overCommitProc;
-        file>>cinp[i].rinp[j].overCommitMem;
-        file>>cinp[i].rinp[j].compCap;
+        file>>cinp[i].rinp[j].totalMemory;
+        file>>cinp[i].rinp[j].totalStorage;
+        file>>cinp[i].rinp[j].overcommitmentProcessors;
+        file>>cinp[i].rinp[j].overcommitmentMemory;
+        file>>cinp[i].rinp[j].computeCapability;
         file>>cinp[i].rinp[j].accelerator;
-        file>>cinp[i].rinp[j].totAcc;
-        file>>cinp[i].rinp[j].accCompCap;
+        file>>cinp[i].rinp[j].totalAccelerators;
+        file>>cinp[i].rinp[j].acceleratorComputeCapability;
         cinp[i].pinp[j].alloc=1;
         cinp[i].pinp[j].accelerator=cinp[i].rinp[j].accelerator;
         file>>cinp[i].pinp[j].typeCpu;
@@ -1385,7 +1392,7 @@ void siminputs::print()
     else{
       cout<<"Resource Allocation Mechanism: Traditional"<<endl;
     }
-    cout << "Update Interval: " << upInterval << " seconds" << endl;
+    cout << "Update Interval: " << updateInterval << " seconds" << endl;
     cout << endl;
     cout << "=========== Cell Parameters ===========" << endl;
     cout << "Number of Cells: " << numOfCells << endl;
@@ -1394,26 +1401,26 @@ void siminputs::print()
     for (i = 0; i < numOfCells; i++) {
       if (cinp[i].alloc) {
         cout << "    Cell: " << cinp[i].ID << endl;
-        cout << "         Number of HW Types: " << cinp[i].numOfTypes << endl;
+        cout << "         Number of HW Types: " << cinp[i].numberOfTypes << endl;
         if (cinp[i].ninp[0].alloc) {
           cout << "         Cell Interconnection Bandwidth: " << cinp[i].ninp[0].netBW << " Gbps" << endl;
-          cout << "         Network Bandwidth Overcommitment ratio: " << cinp[i].ninp[0].overCommitNet << endl;
+          cout << "         Network Bandwidth Overcommitment ratio: " << cinp[i].ninp[0].overCommitmentNetwork << endl;
         }
-        for (j = 0; j < cinp[i].numOfTypes; j++) {
+        for (j = 0; j < cinp[i].numberOfTypes; j++) {
           if (cinp[i].rinp[j].alloc) {
             cout << "              HW Type: " << cinp[i].types[j] << endl;
-            cout << "                   Number of Servers: " << cinp[i].numOfResourcesPerType[j] << endl;
+            cout << "                   Number of Servers: " << cinp[i].numberOfResourcesPerType[j] << endl;
             cout << "                   Number of Proc. Units per Server:" << cinp[i].rinp[j].numOfProcUnits << endl;
-            cout << "                   Memory per Server: " << cinp[i].rinp[j].totMem << " GBytes" << endl;
-            cout << "                   Storage per Server: " << cinp[i].rinp[j].totSto << " TBytes" << endl;
+            cout << "                   Memory per Server: " << cinp[i].rinp[j].totalMemory << " GBytes" << endl;
+            cout << "                   Storage per Server: " << cinp[i].rinp[j].totalStorage << " TBytes" << endl;
 
-            cout << "                   Proc. Overcommitment ratio: " << cinp[i].rinp[j].overCommitProc << endl;
-            cout << "                   Memory Overcommitment ratio: " << cinp[i].rinp[j].overCommitMem << endl;
-            cout << setprecision(10) << "                   Compute Capability: " << cinp[i].rinp[j].compCap << " MIPS"
+            cout << "                   Proc. Overcommitment ratio: " << cinp[i].rinp[j].overcommitmentProcessors << endl;
+            cout << "                   Memory Overcommitment ratio: " << cinp[i].rinp[j].overcommitmentMemory << endl;
+            cout << setprecision(10) << "                   Compute Capability: " << cinp[i].rinp[j].computeCapability << " MIPS"
                  << endl;
             cout << "                   Accelerators: " << cinp[i].rinp[j].accelerator << endl;
-            cout << "                   Total Number of Accelerators per Server: " << cinp[i].rinp[j].totAcc << endl;
-            cout << "                   Accelerator Compute Capability: " << cinp[i].rinp[j].accCompCap << " MIPS"
+            cout << "                   Total Number of Accelerators per Server: " << cinp[i].rinp[j].totalAccelerators << endl;
+            cout << "                   Accelerator Compute Capability: " << cinp[i].rinp[j].acceleratorComputeCapability << " MIPS"
                  << endl;
           }
           if (cinp[i].pinp[j].alloc) {
@@ -1470,7 +1477,7 @@ void siminputs::printfile(const string& outname, const ios::openmode& mode)
     else{
       file << "Resource Allocation Mechanism: Traditional" << endl;
     }
-    file << "Update Interval: " << upInterval << " seconds" << endl;
+    file << "Update Interval: " << updateInterval << " seconds" << endl;
     file << endl;
     file << "=========== Cell Parameters ===========" << endl;
     file << "Number of Cells: " << numOfCells << endl;
@@ -1479,26 +1486,26 @@ void siminputs::printfile(const string& outname, const ios::openmode& mode)
     for (i = 0; i < numOfCells; i++) {
       if (cinp[i].alloc) {
         file << "    Cell: " << cinp[i].ID << endl;
-        file << "         Number of HW Types: " << cinp[i].numOfTypes << endl;
+        file << "         Number of HW Types: " << cinp[i].numberOfTypes << endl;
         if (cinp[i].ninp[0].alloc) {
           file << "         Cell Interconnection Bandwidth: " << cinp[i].ninp[0].netBW << " Gbps" << endl;
-          file << "         Network Bandwidth Overcommitment ratio: " << cinp[i].ninp[0].overCommitNet << endl;
+          file << "         Network Bandwidth Overcommitment ratio: " << cinp[i].ninp[0].overCommitmentNetwork << endl;
         }
-        for (j = 0; j < cinp[i].numOfTypes; j++) {
+        for (j = 0; j < cinp[i].numberOfTypes; j++) {
           if (cinp[i].rinp[j].alloc) {
             file << "              HW Type: " << cinp[i].types[j] << endl;
-            file << "                   Number of Servers: " << cinp[i].numOfResourcesPerType[j] << endl;
+            file << "                   Number of Servers: " << cinp[i].numberOfResourcesPerType[j] << endl;
             file << "                   Number of Proc. Units per Server:" << cinp[i].rinp[j].numOfProcUnits << endl;
-            file << "                   Memory per Server: " << cinp[i].rinp[j].totMem << " GBytes" << endl;
-            file << "                   Storage per Server: " << cinp[i].rinp[j].totSto << " TBytes" << endl;
+            file << "                   Memory per Server: " << cinp[i].rinp[j].totalMemory << " GBytes" << endl;
+            file << "                   Storage per Server: " << cinp[i].rinp[j].totalStorage << " TBytes" << endl;
 
-            file << "                   Proc. Overcommitment ratio: " << cinp[i].rinp[j].overCommitProc << endl;
-            file << "                   Memory Overcommitment ratio: " << cinp[i].rinp[j].overCommitMem << endl;
-            file << setprecision(10) << "                   Compute Capability: " << cinp[i].rinp[j].compCap << " MIPS"
+            file << "                   Proc. Overcommitment ratio: " << cinp[i].rinp[j].overcommitmentProcessors << endl;
+            file << "                   Memory Overcommitment ratio: " << cinp[i].rinp[j].overcommitmentMemory << endl;
+            file << setprecision(10) << "                   Compute Capability: " << cinp[i].rinp[j].computeCapability << " MIPS"
                  << endl;
             file << "                   Accelerators: " << cinp[i].rinp[j].accelerator << endl;
-            file << "                   Total Number of Accelerators per Server: " << cinp[i].rinp[j].totAcc << endl;
-            file << "                   Accelerator Compute Capability: " << cinp[i].rinp[j].accCompCap << " MIPS"
+            file << "                   Total Number of Accelerators per Server: " << cinp[i].rinp[j].totalAccelerators << endl;
+            file << "                   Accelerator Compute Capability: " << cinp[i].rinp[j].acceleratorComputeCapability << " MIPS"
                  << endl;
           }
           if (cinp[i].pinp[j].alloc) {

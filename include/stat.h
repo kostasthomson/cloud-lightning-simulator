@@ -1,11 +1,16 @@
 #ifndef STAT_H
 #define STAT_H
 #include <fstream>
+#include <iostream>
 #include <string>
-using namespace std;
+
+using std::fstream;
+using std::ifstream;
+using std::ios;
+using std::string;
+
 
 struct stat {
-
   stat();
 
   stat(const stat& t);
@@ -19,43 +24,43 @@ struct stat {
   void printfile(const string& outfile, const ios::openmode& mode);
 
   void printfileJson(const string& outfile, const string& inputfile, const ios::openmode& mode, int i, int j,
-                     int overallRecords, int numOfCells, int numOfTypes, int ct);
+                     int overallRecords, int numOfCells, int numberOfTypes, int ct);
 
-  int procActServs;
-  double memActServs;
-  double stoActServs;
-  int accActServs;
+  int processorsOverActiveServers;
+  double memoryOverActiveServers;
+  double storageOverActiveServers;
+  int acceleratorsOverActiveServers;
   int alloc;
-  double currTstep;
-  double phyMem;
-  double phyProc;
-  double phySto;
-  double phyNetw;
-  double totMem;
-  double totProc;
-  double availProc;
-  double availMem;
-  double utilProc;
-  double utilMem;
-  double totSto;
-  double availSto;
-  double utilSto;
-  double totNetw;
-  double availNetw;
-  double utilNetw;
-  double totPcons;
+  double currentTimestep;
+  double physicalMemory;
+  double physicalProcessors;
+  double physicalStorage;
+  double physicalNetwork;
+  double totalMemory;
+  double totalProcessors;
+  double availableProcessors;
+  double availableMemory;
+  double utilizedProcessors;
+  double utilizedMemory;
+  double totalStorage;
+  double availableStorage;
+  double utilizedStorage;
+  double totalNetwork;
+  double availableNetwork;
+  double utilizedNetwork;
+  double totalPowerConsumption;
 
-  int totAcc;
-  int availAcc;
-  int utilAcc;
-  int activeSrvs;
-  int numOfTasks;
-  int rejTasks;
-  int accTasks;
+  int totalAccelerators;
+  int availableAccelerators;
+  int utilizedAccelerators;
+  int activeServers;
+  int numberOfTasks;
+  int rejectedTasks;
+  int acceptedTasks;
 
-  double autilProc;
-  double autilMem;
-  double autilNetw;
+  double actualUtilizedProcessors;
+  double actualUtilizedMemory;
+  double actualUtilizedNetwork;
 };
 
 #endif

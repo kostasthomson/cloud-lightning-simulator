@@ -10,31 +10,23 @@
 #include <sstream>
 #include <vector>
 
-gs::gs()
-{
-  alloc = 0;
-  ai = NULL;
-  si = NULL;
-  stats = NULL;
-}
+gs::gs() : alloc(0), ai(NULL), si(NULL), stats(NULL) {}
 
 gs::gs(const std::string& sfile, const std::string& afile, const std::string& bfile)
 {
-  int i;
   alloc = 1;
   ai = new appinputs[1];
   si = new siminputs[1];
   ai->parse(afile);
   si->parse(sfile, bfile);
   stats = new stat*[si->numOfCells];
-  for (i = 0; i < si->numOfCells; i++) {
-    stats[i] = new stat[si->cinp[i].numOfTypes];
+  for (int i = 0; i < si->numOfCells; i++) {
+    stats[i] = new stat[si->cinp[i].numberOfTypes];
   }
 }
 
 gs::gs(const gs& t)
 {
-  int i, j;
   if (t.galloc()) {
     alloc = 1;
     ai = new appinputs[1];
@@ -42,12 +34,12 @@ gs::gs(const gs& t)
     ai[0] = t.gai()[0];
     si[0] = t.gsi()[0];
     stats = new stat*[si->numOfCells];
-    for (i = 0; i < si->numOfCells; i++) {
-      stats[i] = new stat[si->cinp[i].numOfTypes];
+    for (int i = 0; i < si->numOfCells; i++) {
+      stats[i] = new stat[si->cinp[i].numberOfTypes];
     }
-    for (i = 0; i < si->numOfCells; i++) {
-      for (j = 0; j < si->cinp[i].numOfTypes; j++) {
-        stats[i][j] = t.gstats()[i][j];
+    for (int i = 0; i < si->numOfCells; i++) {
+      for (int j = 0; j < si->cinp[i].numberOfTypes; j++) {
+        stats[i][j] = t.getStats()[i][j];
       }
     }
   }
@@ -55,11 +47,10 @@ gs::gs(const gs& t)
 
 gs& gs::operator=(const gs& t)
 {
-  int i, j;
   if (this != &t) {
     if (alloc) {
       alloc = 0;
-      for (i = 0; i < si->numOfCells; i++) {
+      for (int i = 0; i < si->numOfCells; i++) {
         delete[] stats[i];
       }
       delete[] stats;
@@ -76,12 +67,12 @@ gs& gs::operator=(const gs& t)
       ai[0] = t.gai()[0];
       si[0] = t.gsi()[0];
       stats = new stat*[si->numOfCells];
-      for (i = 0; i < si->numOfCells; i++) {
-        stats[i] = new stat[si->cinp[i].numOfTypes];
+      for (int i = 0; i < si->numOfCells; i++) {
+        stats[i] = new stat[si->cinp[i].numberOfTypes];
       }
-      for (i = 0; i < si->numOfCells; i++) {
-        for (j = 0; j < si->cinp[i].numOfTypes; j++) {
-          stats[i][j] = t.gstats()[i][j];
+      for (int i = 0; i < si->numOfCells; i++) {
+        for (int j = 0; j < si->cinp[i].numberOfTypes; j++) {
+          stats[i][j] = t.getStats()[i][j];
         }
       }
     }
@@ -91,10 +82,9 @@ gs& gs::operator=(const gs& t)
 
 gs::~gs()
 {
-  int i;
   if (alloc) {
     alloc = 0;
-    for (i = 0; i < si->numOfCells; i++) {
+    for (int i = 0; i < si->numOfCells; i++) {
       delete[] stats[i];
     }
     delete[] stats;
@@ -109,8 +99,7 @@ gs::~gs()
 int gs::galloc() const { return alloc; }
 appinputs* gs::gai() const { return ai; }
 siminputs* gs::gsi() const { return si; }
-stat** gs::gstats() const { return stats; }
-
+stat** gs::getStats() const { return stats; }
 int gs::findCell(const int* rImpl, const int& numImpl, const int& rVM, const double& rvProc, const double& rMem,
                  const double& rNet, const double& rSto, const int* rAcc) const
 {
@@ -124,7 +113,7 @@ int gs::findCell(const int* rImpl, const int& numImpl, const int& rVM, const dou
     for (k = 0; k < numImpl; k++) {
       rind = -1;
       // For each hardware type that is offered by the cell
-      for (j = 0; j < si->cinp[i].numOfTypes; j++) {
+      for (j = 0; j < si->cinp[i].numberOfTypes; j++) {
         // If the cell offers a hardware type that is required by the task, select the first offer (usually CPU)
         if (rImpl[k] == si->cinp[i].types[j]) {
           rind = j;
@@ -135,15 +124,15 @@ int gs::findCell(const int* rImpl, const int& numImpl, const int& rVM, const dou
         continue;
       }
       // If stats[cell][hardware type] has the required number of processors, memory, storage and accelerators
-      if (stats[i][rind].availProc >= ((double)rVM) * rvProc && stats[i][rind].availMem >= ((double)rVM) * rMem &&
-          stats[i][rind].availNetw >= rNet && stats[i][rind].availSto >= ((double)rVM) * rSto &&
-          stats[i][rind].availAcc >= ((double)rVM) * rAcc[k]) {
+      if (stats[i][rind].availableProcessors >= ((double)rVM) * rvProc && stats[i][rind].availableMemory >= ((double)rVM) * rMem &&
+          stats[i][rind].availableNetwork >= rNet && stats[i][rind].availableStorage >= ((double)rVM) * rSto &&
+          stats[i][rind].availableAccelerators >= ((double)rVM) * rAcc[k]) {
         // Calculate max weight from the formula: total processors - requested processors
-        lweight = ((stats[i][rind].availProc - ((double)rVM) * rvProc) / (stats[i][rind].availProc + 1) +
-                   (stats[i][rind].availMem - ((double)rVM) * rMem) / (stats[i][rind].availMem + 1) +
-                   (stats[i][rind].availNetw - rNet) / (stats[i][rind].availNetw + 1) +
-                   (stats[i][rind].availSto - ((double)rVM) * rSto) / (stats[i][rind].availSto + 1) +
-                   (stats[i][rind].availAcc - ((double)rVM) * rAcc[k]) / (stats[i][rind].availAcc + 1));
+        lweight = ((stats[i][rind].availableProcessors - ((double)rVM) * rvProc) / (stats[i][rind].availableProcessors + 1) +
+                   (stats[i][rind].availableMemory - ((double)rVM) * rMem) / (stats[i][rind].availableMemory + 1) +
+                   (stats[i][rind].availableNetwork - rNet) / (stats[i][rind].availableNetwork + 1) +
+                   (stats[i][rind].availableStorage - ((double)rVM) * rSto) / (stats[i][rind].availableStorage + 1) +
+                   (stats[i][rind].availableAccelerators - ((double)rVM) * rAcc[k]) / (stats[i][rind].availableAccelerators + 1));
         if (lweight > weight) {
           weight = lweight;
           choice = i + 1;
@@ -154,11 +143,11 @@ int gs::findCell(const int* rImpl, const int& numImpl, const int& rVM, const dou
     }
   }
   if (frind != -1 && choice != -1) {
-    stats[choice - 1][frind].availProc -= ((double)rVM) * rvProc;
-    stats[choice - 1][frind].availMem -= ((double)rVM) * rMem;
-    stats[choice - 1][frind].availNetw -= rNet;
-    stats[choice - 1][frind].availSto -= ((double)rVM) * rSto;
-    stats[choice - 1][frind].availAcc -= ((double)rVM) * rAcc[choice2];
+    stats[choice - 1][frind].availableProcessors -= ((double)rVM) * rvProc;
+    stats[choice - 1][frind].availableMemory -= ((double)rVM) * rMem;
+    stats[choice - 1][frind].availableNetwork -= rNet;
+    stats[choice - 1][frind].availableStorage -= ((double)rVM) * rSto;
+    stats[choice - 1][frind].availableAccelerators -= ((double)rVM) * rAcc[choice2];
   }
 
   return choice;
@@ -185,16 +174,16 @@ void gs::printfile(const std::string& outfile, const ios::openmode& mode)
 
 std::string gs::num2str(int num)
 {
-	stringstream s;
-	s << num;
-	return s.str();
+  stringstream s;
+  s << num;
+  return s.str();
 }
 
 void gs::printStats()
 {
   if (alloc) {
     for (int i = 0; i < si->numOfCells; i++) {
-      for (int j = 0; j < si->cinp[i].numOfTypes; j++) {
+      for (int j = 0; j < si->cinp[i].numberOfTypes; j++) {
         stats[i][j].print();
       }
     }
@@ -205,7 +194,7 @@ void gs::printStats(const std::string& outfile, const ios::openmode& mode)
 {
   if (alloc) {
     for (int i = 0; i < si->numOfCells; i++) {
-      for (int j = 0; j < si->cinp[i].numOfTypes; j++) {
+      for (int j = 0; j < si->cinp[i].numberOfTypes; j++) {
         std::string tmp = outfile + num2str(si->cinp[i].ID) + num2str(si->cinp[i].types[j]);
         stats[i][j].printfile(tmp, mode);
       }
@@ -213,19 +202,19 @@ void gs::printStats(const std::string& outfile, const ios::openmode& mode)
   }
 }
 
-void gs::printStatsJson(const std::string& outfile, const ios::openmode& mode, int endTime, int upInterval)
+void gs::printStatsJson(const std::string& outfile, const ios::openmode& mode, int endTime, int updateInterval)
 {
   int endT = endTime;
-  int upIn = upInterval;
+  int upIn = updateInterval;
   int overallRecords = (endT / upIn) + 1;
 
   if (alloc) {
     for (int i = 0; i < si->numOfCells; i++) {
-      for (int j = 0; j < si->cinp[i].numOfTypes; j++) {
+      for (int j = 0; j < si->cinp[i].numberOfTypes; j++) {
         std::string tmp = outfile + num2str(si->cinp[i].ID) + num2str(si->cinp[i].types[j]);
         std::string temp = outfile + "CLsim.json";
         stats[i][j].printfileJson(temp, tmp, mode, si->cinp[i].ID, si->cinp[i].types[j], overallRecords, si->numOfCells,
-                                  si->cinp[i].numOfTypes, j + 1);
+                                  si->cinp[i].numberOfTypes, j + 1);
       }
     }
   }

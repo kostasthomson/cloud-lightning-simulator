@@ -53,7 +53,7 @@ class gs
 
   siminputs* gsi() const;
 
-  stat** gstats() const;
+  stat** getStats() const;
 
   void print();
 
@@ -63,7 +63,7 @@ class gs
 
   void printfile(const std::string& outfile, const ios::openmode& mode);
 
-  void printStatsJson(const std::string& outfile, const ios::openmode& mode, int endTime, int upInterval);
+  void printStatsJson(const std::string& outfile, const ios::openmode& mode, int endTime, int updateInterval);
 };
 
 #endif

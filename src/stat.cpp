@@ -3,7 +3,9 @@
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <string>
-using namespace std;
+
+using std::cout;
+using std::endl;
 
 jsoncons::json js;
 jsoncons::json cl;
@@ -11,83 +13,80 @@ jsoncons::json output_list = jsoncons::json::array();
 jsoncons::json cl_list = jsoncons::json::array();
 
 stat::stat()
+  : processorsOverActiveServers(0),
+    memoryOverActiveServers(0),
+    storageOverActiveServers(0),
+    acceleratorsOverActiveServers(0),
+    alloc(0),
+    currentTimestep(0.0),
+    physicalMemory(0.0),
+    physicalProcessors(0.0),
+    physicalStorage(0.0),
+    physicalNetwork(0.0),
+    totalMemory(0.0),
+    totalProcessors(0.0),
+    availableProcessors(0.0),
+    availableMemory(0.0),
+    utilizedProcessors(0.0),
+    utilizedMemory(0.0),
+    totalStorage(0.0),
+    availableStorage(0.0),
+    utilizedStorage(0.0),
+    totalNetwork(0.0),
+    availableNetwork(0.0),
+    utilizedNetwork(0.0),
+    totalPowerConsumption(0.0),
+    totalAccelerators(0),
+    availableAccelerators(0),
+    utilizedAccelerators(0),
+    activeServers(0),
+    numberOfTasks(0),
+    rejectedTasks(0),
+    acceptedTasks(0),
+    actualUtilizedProcessors(0.0),
+    actualUtilizedMemory(0.0),
+    actualUtilizedNetwork(0.0)
 {
-  procActServs = 0;
-  memActServs = 0;
-  stoActServs = 0;
-  accActServs = 0;
-
-  alloc = 0;
-  currTstep = 0.0;
-  phyMem = 0.0;
-  phyProc = 0.0;
-  phySto = 0.0;
-  phyNetw = 0.0;
-  totMem = 0.0;
-  totProc = 0.0;
-  availProc = 0.0;
-  availMem = 0.0;
-  utilProc = 0.0;
-  utilMem = 0.0;
-  totSto = 0.0;
-  availSto = 0.0;
-  utilSto = 0.0;
-  totNetw = 0.0;
-  availNetw = 0.0;
-  utilNetw = 0.0;
-  totPcons = 0.0;
-
-  totAcc = 0;
-  availAcc = 0;
-  utilAcc = 0;
-  activeSrvs = 0;
-  numOfTasks = 0;
-  rejTasks = 0;
-  accTasks = 0;
-
-  autilProc = 0.0;
-  autilMem = 0.0;
-  autilNetw = 0.0;
 }
 
 stat::stat(const stat& t)
 {
   if (t.alloc) {
-    procActServs = t.procActServs;
-    memActServs = t.memActServs;
-    stoActServs = t.stoActServs;
-    accActServs = t.accActServs;
+    processorsOverActiveServers = t.processorsOverActiveServers;
+    memoryOverActiveServers = t.memoryOverActiveServers;
+    storageOverActiveServers = t.storageOverActiveServers;
+    acceleratorsOverActiveServers = t.acceleratorsOverActiveServers;
     alloc = t.alloc;
-    currTstep = t.currTstep;
-    phyMem = t.phyMem;
-    phyProc = t.phyProc;
-    phySto = t.phySto;
-    phyNetw = t.phyNetw;
-    totMem = t.totMem;
-    totProc = t.totProc;
-    availProc = t.availProc;
-    availMem = t.availMem;
-    utilProc = t.utilProc;
-    utilMem = t.utilMem;
-    totSto = t.totSto;
-    availSto = t.availSto;
-    utilSto = t.utilSto;
-    totNetw = t.totNetw;
-    availNetw = t.availNetw;
-    utilNetw = t.utilNetw;
-    totPcons = t.totPcons;
+    currentTimestep = t.currentTimestep;
+    physicalMemory = t.physicalMemory;
+    physicalProcessors = t.physicalProcessors;
+    physicalStorage = t.physicalStorage;
+    physicalNetwork = t.physicalNetwork;
+    totalMemory = t.totalMemory;
+    totalProcessors = t.totalProcessors;
+    availableProcessors = t.availableProcessors;
+    availableMemory = t.availableMemory;
+    utilizedProcessors = t.utilizedProcessors;
+    utilizedMemory = t.utilizedMemory;
+    totalStorage = t.totalStorage;
+    availableStorage = t.availableStorage;
+    utilizedStorage = t.utilizedStorage;
+    totalNetwork = t.totalNetwork;
+    availableNetwork = t.availableNetwork;
+    utilizedNetwork = t.utilizedNetwork;
+    totalPowerConsumption = t.totalPowerConsumption;
 
-    totAcc = t.totAcc;
-    availAcc = t.availAcc;
-    utilAcc = t.utilAcc;
-    activeSrvs = t.activeSrvs;
-    numOfTasks = t.numOfTasks;
-    rejTasks = t.rejTasks;
-    accTasks = t.accTasks;
+    totalAccelerators = t.totalAccelerators;
+    availableAccelerators = t.availableAccelerators;
+    utilizedAccelerators = t.utilizedAccelerators;
+    activeServers = t.activeServers;
+    numberOfTasks = t.numberOfTasks;
+    rejectedTasks = t.rejectedTasks;
+    acceptedTasks = t.acceptedTasks;
 
-    autilProc = t.autilProc;
-    autilMem = t.autilMem;
-    autilNetw = t.autilNetw;
+    actualUtilizedProcessors = t.actualUtilizedProcessors;
+    actualUtilizedMemory = t.actualUtilizedMemory;
+    actualUtilizedNetwork = t.actualUtilizedNetwork;
   }
 }
 
@@ -95,78 +94,78 @@ stat& stat::operator=(const stat& t)
 {
   if (this != &t) {
     if (alloc) {
-      procActServs = 0;
-      memActServs = 0;
-      stoActServs = 0;
-      accActServs = 0;
+      processorsOverActiveServers = 0;
+      memoryOverActiveServers = 0;
+      storageOverActiveServers = 0;
+      acceleratorsOverActiveServers = 0;
       alloc = 0;
-      currTstep = 0.0;
-      phyMem = 0.0;
-      phyProc = 0.0;
-      phySto = 0.0;
-      phyNetw = 0.0;
-      totMem = 0.0;
-      totProc = 0.0;
-      availProc = 0.0;
-      availMem = 0.0;
-      utilProc = 0.0;
-      utilMem = 0.0;
-      totSto = 0.0;
-      availSto = 0.0;
-      utilSto = 0.0;
-      totNetw = 0.0;
-      availNetw = 0.0;
-      utilNetw = 0.0;
-      totPcons = 0.0;
+      currentTimestep = 0.0;
+      physicalMemory = 0.0;
+      physicalProcessors = 0.0;
+      physicalStorage = 0.0;
+      physicalNetwork = 0.0;
+      totalMemory = 0.0;
+      totalProcessors = 0.0;
+      availableProcessors = 0.0;
+      availableMemory = 0.0;
+      utilizedProcessors = 0.0;
+      utilizedMemory = 0.0;
+      totalStorage = 0.0;
+      availableStorage = 0.0;
+      utilizedStorage = 0.0;
+      totalNetwork = 0.0;
+      availableNetwork = 0.0;
+      utilizedNetwork = 0.0;
+      totalPowerConsumption = 0.0;
 
-      totAcc = 0;
-      availAcc = 0;
-      utilAcc = 0;
-      activeSrvs = 0;
-      numOfTasks = 0;
-      rejTasks = 0;
-      accTasks = 0;
+      totalAccelerators = 0;
+      availableAccelerators = 0;
+      utilizedAccelerators = 0;
+      activeServers = 0;
+      numberOfTasks = 0;
+      rejectedTasks = 0;
+      acceptedTasks = 0;
 
-      autilProc = 0.0;
-      autilMem = 0.0;
-      autilNetw = 0.0;
+      actualUtilizedProcessors = 0.0;
+      actualUtilizedMemory = 0.0;
+      actualUtilizedNetwork = 0.0;
     }
     alloc = t.alloc;
     if (alloc) {
-      procActServs = t.procActServs;
-      memActServs = t.memActServs;
-      stoActServs = t.stoActServs;
-      accActServs = t.accActServs;
-      currTstep = t.currTstep;
-      phyMem = t.phyMem;
-      phyProc = t.phyProc;
-      phySto = t.phySto;
-      phyNetw = t.phyNetw;
-      totMem = t.totMem;
-      totProc = t.totProc;
-      availProc = t.availProc;
-      availMem = t.availMem;
-      utilProc = t.utilProc;
-      utilMem = t.utilMem;
-      totSto = t.totSto;
-      availSto = t.availSto;
-      utilSto = t.utilSto;
-      totNetw = t.totNetw;
-      availNetw = t.availNetw;
-      utilNetw = t.utilNetw;
-      totPcons = t.totPcons;
+      processorsOverActiveServers = t.processorsOverActiveServers;
+      memoryOverActiveServers = t.memoryOverActiveServers;
+      storageOverActiveServers = t.storageOverActiveServers;
+      acceleratorsOverActiveServers = t.acceleratorsOverActiveServers;
+      currentTimestep = t.currentTimestep;
+      physicalMemory = t.physicalMemory;
+      physicalProcessors = t.physicalProcessors;
+      physicalStorage = t.physicalStorage;
+      physicalNetwork = t.physicalNetwork;
+      totalMemory = t.totalMemory;
+      totalProcessors = t.totalProcessors;
+      availableProcessors = t.availableProcessors;
+      availableMemory = t.availableMemory;
+      utilizedProcessors = t.utilizedProcessors;
+      utilizedMemory = t.utilizedMemory;
+      totalStorage = t.totalStorage;
+      availableStorage = t.availableStorage;
+      utilizedStorage = t.utilizedStorage;
+      totalNetwork = t.totalNetwork;
+      availableNetwork = t.availableNetwork;
+      utilizedNetwork = t.utilizedNetwork;
+      totalPowerConsumption = t.totalPowerConsumption;
 
-      totAcc = t.totAcc;
-      availAcc = t.availAcc;
-      utilAcc = t.utilAcc;
-      activeSrvs = t.activeSrvs;
-      numOfTasks = t.numOfTasks;
-      rejTasks = t.rejTasks;
-      accTasks = t.accTasks;
+      totalAccelerators = t.totalAccelerators;
+      availableAccelerators = t.availableAccelerators;
+      utilizedAccelerators = t.utilizedAccelerators;
+      activeServers = t.activeServers;
+      numberOfTasks = t.numberOfTasks;
+      rejectedTasks = t.rejectedTasks;
+      acceptedTasks = t.acceptedTasks;
 
-      autilProc = t.autilProc;
-      autilMem = t.autilMem;
-      autilNetw = t.utilNetw;
+      actualUtilizedProcessors = t.actualUtilizedProcessors;
+      actualUtilizedMemory = t.actualUtilizedMemory;
+      actualUtilizedNetwork = t.utilizedNetwork;
     }
   }
   return *this;
@@ -175,79 +174,79 @@ stat& stat::operator=(const stat& t)
 stat::~stat()
 {
   if (alloc) {
-    procActServs = 0;
-    memActServs = 0;
-    stoActServs = 0;
-    accActServs = 0;
+    processorsOverActiveServers = 0;
+    memoryOverActiveServers = 0;
+    storageOverActiveServers = 0;
+    acceleratorsOverActiveServers = 0;
     alloc = 0;
-    currTstep = 0.0;
-    phyMem = 0.0;
-    phyProc = 0.0;
-    phySto = 0.0;
-    phyNetw = 0.0;
-    totMem = 0.0;
-    totProc = 0.0;
-    availProc = 0.0;
-    availMem = 0.0;
-    utilProc = 0.0;
-    utilMem = 0.0;
-    totSto = 0.0;
-    availSto = 0.0;
-    utilSto = 0.0;
-    totNetw = 0.0;
-    availNetw = 0.0;
-    utilNetw = 0.0;
-    totPcons = 0.0;
+    currentTimestep = 0.0;
+    physicalMemory = 0.0;
+    physicalProcessors = 0.0;
+    physicalStorage = 0.0;
+    physicalNetwork = 0.0;
+    totalMemory = 0.0;
+    totalProcessors = 0.0;
+    availableProcessors = 0.0;
+    availableMemory = 0.0;
+    utilizedProcessors = 0.0;
+    utilizedMemory = 0.0;
+    totalStorage = 0.0;
+    availableStorage = 0.0;
+    utilizedStorage = 0.0;
+    totalNetwork = 0.0;
+    availableNetwork = 0.0;
+    utilizedNetwork = 0.0;
+    totalPowerConsumption = 0.0;
 
-    totAcc = 0;
-    availAcc = 0;
-    utilAcc = 0;
-    activeSrvs = 0;
-    numOfTasks = 0;
-    rejTasks = 0;
-    accTasks = 0;
+    totalAccelerators = 0;
+    availableAccelerators = 0;
+    utilizedAccelerators = 0;
+    activeServers = 0;
+    numberOfTasks = 0;
+    rejectedTasks = 0;
+    acceptedTasks = 0;
 
-    autilProc = 0.0;
-    autilMem = 0.0;
-    autilNetw = 0.0;
+    actualUtilizedProcessors = 0.0;
+    actualUtilizedMemory = 0.0;
+    actualUtilizedNetwork = 0.0;
   }
 }
 
 void stat::print() const
 {
   if (alloc) {
-    cout << "         Active Servers: " << activeSrvs << endl;
-    cout << "         Time Step: " << currTstep << endl;
-    cout << "         Total Processors over Active Servers: " << procActServs << endl;
-    cout << "         Total Memory over Active Servers: " << memActServs << endl;
-    cout << "         Total Storage over Active Servers: " << stoActServs << endl;
-    cout << "         Total Accelerators over Active Servers: " << accActServs << endl;
-    cout << "         Total Number of currently running VMs: " << numOfTasks << endl;
-    cout << "         Total Number of accepted Tasks: " << accTasks << endl;
-    cout << "         Total Number of rejected Tasks: " << rejTasks << endl;
-    cout << "         Total Physical Processors: " << phyProc << " Proc. Units" << endl;
-    cout << "         Total Processors: " << totProc << " Proc. Units" << endl;
-    cout << "         Utilized Processors: " << utilProc << " Proc. Units" << endl;
-    cout << "         Actual Utilized Processors: " << autilProc << " Proc. Units" << endl;
-    cout << "         Available Processors: " << availProc << " Proc. Units" << endl;
-    cout << "         Total Physical Memory: " << phyMem << " GBytes" << endl;
-    cout << "         Total Memory: " << totMem << " GBytes" << endl;
-    cout << "         Utilized Memory: " << utilMem << " GBytes" << endl;
-    cout << "         Actual Utilized Memory: " << autilMem << " Proc. Units" << endl;
-    cout << "         Available Memory: " << availMem << " GBytes" << endl;
-    cout << "         Total Physical Storage: " << phySto << " TBytes" << endl;
-    cout << "         Total Storage: " << totSto << " TBytes" << endl;
-    cout << "         Utilized Storage: " << utilSto << " TBytes" << endl;
-    cout << "         Available Storage: " << availSto << " TBytes" << endl;
-    cout << "         Total Physical Network: " << phyNetw << " Gbps" << endl;
-    cout << "         Total Network: " << totNetw << " Gbps" << endl;
-    cout << "         Utilized Network: " << utilNetw << " Gbps" << endl;
-    cout << "         Actual Utilized Network: " << autilNetw << " Gbps" << endl;
-    cout << "         Available Network: " << availNetw << " Gbps" << endl;
-    cout << "         Total Energy Consumption: " << totPcons << " GWh" << endl;
-    cout << "         Total Accelerators: " << totAcc << endl;
-    cout << "         Utilized Accelerators: " << utilAcc << endl;
-    cout << "         Available Accelerators: " << availAcc << endl;
+    cout << "         Active Servers: " << activeServers << endl;
+    cout << "         Time Step: " << currentTimestep << endl;
+    cout << "         Total Processors over Active Servers: " << processorsOverActiveServers << endl;
+    cout << "         Total Memory over Active Servers: " << memoryOverActiveServers << endl;
+    cout << "         Total Storage over Active Servers: " << storageOverActiveServers << endl;
+    cout << "         Total Accelerators over Active Servers: " << acceleratorsOverActiveServers << endl;
+    cout << "         Total Number of currently running VMs: " << numberOfTasks << endl;
+    cout << "         Total Number of accepted Tasks: " << acceptedTasks << endl;
+    cout << "         Total Number of rejected Tasks: " << rejectedTasks << endl;
+    cout << "         Total Physical Processors: " << physicalProcessors << " Proc. Units" << endl;
+    cout << "         Total Processors: " << totalProcessors << " Proc. Units" << endl;
+    cout << "         Utilized Processors: " << utilizedProcessors << " Proc. Units" << endl;
+    cout << "         Actual Utilized Processors: " << actualUtilizedProcessors << " Proc. Units" << endl;
+    cout << "         Available Processors: " << availableProcessors << " Proc. Units" << endl;
+    cout << "         Total Physical Memory: " << physicalMemory << " GBytes" << endl;
+    cout << "         Total Memory: " << totalMemory << " GBytes" << endl;
+    cout << "         Utilized Memory: " << utilizedMemory << " GBytes" << endl;
+    cout << "         Actual Utilized Memory: " << actualUtilizedMemory << " Proc. Units" << endl;
+    cout << "         Available Memory: " << availableMemory << " GBytes" << endl;
+    cout << "         Total Physical Storage: " << physicalStorage << " TBytes" << endl;
+    cout << "         Total Storage: " << totalStorage << " TBytes" << endl;
+    cout << "         Utilized Storage: " << utilizedStorage << " TBytes" << endl;
+    cout << "         Available Storage: " << availableStorage << " TBytes" << endl;
+    cout << "         Total Physical Network: " << physicalNetwork << " Gbps" << endl;
+    cout << "         Total Network: " << totalNetwork << " Gbps" << endl;
+    cout << "         Utilized Network: " << utilizedNetwork << " Gbps" << endl;
+    cout << "         Actual Utilized Network: " << actualUtilizedNetwork << " Gbps" << endl;
+    cout << "         Available Network: " << availableNetwork << " Gbps" << endl;
+    cout << "         Total Energy Consumption: " << totalPowerConsumption << " GWh" << endl;
+    cout << "         Total Accelerators: " << totalAccelerators << endl;
+    cout << "         Utilized Accelerators: " << utilizedAccelerators << endl;
+    cout << "         Available Accelerators: " << availableAccelerators << endl;
   }
 }
 
@@ -256,18 +255,21 @@ void stat::printfile(const string& outfile, const ios::openmode& mode)
   fstream file;
   if (alloc) {
     file.open(outfile.c_str(), mode);
-    file << currTstep << " " << activeSrvs << " " << procActServs << " " << memActServs << " " << stoActServs << " "
-         << accActServs << " " << numOfTasks << " " << accTasks << " " << rejTasks << " " << availProc << " "
-         << utilProc << " " << autilProc << " " << totProc << " " << phyProc << " " << availMem << " " << utilMem << " "
-         << autilMem << " " << totMem << " " << phyMem << " " << availSto << " " << utilSto << " " << availSto << " "
-         << phySto << " " << availNetw << " " << utilNetw << " " << autilNetw << " " << totNetw << " " << phyNetw << " "
-         << availAcc << " " << utilAcc << " " << totAcc << " " << totPcons << endl;
+    file << currentTimestep << " " << activeServers << " " << processorsOverActiveServers << " "
+         << memoryOverActiveServers << " " << storageOverActiveServers << " " << acceleratorsOverActiveServers << " "
+         << numberOfTasks << " " << acceptedTasks << " " << rejectedTasks << " " << availableProcessors << " "
+         << utilizedProcessors << " " << actualUtilizedProcessors << " " << totalProcessors << " " << physicalProcessors
+         << " " << availableMemory << " " << utilizedMemory << " " << actualUtilizedMemory << " " << totalMemory << " "
+         << physicalMemory << " " << availableStorage << " " << utilizedStorage << " " << availableStorage << " "
+         << physicalStorage << " " << availableNetwork << " " << utilizedNetwork << " " << actualUtilizedNetwork << " "
+         << totalNetwork << " " << physicalNetwork << " " << availableAccelerators << " " << utilizedAccelerators << " "
+         << totalAccelerators << " " << totalPowerConsumption << endl;
     file.close();
   }
 }
 
 void stat::printfileJson(const string& outfile, const string& inputfile, const ios::openmode& mode, int a, int b,
-                         int overallRecords, int numOfCells, int numOfTypes, int j)
+                         int overallRecords, int numOfCells, int numberOfTypes, int j)
 {
   ifstream file;
   file.open(inputfile.c_str());
@@ -276,72 +278,72 @@ void stat::printfileJson(const string& outfile, const string& inputfile, const i
 
   int k;
   for (k = 0; k < overallRecords; k++) {
-    file >> currTstep;
-    file >> activeSrvs;
-    file >> procActServs;
-    file >> memActServs;
-    file >> stoActServs;
-    file >> accActServs;
-    file >> numOfTasks;
-    file >> accTasks;
-    file >> rejTasks;
-    file >> availProc;
-    file >> utilProc;
-    file >> autilProc;
-    file >> totProc;
-    file >> phyProc;
-    file >> availMem;
-    file >> utilMem;
-    file >> autilMem;
-    file >> totMem;
-    file >> phyMem;
-    file >> availSto;
-    file >> utilSto;
-    file >> totSto;
-    file >> phySto;
-    file >> availNetw;
-    file >> utilNetw;
-    file >> autilNetw;
-    file >> totNetw;
-    file >> phyNetw;
-    file >> availAcc;
-    file >> utilAcc;
-    file >> totAcc;
-    file >> totPcons;
+    file >> currentTimestep;
+    file >> activeServers;
+    file >> processorsOverActiveServers;
+    file >> memoryOverActiveServers;
+    file >> storageOverActiveServers;
+    file >> acceleratorsOverActiveServers;
+    file >> numberOfTasks;
+    file >> acceptedTasks;
+    file >> rejectedTasks;
+    file >> availableProcessors;
+    file >> utilizedProcessors;
+    file >> actualUtilizedProcessors;
+    file >> totalProcessors;
+    file >> physicalProcessors;
+    file >> availableMemory;
+    file >> utilizedMemory;
+    file >> actualUtilizedMemory;
+    file >> totalMemory;
+    file >> physicalMemory;
+    file >> availableStorage;
+    file >> utilizedStorage;
+    file >> totalStorage;
+    file >> physicalStorage;
+    file >> availableNetwork;
+    file >> utilizedNetwork;
+    file >> actualUtilizedNetwork;
+    file >> totalNetwork;
+    file >> physicalNetwork;
+    file >> availableAccelerators;
+    file >> utilizedAccelerators;
+    file >> totalAccelerators;
+    file >> totalPowerConsumption;
 
     js = jsoncons::json::object{
-        {"Time Step", currTstep},
-        {"Total Energy Consumption",totPcons},
-        {"Active Servers", activeSrvs},
-        {"Total Number of currently running VMs",numOfTasks},
-        {"Total Processors over Active Servers",procActServs},
-        {"Total Memory over Active Servers",memActServs},
-        {"Total Storage over Active Servers",stoActServs},
-        {"Total Accelerators over Active Servers",accActServs},
-        {"Total Number of accepted Tasks",accTasks},
-        {"Total Number of rejected Tasks",rejTasks},
-        {"Total Physical Processors",phyProc},
-        {"Total Processors",totProc},
-        {"Utilized Processors",utilProc},
-        {"Actual Utilized Processors",autilProc},
-        {"Available Processors",availProc},
-        {"Total Physical Memory",phyMem},
-        {"Total Memory",totMem},
-        {"Utilized Memory",utilMem},
-        {"Actual Utilized Memory",autilMem},
-        {"Available Memory",availMem},
-        {"Total Physical Storage",phySto},
-        {"Total Storage",totSto},
-        {"Utilized Storage",utilSto},
-        {"Available Storage",availSto},
-        {"Total Physical Network",phyNetw},
-        {"Total Network",totNetw},
-        {"Utilized Network",utilNetw},
-        {"Actual Utilized Network",autilNetw},
-        {"Available Network",availNetw},
-        {"Total Accelerators",totAcc},
-        {"Utilized Accelerators",utilAcc},
-        {"Available Accelerators",availAcc} 
+        {"Time Step", currentTimestep},
+        {"Total Energy Consumption",totalPowerConsumption},
+        {"Active Servers", activeServers},
+        {"Total Number of currently running VMs",numberOfTasks},
+        {"Total Processors over Active Servers",processorsOverActiveServers},
+        {"Total Memory over Active Servers",memoryOverActiveServers},
+        {"Total Storage over Active Servers",storageOverActiveServers},
+        {"Total Accelerators over Active Servers",acceleratorsOverActiveServers},
+        {"Total Number of accepted Tasks",acceptedTasks},
+        {"Total Number of rejected Tasks",rejectedTasks},
+        {"Total Physical Processors",physicalProcessors},
+        {"Total Processors",totalProcessors},
+        {"Utilized Processors",utilizedProcessors},
+        {"Actual Utilized Processors",actualUtilizedProcessors},
+        {"Available Processors",availableProcessors},
+        {"Total Physical Memory",physicalMemory},
+        {"Total Memory",totalMemory},
+        {"Utilized Memory",utilizedMemory},
+        {"Actual Utilized Memory",actualUtilizedMemory},
+        {"Available Memory",availableMemory},
+        {"Total Physical Storage",physicalStorage},
+        {"Total Storage",totalStorage},
+        {"Utilized Storage",utilizedStorage},
+        {"Available Storage",availableStorage},
+        {"Total Physical Network",physicalNetwork},
+        {"Total Network",totalNetwork},
+        {"Utilized Network",utilizedNetwork},
+        {"Actual Utilized Network",actualUtilizedNetwork},
+        {"Available Network",availableNetwork},
+        {"Total Accelerators",totalAccelerators},
+        {"Utilized Accelerators",utilizedAccelerators},
+        {"Available Accelerators",availableAccelerators} 
         
     };
     output_list.add(js);
@@ -355,7 +357,7 @@ void stat::printfileJson(const string& outfile, const string& inputfile, const i
 
   cl_list.add(cl);
 
-  if (a == numOfCells && j == numOfTypes){
+  if (a == numOfCells && j == numberOfTypes){
     ff << std::setw(4) << pretty_print(cl_list) << std::endl;
   }
   file.close();

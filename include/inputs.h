@@ -2,11 +2,15 @@
 #define INPUTS_H
 #include <fstream>
 #include <string>
-using namespace std;
+
+using std::string;
+using std::fstream;
+using std::ifstream;
+using std::ios;
 
 struct brinputs {
   int alloc;
-  int numOfFuncs;
+  int numberOfFunctions;
   double* Ws;
   int initResPervRM;
   int initvRMPerpSwitch;
@@ -29,8 +33,8 @@ struct appinputs {
   int alloc;
   double* minmaxJobsPerSec;
   int numOfApps;
-  int* numOfAvailImplPerApp;
-  int** availImplPerApp;
+  int* numberOfAvailableImplementationsPerApp;
+  int** availableImplementationsPerApp;
   int** minmaxVMPerApp;
   double** minmaxInsPerApp;
   double** minmaxProcPerVM;
@@ -57,7 +61,7 @@ struct appinputs {
 struct netinputs {
   int alloc;
   double netBW;
-  double overCommitNet;
+  double overCommitmentNetwork;
   void print();
   netinputs();
   ~netinputs();
@@ -83,14 +87,14 @@ struct powinputs {
 struct resinputs {
   int alloc;
   double numOfProcUnits;
-  double totMem;
-  double totSto;
-  double overCommitProc;
-  double overCommitMem;
-  double compCap;
+  double totalMemory;
+  double totalStorage;
+  double overcommitmentProcessors;
+  double overcommitmentMemory;
+  double computeCapability;
   int accelerator;
-  double accCompCap;
-  int totAcc;
+  double acceleratorComputeCapability;
+  int totalAccelerators;
   int type;
   resinputs();
   resinputs(const resinputs& t);
@@ -105,9 +109,9 @@ struct cellinputs {
   struct powinputs* pinp;
   struct netinputs* ninp;
   struct brinputs* binp;
-  int numOfTypes;
+  int numberOfTypes;
   int* types;
-  int* numOfResourcesPerType;
+  int* numberOfResourcesPerType;
   cellinputs();
   cellinputs(const cellinputs& t);
   ~cellinputs();
@@ -120,7 +124,8 @@ struct siminputs {
   int numOfCells;
   double maxTime;
   int sosmIntegration;
-  double upInterval;
+  double updateInterval;
+
   siminputs();
   siminputs(const siminputs& t);
   void parse(const string& fname, const string& bname);

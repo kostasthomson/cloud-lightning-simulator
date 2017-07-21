@@ -1,16 +1,15 @@
 #ifndef TASK_H
 #define TASK_H
 #include <vector>
-using namespace std;
 
 class task
 {
  private:
   int type;
-  int numOfAvailImpl;
-  int* availImpl;
-  double reqIns;
-  int numOfVMs;
+  int numberOfAvailableImplementations;
+  int* availableImplementations;
+  double requestedInstructions;
+  int numberOfVMs;
   double* reqPMNS;
   int* typeactPMN;
   double** minmaxactPMN;
@@ -30,10 +29,11 @@ class task
 
   ~task();
 
-  task(const int& L_type, const int& L_numOfAvailImpl, const int* L_availImpl, const double& L_reqIns,
-       const int& L_numOfVMs, const double& L_reqP, const double& L_reqM, const double& L_reqN, const double& L_reqS,
-       const int& L_typeactP, const int& L_typeactM, const int& L_typeactN, const double* L_minmaxactP,
-       const double* L_minmaxactM, const double* L_minmaxactN, const int* L_avAcc, const double* L_rhoAcc);
+  task(const int& L_type, const int& L_numberOfAvailableImplementations, const int* L_availableImplementations,
+       const double& L_requestedInstructions, const int& L_numberOfVMs, const double& L_reqP, const double& L_reqM,
+       const double& L_reqN, const double& L_reqS, const int& L_typeactP, const int& L_typeactM, const int& L_typeactN,
+       const double* L_minmaxactP, const double* L_minmaxactM, const double* L_minmaxactN, const int* L_avAcc,
+       const double* L_rhoAcc);
 
   void attachResources(const int* IDs);
 
@@ -45,14 +45,16 @@ class task
 
   void reduceImpl(const int* type);
 
+  void print() const;
+
   void reduceIns(const double& amount);
-  int gtype() const;
-  int gnumOfAvailImpl() const;
-  int* gavailImpl() const;
-  double greqIns() const;
-  int gnumOfVMs() const;
+  int getType() const;
+  int getNumberOfAvailableImplementations() const;
+  int* getAvailableImplementations() const;
+  double grequestedInstructions() const;
+  int getNumberOfVMs() const;
   double* greqPMNS() const;
-  int* gtypeactPMN() const;
+  int* getTypeactPMN() const;
   double** gminmaxactPMN() const;
   int* gavAcc() const;
   double* grhoAcc() const;
@@ -62,8 +64,6 @@ class task
   double getactP();
   double getactM();
   double getactN();
-
-  void print() const;
 };
 
 #endif
