@@ -60,13 +60,27 @@ class resource
 
   ~resource();
 
+  /// Initializes the running quantities of a resource
   void initRunQuan();
+
+  /// Calculates the compute capability of each processor
   void compcCompCapPerProc();
+
+  /// Calculates the compute capability of each accelerator
   void compcCompCapPerAcc();
+
+  /// Increments the running quantities of a resource by the provided values for processors, memory and accelerators
   void incrRunQuan(const double& uProc, const double& uMem, const double& rAcc);
 
+  /// Assigns a task to a resource: Increments the number of tasks variable, reduces the resources' available
+  /// processors, memory, storage and accelerators and calculates the utilized units
+  /// \param t The task to be assigned to the resource
   void deploy(const task* t);
+
   int probe(const double& reqProc, const double& reqMem, const double& reqSto, const int& reqAcc);
+
+  /// Dissociates a task from a resource by reversing the actions of the deploy method
+  /// \param t The iterator for a list of tasks that points to the task to be dissociated
   void unload(const list<task>::iterator& t);
 
   int galloc() const;

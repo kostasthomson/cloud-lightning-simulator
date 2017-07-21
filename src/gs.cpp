@@ -10,7 +10,6 @@
 #include <json.hpp>
 #include <sstream>
 #include <vector>
-using namespace std;
 
 gs::gs()
 {
@@ -20,7 +19,7 @@ gs::gs()
   stats = NULL;
 }
 
-gs::gs(const string& sfile, const string& afile, const string& bfile)
+gs::gs(const std::string& sfile, const std::string& afile, const std::string& bfile)
 {
   int i;
   alloc = 1;
@@ -112,6 +111,7 @@ int gs::galloc() const { return alloc; }
 appinputs* gs::gai() const { return ai; }
 siminputs* gs::gsi() const { return si; }
 stat** gs::gstats() const { return stats; }
+
 int gs::findCell(const int* rImpl, const int& numImpl, const int& rVM, const double& rvProc, const double& rMem,
                  const double& rNet, const double& rSto, const int* rAcc) const
 {
@@ -173,7 +173,7 @@ void gs::print()
   }
 }
 
-void gs::printfile(const string& outfile, const ios::openmode& mode)
+void gs::printfile(const std::string& outfile, const ios::openmode& mode)
 {
   fstream file;
   if (alloc) {
@@ -202,19 +202,19 @@ void gs::printStats()
   }
 }
 
-void gs::printStats(const string& outfile, const ios::openmode& mode)
+void gs::printStats(const std::string& outfile, const ios::openmode& mode)
 {
   if (alloc) {
     for (int i = 0; i < si->numOfCells; i++) {
       for (int j = 0; j < si->cinp[i].numOfTypes; j++) {
-        string tmp = outfile + num2str(si->cinp[i].ID) + num2str(si->cinp[i].types[j]);
+        std::string tmp = outfile + num2str(si->cinp[i].ID) + num2str(si->cinp[i].types[j]);
         stats[i][j].printfile(tmp, mode);
       }
     }
   }
 }
 
-void gs::printStatsJson(const string& outfile, const ios::openmode& mode, int endTime, int upInterval)
+void gs::printStatsJson(const std::string& outfile, const ios::openmode& mode, int endTime, int upInterval)
 {
   int endT = endTime;
   int upIn = upInterval;
@@ -223,8 +223,8 @@ void gs::printStatsJson(const string& outfile, const ios::openmode& mode, int en
   if (alloc) {
     for (int i = 0; i < si->numOfCells; i++) {
       for (int j = 0; j < si->cinp[i].numOfTypes; j++) {
-        string tmp = outfile + num2str(si->cinp[i].ID) + num2str(si->cinp[i].types[j]);
-        string temp = outfile + "clsim.json";
+        std::string tmp = outfile + num2str(si->cinp[i].ID) + num2str(si->cinp[i].types[j]);
+        std::string temp = outfile + "clsim.json";
         stats[i][j].printfileJson(temp, tmp, mode, si->cinp[i].ID, si->cinp[i].types[j], overallRecords, si->numOfCells,
                                   si->cinp[i].numOfTypes, j + 1);
       }

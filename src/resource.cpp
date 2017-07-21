@@ -273,9 +273,6 @@ resource::~resource()
   }
 }
 
-//---------------------------------
-// INITIALIZE RUNNING QUANTITIES
-//---------------------------------
 void resource::initRunQuan()
 {
   if (alloc) {
@@ -313,9 +310,6 @@ void resource::compcCompCapPerAcc()
   }
 }
 
-//---------------------------------
-//       PROBE - ADDJOB
-//---------------------------------
 void resource::deploy(const task* t)
 {
   numOfTasks++;

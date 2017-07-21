@@ -11,7 +11,6 @@
 #include <string>
 using namespace std;
 
-
 /// Sends configuration parameters from the gateway to the cells
 void commSimParameters(struct siminputs& si, const int& rank, const int& numtasks, const MPI_Comm& Comm);
 

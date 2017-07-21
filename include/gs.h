@@ -7,10 +7,8 @@
 #include <stat.h>
 #include <task.h>
 
-using namespace std;
-
 template <typename T>
-string num2str(T num);
+std::string num2str(T num);
 
 class gs
 {
@@ -24,7 +22,10 @@ class gs
   gs();
 
   /// Parse the simulator configuration files
-  gs(const string& sfile, const string& afile, const string& bfile);
+  /// \param sfile The path to the CellData configuration file
+  /// \param afile The path to the AppData configuration file
+  /// \param bfile The path to the BrokerData configuration file
+  gs(const std::string& sfile, const std::string& afile, const std::string& bfile);
 
   gs(const gs& t);
 
@@ -58,11 +59,11 @@ class gs
 
   void printStats();
 
-  void printStats(const string& outfile, const ios::openmode& mode);
+  void printStats(const std::string& outfile, const ios::openmode& mode);
 
-  void printfile(const string& outfile, const ios::openmode& mode);
+  void printfile(const std::string& outfile, const ios::openmode& mode);
 
-  void printStatsJson(const string& outfile, const ios::openmode& mode, int endTime, int upInterval);
+  void printStatsJson(const std::string& outfile, const ios::openmode& mode, int endTime, int upInterval);
 };
 
 #endif

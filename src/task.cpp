@@ -360,13 +360,12 @@ void task::reduceImpl(const int* type)
 
 void task::print() const
 {
-  int i;
   if (alloc) {
     cout << "-----------------------------------------------" << endl;
     cout << "Task type (oil, genomics etc): " << type << endl;
     cout << "Number of available implementations: " << numOfAvailImpl << endl;
     cout << "Available Implementations: ";
-    for (i = 0; i < numOfAvailImpl; i++) {
+    for (int i = 0; i < numOfAvailImpl; i++) {
       cout << availImpl[i] << " ";
     }
     cout << endl;
@@ -377,7 +376,7 @@ void task::print() const
     cout << "Storage per VM: " << reqPMNS[3] << " TBytes" << endl;
     cout << "Network per App: " << reqPMNS[2] << " Gbps" << endl;
     cout << "Type of Actual Utilization (Proc,Mem,Sto): ";
-    for (i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++) {
       cout << typeactPMN[i] << " ";
     }
     cout << endl;
@@ -386,12 +385,12 @@ void task::print() const
     cout << "Minimum - Maximum actual utilization Memory: " << minmaxactPMN[1][0] << " " << minmaxactPMN[1][1] << endl;
     cout << "Minimum - Maximum actual utilization Network: " << minmaxactPMN[2][0] << " " << minmaxactPMN[2][1] << endl;
     cout << "Accelerator support per Implementation: ";
-    for (i = 0; i < numOfAvailImpl; i++) {
+    for (int i = 0; i < numOfAvailImpl; i++) {
       cout << avAcc[i] << " ";
     }
     cout << endl;
     cout << "Actual accelerator usage: ";
-    for (i = 0; i < numOfAvailImpl; i++) {
+    for (int i = 0; i < numOfAvailImpl; i++) {
       cout << rhoAcc[i] << " ";
     }
     cout << endl;

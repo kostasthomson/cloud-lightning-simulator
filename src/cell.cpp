@@ -316,24 +316,26 @@ void cell::updateStats(const double& tstep)
 
 void cell::print()
 {
-  int i;
-
   if (alloc) {
     cout << endl;
     cout << "Cell ID: " << ID << endl;
     cout << "Number of HW types: " << numOfTypes << endl;
     cout << "HW types: ";
-    for (i = 0; i < numOfTypes; i++)
+    for (int i = 0; i < numOfTypes; i++) {
       cout << types[i] << " ";
+    }
     cout << endl;
     cout << "Number of Resources Per Type: ";
-    for (i = 0; i < numOfTypes; i++)
+    for (int i = 0; i < numOfTypes; i++) {
       cout << numOfResourcesPerType[i] << " ";
+    }
     cout << endl;
     cout << "---------------------------------------------" << endl;
+
     network[0].print();
     brok[0].print();
-    for (i = 0; i < numOfTypes; i++) {
+
+    for (int i = 0; i < numOfTypes; i++) {
       cout << "     Resource Type: " << types[i] << endl;
       powerComp[i].print();
       stats[i].print();
