@@ -4,7 +4,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <json.hpp>
+#include <jsoncons/json.hpp>
 #include <string>
 #include <vector>
 using namespace std;
@@ -123,24 +123,28 @@ void brinputs::print()
 
 void brinputs::parse(const string& outname, int i)
 {
-  ifstream bb(outname); // open json file
-  nlohmann::json xx;    // declare a json object
-  bb >> xx;             // connect json object with file
+  // Read the JSON text into a json value
+  std::ifstream is(outname);
+  jsoncons::json b;
+  is >> b;
+
   int k = i;
   int j;
   alloc = 1;
-  numOfFuncs = xx["Brokers"][k]["Number of functions"].get<int>();
-  Ws = new double[numOfFuncs];
-  for (j = 0; j < numOfFuncs; j++)
-    Ws[j] = xx["Brokers"][k]["Weights of functions"][j].get<double>();
-  initResPervRM = xx["Brokers"][k]["Number of Resources per vRM"].get<int>();
-  initvRMPerpSwitch = xx["Brokers"][k]["Number of vRMs per pSwitch"].get<int>();
-  initpSwitchPerpRouter = xx["Brokers"][k]["Number of pSwitch per pRouter"].get<int>();
-  pollIntervalCellM = xx["Brokers"][k]["Poll Interval Cell Manager"].get<int>();
-  pollIntervalpRouter = xx["Brokers"][k]["Poll Interval pRouter"].get<int>();
-  pollIntervalpSwitch = xx["Brokers"][k]["Poll Interval pSwitch"].get<int>();
-  pollIntervalvRM = xx["Brokers"][k]["Poll Interval vRM"].get<int>();
-  vRMdeploystrategy = xx["Brokers"][k]["vRM deployment strategy"].get<int>();
+  numOfFuncs = b["Brokers"][k]["Number of functions"].as<int>();
+  Ws=new double[numOfFuncs];
+  for(j=0;j<numOfFuncs;j++){
+    Ws[j] = b["Brokers"][k]["Weights of functions"][j].as<double>();
+  }
+  initResPervRM = b["Brokers"][k]["Number of Resources per vRM"].as<int>();
+  initvRMPerpSwitch = b["Brokers"][k]["Number of vRMs per pSwitch"].as<int>();
+  initpSwitchPerpRouter = b["Brokers"][k]["Number of pSwitch per pRouter"].as<int>();
+  pollIntervalCellM = b["Brokers"][k]["Poll Interval Cell Manager"].as<int>();
+  pollIntervalpRouter = b["Brokers"][k]["Poll Interval pRouter"].as<int>();
+  pollIntervalpSwitch = b["Brokers"][k]["Poll Interval pSwitch"].as<int>();
+  pollIntervalvRM = b["Brokers"][k]["Poll Interval vRM"].as<int>();
+  vRMdeploystrategy = b["Brokers"][k]["vRM deployment strategy"].as<int>();
+
   /*
     outname>>numOfFuncs;
     Ws=new double[numOfFuncs];
@@ -395,17 +399,16 @@ appinputs& appinputs::operator=(const appinputs& t)
 
 void appinputs::parse(const string& fname)
 {
-  ifstream file;
-  ifstream bb(fname); // open json file
-  nlohmann::json xx;  // declare a json object
-  bb >> xx;           // connect json object with file
+  std::ifstream is(fname);
+  jsoncons::json a;
+  is >> a;
+
   int i, j;
   alloc = 1;
-  numOfApps = xx["Number of Applications"].get<int>(); // read number of applications and assign to variable
-  minmaxJobsPerSec = new double[2];
-
-  for (i = 0; i < 2; i++) {
-    minmaxJobsPerSec[i] = xx["Minimum and Maximum Jobs Per Second"][i].get<double>();
+  numOfApps = a["Number of Applications"].as<int>();  //read number of applications and assign to variable
+  minmaxJobsPerSec=new double[2];
+  for(i=0;i<2;i++){
+    minmaxJobsPerSec[i] = a["Minimum and Maximum Jobs Per Second"][i].as<double>(); 
   }
 
   // Initialization of application characteristics
@@ -426,63 +429,64 @@ void appinputs::parse(const string& fname)
   typeOfActM = new int[numOfApps];
   typeOfActN = new int[numOfApps];
 
-  for (i = 0; i < numOfApps; i++) {
-    numOfAvailImplPerApp[i] = xx["Applications"][i]["Number of Available Implementations"].get<int>();
-    availImplPerApp[i] = new int[numOfAvailImplPerApp[i]];
-    for (j = 0; j < numOfAvailImplPerApp[i]; j++) {
-      availImplPerApp[i][j] = xx["Applications"][i]["Available Implementations"][j].get<int>();
-    }
-    minmaxInsPerApp[i] = new double[2];
-    minmaxVMPerApp[i] = new int[2];
-    minmaxProcPerVM[i] = new double[2];
-    minmaxMemPerVM[i] = new double[2];
-    minmaxStoPerVM[i] = new double[2];
-    minmaxNetPerApp[i] = new double[2];
+  for(i=0;i<numOfApps;i++){
+    
+    numOfAvailImplPerApp[i] = a["Applications"][i]["Number of Available Implementations"].as<int>();
+    availImplPerApp[i]=new int[numOfAvailImplPerApp[i]];
+    for(j=0;j<numOfAvailImplPerApp[i];j++){
+        availImplPerApp[i][j] = a["Applications"][i]["Available Implementations"][j].as<int>() ;
+      }
+    minmaxInsPerApp[i]=new double[2];
+    minmaxVMPerApp[i]=new int[2];
+    minmaxProcPerVM[i]=new double[2];
+    minmaxMemPerVM[i]=new double[2];
+    minmaxStoPerVM[i]=new double[2];
+    minmaxNetPerApp[i]=new double[2];
 
-    for (j = 0; j < 2; j++) {
-      minmaxInsPerApp[i][j] = xx["Applications"][i]["Minimum - Maximum Instructions Per App"][j].get<double>();
-    }
-    for (j = 0; j < 2; j++) {
-      minmaxVMPerApp[i][j] = xx["Applications"][i]["Minimum - Maximum VMs Per App"][j].get<int>();
-    }
-    for (j = 0; j < 2; j++) {
-      minmaxProcPerVM[i][j] = xx["Applications"][i]["Minimum - Maximum vCPUs Per VM"][j].get<int>();
-    }
-    for (j = 0; j < 2; j++) {
-      minmaxMemPerVM[i][j] = xx["Applications"][i]["Minimum - Maximum Memory Per VM"][j].get<int>();
-    }
-    for (j = 0; j < 2; j++) {
-      minmaxStoPerVM[i][j] = xx["Applications"][i]["Minimum - Maximum Storage Per VM"][j].get<double>();
-    }
-    for (j = 0; j < 2; j++) {
-      minmaxNetPerApp[i][j] = xx["Applications"][i]["Minimum - Maximum Network Per VM"][j].get<double>();
-    }
+      for(j=0;j<2;j++){
+        minmaxInsPerApp[i][j] = a["Applications"][i]["Minimum - Maximum Instructions Per App"][j].as<double>();
+      }
+      for(j=0;j<2;j++){
+        minmaxVMPerApp[i][j] = a["Applications"][i]["Minimum - Maximum VMs Per App"][j].as<int>();
+      }
+      for(j=0;j<2;j++){
+        minmaxProcPerVM[i][j] = a["Applications"][i]["Minimum - Maximum vCPUs Per VM"][j].as<int>();
+      }
+      for(j=0;j<2;j++){
+        minmaxMemPerVM[i][j] = a["Applications"][i]["Minimum - Maximum Memory Per VM"][j].as<int>();
+      }
+      for(j=0;j<2;j++){
+        minmaxStoPerVM[i][j] = a["Applications"][i]["Minimum - Maximum Storage Per VM"][j].as<double>();
+      }
+      for(j=0;j<2;j++){
+        minmaxNetPerApp[i][j] = a["Applications"][i]["Minimum - Maximum Network Per VM"][j].as<double>();
+      }
+      
+      typeOfActP[i] = a["Applications"][i]["Type of Actual Utilization (vCPU,Memory,Network)"][0].as<int>();
+      typeOfActM[i] = a["Applications"][i]["Type of Actual Utilization (vCPU,Memory,Network)"][1].as<int>();
+      typeOfActN[i] = a["Applications"][i]["Type of Actual Utilization (vCPU,Memory,Network)"][2].as<int>();
 
-    typeOfActP[i] = xx["Applications"][i]["Type of Actual Utilization (vCPU,Memory,Network)"][0].get<int>();
-    typeOfActM[i] = xx["Applications"][i]["Type of Actual Utilization (vCPU,Memory,Network)"][1].get<int>();
-    typeOfActN[i] = xx["Applications"][i]["Type of Actual Utilization (vCPU,Memory,Network)"][2].get<int>();
-
-    minmaxActP[i] = new double[2];
-    minmaxActM[i] = new double[2];
-    minmaxActN[i] = new double[2];
-    for (j = 0; j < 2; j++) {
-      minmaxActP[i][j] = xx["Applications"][i]["Minimum - Maximum Actual vCPU Utilization"][j].get<double>();
+      minmaxActP[i]=new double[2];
+      minmaxActM[i]=new double[2];
+      minmaxActN[i]=new double[2];
+      for(j=0;j<2;j++){
+        minmaxActP[i][j] = a["Applications"][i]["Minimum - Maximum Actual vCPU Utilization"][j].as<double>();
+      }
+      for(j=0;j<2;j++){
+        minmaxActM[i][j] = a["Applications"][i]["Minimum - Maximum Actual Memory Utilization"][j].as<double>();
+      }
+      for(j=0;j<2;j++){
+        minmaxActN[i][j] = a["Applications"][i]["Minimum - Maximum Actual Network Utilization"][j].as<double>();
+      }
+      accelerator[i]=new int[numOfAvailImplPerApp[i]];
+      for(j=0;j<numOfAvailImplPerApp[i];j++){
+        accelerator[i][j] = a["Applications"][i]["Accelerator support"][j].as<int>();
+      }     
+      rhoAcc[i]=new double[numOfAvailImplPerApp[i]];
+      for(j=0;j<numOfAvailImplPerApp[i];j++){
+        rhoAcc[i][j] = a["Applications"][i]["Rho for accelerator execution per Implementation"][j].as<double>();
+      }
     }
-    for (j = 0; j < 2; j++) {
-      minmaxActM[i][j] = xx["Applications"][i]["Minimum - Maximum Actual Memory Utilization"][j].get<double>();
-    }
-    for (j = 0; j < 2; j++) {
-      minmaxActN[i][j] = xx["Applications"][i]["Minimum - Maximum Actual Network Utilization"][j].get<double>();
-    }
-    accelerator[i] = new int[numOfAvailImplPerApp[i]];
-    for (j = 0; j < numOfAvailImplPerApp[i]; j++) {
-      accelerator[i][j] = xx["Applications"][i]["Accelerator support"][j].get<int>();
-    }
-    rhoAcc[i] = new double[numOfAvailImplPerApp[i]];
-    for (j = 0; j < numOfAvailImplPerApp[i]; j++) {
-      rhoAcc[i][j] = xx["Applications"][i]["Rho for accelerator execution per Implementation"][j].get<double>();
-    }
-  }
   /*ifstream file;
   int i,j;
   file.open(fname.c_str());
@@ -1202,82 +1206,80 @@ void siminputs::parse(const string& fname, const string& bname)
 {
   int i, j, k;
   double dummy;
-  ifstream file2;
+  
+  std::ifstream is(fname);
+  jsoncons::json c;
+  is >> c;
 
-  ifstream bb(fname); // open json file
-  nlohmann::json pp;  // declare a json object
-  bb >> pp;           // connect json object with file
-
-  // file.open(fname.c_str());
-  // file2.open(bname.c_str());
-
-  maxTime = pp["Maximum Simulation Time"].get<int>(); // read maximum simulation time and assign to variable
-  upInterval = pp["Update Interval"].get<int>();      // read update interval and assign to variable
-  numOfCells = pp["Number of Cells"].get<int>();      // read number of cells and assign to variable
-  cinp = new cellinputs[numOfCells];
-  alloc = 1;
+  maxTime = c["Maximum Simulation Time"].as<int>();   //read maximum simulation time and assign to variable
+  upInterval = c["Update Interval"].as<int>();      //read update interval and assign to variable
+  numOfCells = c["Number of Cells"].as<int>();      //read number of cells and assign to variable
+  cinp=new cellinputs[numOfCells];
+  alloc=1;
 
   //---------------------------------------------
   // For each cell and for each hardware type,
-  // initialization of characteristics and reading
+  // initialization of characteristics and reading 
   // data from file
   //---------------------------------------------
-  for (i = 0; i < numOfCells; i++) {
-    cinp[i].binp = new brinputs[1];
-    cinp[i].binp[0].alloc = 1;
-    cinp[i].binp[0].parse(bname, i);
-    cinp[i].numOfTypes = pp["Cells"][i]["Number_of_HW_types"].get<int>();
-    cinp[i].alloc = 1;
-    cinp[i].ID = i + 1;
-    cinp[i].types = new int[cinp[i].numOfTypes];
-    cinp[i].numOfResourcesPerType = new int[cinp[i].numOfTypes];
-    cinp[i].rinp = new resinputs[cinp[i].numOfTypes];
-    cinp[i].pinp = new powinputs[cinp[i].numOfTypes];
-    cinp[i].ninp = new netinputs[1];
-    cinp[i].ninp[0].alloc = 1;
-    cinp[i].ninp[0].netBW = pp["Cells"][i]["Cell_Interconnection_Bandwidth"].get<int>();
-    cinp[i].ninp[0].overCommitNet = pp["Cells"][i]["Network_Bandwidth_Overcommitment_ratio"].get<double>();
+  for(i=0;i<numOfCells;i++){
+    cinp[i].binp=new brinputs[1];
+    cinp[i].binp[0].alloc=1;
+    cinp[i].binp[0].parse(bname,i);
+    cinp[i].numOfTypes = c["Cells"][i]["Number_of_HW_types"].as<int>();
+    cinp[i].alloc=1;
+    cinp[i].ID=i+1;
+    cinp[i].types=new int[cinp[i].numOfTypes];
+    cinp[i].numOfResourcesPerType=new int[cinp[i].numOfTypes];
+    cinp[i].rinp=new resinputs[cinp[i].numOfTypes];
+    cinp[i].pinp=new powinputs[cinp[i].numOfTypes];
+    cinp[i].ninp=new netinputs[1];
+    cinp[i].ninp[0].alloc=1;
+    cinp[i].ninp[0].netBW = c["Cells"][i]["Cell_Interconnection_Bandwidth"].as<int>();
+    cinp[i].ninp[0].overCommitNet = c["Cells"][i]["Network_Bandwidth_Overcommitment_ratio"].as<double>();
 
-    for (j = 0; j < cinp[i].numOfTypes; j++) {
-      cinp[i].types[j] = pp["Cells"][i]["HW_types"][j]["HW_type_ID"].get<int>();
-      cinp[i].numOfResourcesPerType[j] = pp["Cells"][i]["HW_types"][j]["Number of Servers"].get<int>();
-      cinp[i].rinp[j].alloc = 1;
-      cinp[i].rinp[j].type = cinp[i].types[j];
-      cinp[i].rinp[j].numOfProcUnits = pp["Cells"][i]["HW_types"][j]["Number_of_Proc_Units_per_Server"].get<int>();
-      cinp[i].rinp[j].totMem = pp["Cells"][i]["HW_types"][j]["Memory_per_Server"].get<int>();
-      cinp[i].rinp[j].totSto = pp["Cells"][i]["HW_types"][j]["Storage_per_Server"].get<int>();
-      cinp[i].rinp[j].overCommitProc = pp["Cells"][i]["HW_types"][j]["Proc_Overcommitment_ratio"].get<double>();
-      cinp[i].rinp[j].overCommitMem = pp["Cells"][i]["HW_types"][j]["Memory_Overcommitment_ratio"].get<double>();
-      cinp[i].rinp[j].compCap = pp["Cells"][i]["HW_types"][j]["Compute_Capability"].get<double>();
-      cinp[i].rinp[j].accelerator = pp["Cells"][i]["HW_types"][j]["Accelerators"].get<int>();
-      cinp[i].rinp[j].totAcc = pp["Cells"][i]["HW_types"][j]["Total_Number_of_Accelerators_per_Server"].get<int>();
-      cinp[i].rinp[j].accCompCap = pp["Cells"][i]["HW_types"][j]["Accelerator_Compute_Capability"].get<double>();
-      cinp[i].pinp[j].alloc = 1;
-      cinp[i].pinp[j].accelerator = cinp[i].rinp[j].accelerator;
-      cinp[i].pinp[j].typeCpu = pp["Cells"][i]["HW_types"][j]["Type_of_CPU_model"].get<int>();
-      cinp[i].pinp[j].cpuPmin = pp["Cells"][i]["HW_types"][j]["CPU Idle Power Consumption"].get<double>();
-      cinp[i].pinp[j].cpuPmax = pp["Cells"][i]["HW_types"][j]["CPU Max Power Consumption"].get<double>();
-      cinp[i].pinp[j].numOfPoints = pp["Cells"][i]["HW_types"][j]["CPU_Number_of_Points_for_Interpolation"].get<int>();
-      // cout<<"CPU_Number_of_Points_for_Interpolation: "<<cinp[i].pinp[j].numOfPoints<<endl;
-      if (cinp[i].pinp[j].numOfPoints > 0) {
-        cinp[i].pinp[j].cpubins = new double[cinp[i].pinp[j].numOfPoints];
-        for (k = 0; k < cinp[i].pinp[j].numOfPoints; k++)
-          cinp[i].pinp[j].cpubins[k] = pp["Cells"][i]["HW_types"][j]["CPU Utilization Bins"][k].get<double>();
-        cinp[i].pinp[j].cpuP = new double[cinp[i].pinp[j].numOfPoints];
-        for (k = 0; k < cinp[i].pinp[j].numOfPoints; k++)
-          cinp[i].pinp[j].cpuP[k] = pp["Cells"][i]["HW_types"][j]["CPU Power Consuption"][k].get<double>();
-      } else {
-        dummy = 0.0;
-        dummy = 0.0;
-      }
-      cinp[i].pinp[j].cpuC = pp["Cells"][i]["HW_types"][j]["CPU Sleep Power Consumption"].get<int>();
-      cinp[i].pinp[j].typeAcc = pp["Cells"][i]["HW_types"][j]["Type of Accelerator Model"].get<int>();
-      cinp[i].pinp[j].accPmin = pp["Cells"][i]["HW_types"][j]["Accelerator Idle Power Consumption"].get<double>();
-      cinp[i].pinp[j].accPmax = pp["Cells"][i]["HW_types"][j]["Accelerator Max Power Consumption"].get<double>();
-      cinp[i].pinp[j].accC = pp["Cells"][i]["HW_types"][j]["Accelerator Sleep Power Consumption"].get<double>();
+    for(j=0;j<cinp[i].numOfTypes;j++)
+    {
+        cinp[i].types[j] = c["Cells"][i]["HW_types"][j]["HW_type_ID"].as<int>();
+        cinp[i].numOfResourcesPerType[j] = c["Cells"][i]["HW_types"][j]["Number of Servers"].as<int>();
+        cinp[i].rinp[j].alloc=1;
+        cinp[i].rinp[j].type=cinp[i].types[j];  
+        cinp[i].rinp[j].numOfProcUnits = c["Cells"][i]["HW_types"][j]["Number_of_Proc_Units_per_Server"].as<int>();
+        cinp[i].rinp[j].totMem = c["Cells"][i]["HW_types"][j]["Memory_per_Server"].as<int>();
+        cinp[i].rinp[j].totSto = c["Cells"][i]["HW_types"][j]["Storage_per_Server"].as<int>();
+        cinp[i].rinp[j].overCommitProc = c["Cells"][i]["HW_types"][j]["Proc_Overcommitment_ratio"].as<double>();
+        cinp[i].rinp[j].overCommitMem = c["Cells"][i]["HW_types"][j]["Memory_Overcommitment_ratio"].as<double>();
+        cinp[i].rinp[j].compCap = c["Cells"][i]["HW_types"][j]["Compute_Capability"].as<double>();
+        cinp[i].rinp[j].accelerator = c["Cells"][i]["HW_types"][j]["Accelerators"].as<int>();
+        cinp[i].rinp[j].totAcc = c["Cells"][i]["HW_types"][j]["Total_Number_of_Accelerators_per_Server"].as<int>();
+        cinp[i].rinp[j].accCompCap = c["Cells"][i]["HW_types"][j]["Accelerator_Compute_Capability"].as<double>();
+        cinp[i].pinp[j].alloc=1;
+        cinp[i].pinp[j].accelerator=cinp[i].rinp[j].accelerator;
+        cinp[i].pinp[j].typeCpu = c["Cells"][i]["HW_types"][j]["Type_of_CPU_model"].as<int>();
+        cinp[i].pinp[j].cpuPmin = c["Cells"][i]["HW_types"][j]["CPU Idle Power Consumption"].as<double>();
+        cinp[i].pinp[j].cpuPmax = c["Cells"][i]["HW_types"][j]["CPU Max Power Consumption"].as<double>();
+        cinp[i].pinp[j].numOfPoints = c["Cells"][i]["HW_types"][j]["CPU_Number_of_Points_for_Interpolation"].as<int>();
+        if(cinp[i].pinp[j].numOfPoints>0)
+        {
+          cinp[i].pinp[j].cpubins=new double[cinp[i].pinp[j].numOfPoints];
+          for(k=0;k<cinp[i].pinp[j].numOfPoints;k++)
+            cinp[i].pinp[j].cpubins[k] = c["Cells"][i]["HW_types"][j]["CPU Utilization Bins"][k].as<double>();
+          cinp[i].pinp[j].cpuP=new double[cinp[i].pinp[j].numOfPoints];
+          for(k=0;k<cinp[i].pinp[j].numOfPoints;k++)
+            cinp[i].pinp[j].cpuP[k] = c["Cells"][i]["HW_types"][j]["CPU Power Consuption"][k].as<double>();
+        }
+        else
+        {
+          dummy = 0.0;
+          dummy = 0.0;
+        }
+        cinp[i].pinp[j].cpuC = c["Cells"][i]["HW_types"][j]["CPU Sleep Power Consumption"].as<int>();
+        cinp[i].pinp[j].typeAcc = c["Cells"][i]["HW_types"][j]["Type of Accelerator Model"].as<int>();        
+        cinp[i].pinp[j].accPmin = c["Cells"][i]["HW_types"][j]["Accelerator Idle Power Consumption"].as<double>();
+        cinp[i].pinp[j].accPmax = c["Cells"][i]["HW_types"][j]["Accelerator Max Power Consumption"].as<double>();
+        cinp[i].pinp[j].accC = c["Cells"][i]["HW_types"][j]["Accelerator Sleep Power Consumption"].as<double>();
     }
   }
-  file2.close();
 
   /*
   if (file && file2)

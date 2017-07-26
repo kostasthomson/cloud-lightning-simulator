@@ -1,18 +1,14 @@
 #include <stat.h>
 #include <fstream>
 #include <iostream>
-#include <json.hpp>
+#include <jsoncons/json.hpp>
 #include <string>
 using namespace std;
 
-nlohmann::json js;
-nlohmann::json cl;
-nlohmann::json hw;
-
-nlohmann::json hw_list;
-nlohmann::json js_list;
-nlohmann::json output_list;
-nlohmann::json cl_list;
+jsoncons::json js;
+jsoncons::json cl;
+jsoncons::json output_list = jsoncons::json::array();
+jsoncons::json cl_list = jsoncons::json::array();
 
 stat::stat()
 {
@@ -277,7 +273,6 @@ void stat::printfileJson(const string& outfile, const string& inputfile, const i
   file.open(inputfile.c_str());
   std::ofstream ff(outfile, mode);
   output_list.clear();
-  hw_list.clear();
 
   int k;
   for (k = 0; k < overallRecords; k++) {
@@ -314,56 +309,54 @@ void stat::printfileJson(const string& outfile, const string& inputfile, const i
     file >> totAcc;
     file >> totPcons;
 
-    js = {
-
-      { "Time Step", currTstep },
-      { "Total Energy Consumption", totPcons },
-      { "Active Servers", activeSrvs },
-      { "Total Number of currently running VMs", numOfTasks },
-      { "Total Processors over Active Servers", procActServs },
-      { "Total Memory over Active Servers", memActServs },
-      { "Total Storage over Active Servers", stoActServs },
-      { "Total Accelerators over Active Servers", accActServs },
-      { "Total Number of accepted Tasks", accTasks },
-      { "Total Number of rejected Tasks", rejTasks },
-      { "Total Physical Processors", phyProc },
-      { "Total Processors", totProc },
-      { "Utilized Processors", utilProc },
-      { "Actual Utilized Processors", autilProc },
-      { "Available Processors", availProc },
-      { "Total Physical Memory", phyMem },
-      { "Total Memory", totMem },
-      { "Utilized Memory", utilMem },
-      { "Actual Utilized Memory", autilMem },
-      { "Available Memory", availMem },
-      { "Total Physical Storage", phySto },
-      { "Total Storage", totSto },
-      { "Utilized Storage", utilSto },
-      { "Available Storage", availSto },
-      { "Total Physical Network", phyNetw },
-      { "Total Network", totNetw },
-      { "Utilized Network", utilNetw },
-      { "Actual Utilized Network", autilNetw },
-      { "Available Network", availNetw },
-      { "Total Accelerators", totAcc },
-      { "Utilized Accelerators", utilAcc },
-      { "Available Accelerators", availAcc }
-
+    js = jsoncons::json::object{
+        {"Time Step", currTstep},
+        {"Total Energy Consumption",totPcons},
+        {"Active Servers", activeSrvs},
+        {"Total Number of currently running VMs",numOfTasks},
+        {"Total Processors over Active Servers",procActServs},
+        {"Total Memory over Active Servers",memActServs},
+        {"Total Storage over Active Servers",stoActServs},
+        {"Total Accelerators over Active Servers",accActServs},
+        {"Total Number of accepted Tasks",accTasks},
+        {"Total Number of rejected Tasks",rejTasks},
+        {"Total Physical Processors",phyProc},
+        {"Total Processors",totProc},
+        {"Utilized Processors",utilProc},
+        {"Actual Utilized Processors",autilProc},
+        {"Available Processors",availProc},
+        {"Total Physical Memory",phyMem},
+        {"Total Memory",totMem},
+        {"Utilized Memory",utilMem},
+        {"Actual Utilized Memory",autilMem},
+        {"Available Memory",availMem},
+        {"Total Physical Storage",phySto},
+        {"Total Storage",totSto},
+        {"Utilized Storage",utilSto},
+        {"Available Storage",availSto},
+        {"Total Physical Network",phyNetw},
+        {"Total Network",totNetw},
+        {"Utilized Network",utilNetw},
+        {"Actual Utilized Network",autilNetw},
+        {"Available Network",availNetw},
+        {"Total Accelerators",totAcc},
+        {"Utilized Accelerators",utilAcc},
+        {"Available Accelerators",availAcc} 
+        
     };
-    output_list.push_back(js);
+    output_list.add(js);
   }
-  // hw =
-  //{
-  //	{"HW Type", j},
-  //	{"Outputs: ", output_list}
-  // };
-  // hw_list.push_back(hw);
 
-  cl = { { "Cell", a }, { "HW Type", b }, { "Outputs", output_list } };
+  cl = jsoncons::json::object{
+      {"Cell",a},
+      {"HW Type", b},
+      {"Outputs", output_list}
+    };
 
-  cl_list.push_back(cl);
+  cl_list.add(cl);
 
-  if (a == numOfCells && j == numOfTypes)
-    ff << std::setw(4) << cl_list << std::endl;
+  if (a == numOfCells && j == numOfTypes){
+    ff << std::setw(4) << pretty_print(cl_list) << std::endl;
+  }
   file.close();
 }

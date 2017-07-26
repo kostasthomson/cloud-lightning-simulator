@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5.1)
+cmake_minimum_required(VERSION 2.8.1)
 project(CloudLightning)
 
 ###############################################################################
@@ -35,7 +35,7 @@ add_subdirectory(doc)
 add_executable(cl_sim ${sources} ${data})
 
 # Just for example add some compiler flags.
-target_compile_options(cl_sim PUBLIC -O3 -std=c++11 -lm -Wall -Wfloat-conversion)
+target_compile_options(cl_sim PUBLIC -O3 -std=c++11 -lm -Wall)
 
 # This allows to include files relative to the root of the src directory with a <> pair
 target_include_directories(cl_sim PUBLIC include/)

@@ -224,7 +224,7 @@ void gs::printStatsJson(const std::string& outfile, const ios::openmode& mode, i
     for (int i = 0; i < si->numOfCells; i++) {
       for (int j = 0; j < si->cinp[i].numOfTypes; j++) {
         std::string tmp = outfile + num2str(si->cinp[i].ID) + num2str(si->cinp[i].types[j]);
-        std::string temp = outfile + "clsim.json";
+        std::string temp = outfile + "CLsim.json";
         stats[i][j].printfileJson(temp, tmp, mode, si->cinp[i].ID, si->cinp[i].types[j], overallRecords, si->numOfCells,
                                   si->cinp[i].numOfTypes, j + 1);
       }
