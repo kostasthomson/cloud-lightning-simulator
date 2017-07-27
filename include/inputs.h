@@ -22,7 +22,7 @@ struct brinputs {
   ~brinputs();
   void parse(const string& outname, int cell_id);
   void print();
-  void printfile(const string& outname, const ios::openmode& mode);
+  void printfile(const string& outname, const ios::openmode& mode, int sosmIntegration);
 };
 
 struct appinputs {
@@ -119,6 +119,7 @@ struct siminputs {
   int alloc;
   int numOfCells;
   double maxTime;
+  int sosmIntegration;
   double upInterval;
   siminputs();
   siminputs(const siminputs& t);

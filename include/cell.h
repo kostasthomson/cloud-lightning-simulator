@@ -15,11 +15,13 @@ class cell
   int ID;
   int alloc;
   int numOfTypes;             //! Number of hardware types
+  int sosmIntegration;
   int* types;                 //! Hardware type
   int* numOfResourcesPerType; //! Number of resources that correspond to each hardware type
   power* powerComp;
   netw* network;
   broker* brok;
+  brokerNOsosm *brokNOsosm;
   resource** resources; //! Two-dimensional array of computer resources (servers)
   stat* stats;          //! Array to keep cell statistics
 
@@ -28,7 +30,7 @@ class cell
 
   /// Creates cell based on user-supplied configuration
   /// \param setup Stores cell-related configuration from the CellData file
-  cell(const cellinputs& setup);
+  cell(const cellinputs& setup, int L_sosmIntegration);
 
   cell(const cell& t);
 
@@ -51,10 +53,12 @@ class cell
   int gID() const;
   int galloc() const;
   int gnumOfTypes() const;
+  int getSosmIntegration() const;
   int* gtypes() const;
   int* gnumOfResourcesPerType() const;
   resource** gresources() const;
   broker* gbrok() const;
+  brokerNOsosm *getBrokNOsosm() const;
   power* gpowerComp() const;
   netw* gnetwork() const;
   stat* gstats() const;

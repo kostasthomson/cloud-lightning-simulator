@@ -67,6 +67,7 @@ int main(int argc, char** argv)
 
   // Initialization phase
   // Communicate Cell and Resource parameters and create all components
+  int sosmIntegration = 0;
   double endTime = 0.0, upInterval = 0;
   if (rank == 0) {
     gates = new gs[1];
@@ -76,25 +77,30 @@ int main(int argc, char** argv)
 
     endTime = gates[0].gsi()[0].maxTime;
     upInterval = gates[0].gsi()[0].upInterval;
-  } else {
+    sosmIntegration=gates[0].gsi()[0].sosmIntegration;
+  } 
+  else {
     struct siminputs* si;
     si = new siminputs[1];
 
     // Receive program values from the master
     commSimParameters(*si, rank, numtasks, MPI_COMM_WORLD);
 
+    sosmIntegration=si->sosmIntegration;
     clCell = new cell[1];
 
     // Initialize cells based on user-defined configuration
-    *clCell = cell(*(si->cinp));
+    *clCell = cell(*(si->cinp),sosmIntegration);
 
     // Initialization and Update outside of the constructor to avoid changing the values of the pointers to components
     // (can be avoided with move copy constructor in (>=C++11))
     // Creation of the SOSM hierarchical topology
-    clCell[0].gbrok()->initbroker(clCell->gnumOfTypes(), clCell->gtypes(), clCell->gnumOfResourcesPerType(),
+    if (sosmIntegration){
+      clCell[0].gbrok()->initbroker(clCell->gnumOfTypes(), clCell->gtypes(), clCell->gnumOfResourcesPerType(),
                                   clCell->gresources(), clCell->gpowerComp(), clCell->gnetwork(), si->cinp->binp[0]);
-    // State information update and Assessment Functions and SI calculation
-    clCell[0].gbrok()->updateStateInfo(clCell[0].gnetwork(), 0.0);
+      // State information update and Assessment Functions and SI calculation
+      clCell[0].gbrok()->updateStateInfo(clCell[0].gnetwork(), 0.0);
+    }    
     endTime = si->maxTime;
     upInterval = si->upInterval;
   }
@@ -104,10 +110,20 @@ int main(int argc, char** argv)
   if (rank == 0) {
     commStats(gates, clCell, rank, numtasks, MPI_COMM_WORLD);
     gates[0].printStats("../output/output", ios::out);
-  } else {
+  } 
+  else {
     commStats(gates, clCell, rank, numtasks, MPI_COMM_WORLD);
   }
   MPI_Barrier(MPI_COMM_WORLD);
+
+  if (rank==0){
+    if (sosmIntegration){
+      cout<<"Resource Allocation Mechanism: SOSM"<<endl;
+    } 
+    else{
+      cout<<"Resource Allocation Mechanism: Traditional"<<endl;
+    }
+  }
 
   int ss = 0, allTasks = 0;
   int* commCells = nullptr;
@@ -155,8 +171,11 @@ int main(int argc, char** argv)
     }
   }
 
+  
+
   if (rank == 0) {
-    // Print output to json file
+    // Print output to json file 
+    remove("../output/outputCLsim.json");
     gates[0].printStatsJson("../output/output", ios::out | ios::app, endTime, upInterval);
 
     commStats(gates, clCell, rank, numtasks, MPI_COMM_WORLD);

@@ -20,6 +20,7 @@ void commSimParameters(struct siminputs& si, const int& rank, const int& numtask
     for (i = 0; i < numtasks - 1; i++) {
       // Send simulator-specific info
       MPI_Send(&si.maxTime, 1, MPI_DOUBLE, i + 1, i + 1, Comm);
+      MPI_Send(&si.sosmIntegration,1,MPI_INT,i+1,i+1,Comm);
       MPI_Send(&si.upInterval, 1, MPI_DOUBLE, i + 1, i + 1, Comm);
       MPI_Send(&one, 1, MPI_INT, i + 1, i + 1, Comm);
 
@@ -76,6 +77,7 @@ void commSimParameters(struct siminputs& si, const int& rank, const int& numtask
     // Receive Simulator specific info
     si.alloc = 1;
     MPI_Recv(&si.maxTime, 1, MPI_DOUBLE, 0, rank, Comm, &status);
+    MPI_Recv(&si.sosmIntegration,1,MPI_INT,0,rank,Comm,&status);
     MPI_Recv(&si.upInterval, 1, MPI_DOUBLE, 0, rank, Comm, &status);
     MPI_Recv(&si.numOfCells, 1, MPI_INT, 0, rank, Comm, &status);
 

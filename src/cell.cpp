@@ -16,20 +16,23 @@ cell::cell()
   alloc = 0;
   types = NULL;
   numOfTypes = 0;
+  sosmIntegration=0;
   numOfResourcesPerType = NULL;
   resources = NULL;
   powerComp = NULL;
   network = NULL;
   brok = NULL;
+  brokNOsosm=NULL;
   stats = NULL;
 }
 
-cell::cell(const cellinputs& setup)
+cell::cell(const cellinputs& setup, int L_sosmIntegration)
 {
   int i, j;
   alloc = 1;
   ID = setup.ID;
   numOfTypes = setup.numOfTypes;
+  sosmIntegration=L_sosmIntegration;
   types = new int[numOfTypes];
   numOfResourcesPerType = new int[numOfTypes];
   for (i = 0; i < numOfTypes; i++) {
@@ -54,12 +57,19 @@ cell::cell(const cellinputs& setup)
   network[0] = netw(setup.ninp[0]);
 
   brok = new broker[1];
+  brokNOsosm=new brokerNOsosm[1];
+  
+  if (sosmIntegration==0)
+    brokNOsosm[0]=brokerNOsosm(numOfTypes,types,numOfResourcesPerType,setup.binp[0].pollIntervalCellM);
   //	brok[0]=broker(numOfTypes,types,numOfResourcesPerType,resources,powerComp,network,setup.binp[0]);
 
   stats = new stat[numOfTypes];
   for (i = 0; i < numOfTypes; i++) {
     stats[i] = stat();
   }
+
+  if (sosmIntegration==0)
+    brokNOsosm[0].updateStateInfo(resources,network,0.0);
 
   // brok->updateStateInfo(network,0.0);
   updateStats(0.0);
@@ -72,6 +82,7 @@ cell::cell(const cell& t)
     ID = t.gID();
     alloc = t.galloc();
     numOfTypes = t.gnumOfTypes();
+    sosmIntegration=t.getSosmIntegration();
     types = new int[numOfTypes];
     numOfResourcesPerType = new int[numOfTypes];
     for (i = 0; i < numOfTypes; i++) {
@@ -94,6 +105,8 @@ cell::cell(const cell& t)
     network[0] = t.gnetwork()[0];
     brok = new broker[1];
     brok[0] = t.gbrok()[0];
+    brokNOsosm=new brokerNOsosm[1];
+    brokNOsosm[0]=t.getBrokNOsosm()[0];
     stats = new stat[numOfTypes];
     for (i = 0; i < numOfTypes; i++) {
       stats[i] = t.gstats()[i];
@@ -119,18 +132,22 @@ cell& cell::operator=(const cell& t)
       delete[] powerComp;
       delete[] network;
       delete[] brok;
+      delete[] brokNOsosm;
       delete[] stats;
       resources = NULL;
       powerComp = NULL;
       network = NULL;
       brok = NULL;
+      brokNOsosm=NULL;
       stats = NULL;
       numOfTypes = 0;
+      sosmIntegration=0;
     }
     alloc = t.galloc();
     if (alloc) {
       ID = t.gID();
       numOfTypes = t.gnumOfTypes();
+      sosmIntegration=t.getSosmIntegration();
       types = new int[numOfTypes];
       numOfResourcesPerType = new int[numOfTypes];
       for (i = 0; i < numOfTypes; i++) {
@@ -153,6 +170,8 @@ cell& cell::operator=(const cell& t)
       network[0] = t.gnetwork()[0];
       brok = new broker[1];
       brok[0] = t.gbrok()[0];
+      brokNOsosm=new brokerNOsosm[1];
+      brokNOsosm[0]=t.getBrokNOsosm()[0];
       stats = new stat[numOfTypes];
       for (i = 0; i < numOfTypes; i++)
         stats[i] = t.gstats()[i];
@@ -179,21 +198,30 @@ cell::~cell()
     delete[] powerComp;
     delete[] network;
     delete[] brok;
+    delete[] brokNOsosm;
     delete[] stats;
     resources = NULL;
     powerComp = NULL;
     network = NULL;
     brok = NULL;
+    brokNOsosm=NULL;
     stats = NULL;
     numOfTypes = 0;
+    sosmIntegration=0;
   }
 }
 
 void cell::timestep(const double& tstep)
 {
   if (alloc) {
-    brok[0].timestep(resources, network, stats, powerComp);
-    brok->updateStateInfo(network, tstep);
+    if(getSosmIntegration()){
+      brok[0].timestep(resources, network, stats, powerComp);
+      brok->updateStateInfo(network, tstep);
+    }
+    else{
+      brokNOsosm[0].timestep(resources,network,stats,powerComp);
+      brokNOsosm[0].updateStateInfo(resources,network,tstep);
+    }   
     updateStats(tstep);
   }
 }
@@ -201,20 +229,30 @@ void cell::timestep(const double& tstep)
 int cell::gID() const { return ID; }
 int cell::galloc() const { return alloc; }
 int cell::gnumOfTypes() const { return numOfTypes; }
+int cell::getSosmIntegration() const { return sosmIntegration; }
 int* cell::gtypes() const { return types; }
 int* cell::gnumOfResourcesPerType() const { return numOfResourcesPerType; }
 resource** cell::gresources() const { return resources; }
 power* cell::gpowerComp() const { return powerComp; }
 broker* cell::gbrok() const { return brok; }
+brokerNOsosm *cell::getBrokNOsosm() const { return brokNOsosm; }
 netw* cell::gnetwork() const { return network; }
 stat* cell::gstats() const { return stats; }
+
 void cell::deploy(list<task>* jobs)
 {
   list<task>::iterator it;
   if (alloc) {
-    for (it = jobs->begin(); it != jobs->end(); it++) {
-      brok[0].deploy(resources, network, stats, &(*it));
+    if(getSosmIntegration()){
+      for (it = jobs->begin(); it != jobs->end(); it++) {
+        brok[0].deploy(resources, network, stats, &(*it));
+      }
     }
+    else{
+      for (it = jobs->begin(); it != jobs->end(); it++){
+        brokNOsosm[0].deploy(resources,network,stats,&(*it));
+      }
+    }    
   }
 }
 
@@ -334,7 +372,7 @@ void cell::print()
 
     network[0].print();
     brok[0].print();
-
+    brokNOsosm[0].print();
     for (int i = 0; i < numOfTypes; i++) {
       cout << "     Resource Type: " << types[i] << endl;
       powerComp[i].print();

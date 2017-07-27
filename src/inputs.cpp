@@ -161,27 +161,32 @@ void brinputs::parse(const string& outname, int i)
   */
 }
 
-void brinputs::printfile(const string& outname, const ios::openmode& mode)
+void brinputs::printfile(const string& outname, const ios::openmode& mode, int sosmIntegration)
 {
   fstream file;
   int i;
   if (alloc) {
     file.open(outname.c_str(), mode);
     file << "    =========== Broker ===========" << endl;
-    file << "        Number of Assessment Functions: " << numOfFuncs << endl;
-    file << "        Weights: ";
-    for (i = 0; i < numOfFuncs; i++) {
-      file << Ws[i] << " ";
+    if (sosmIntegration){
+      file << "        Number of Assessment Functions: " << numOfFuncs << endl;
+      file << "        Weights: ";
+      for (i = 0; i < numOfFuncs; i++) {
+          file << Ws[i] << " ";
+      }
+      file << endl;
+      file << "        Initial number of Resources per vRM: " << initResPervRM << endl;
+      file << "        Initial number of vRMs per pSwitch: " << initvRMPerpSwitch << endl;
+      file << "        Initial number of pSwitches per pRouter: " << initpSwitchPerpRouter << endl;
+      file << "        Poll Interval for the Cell Manager: " << pollIntervalCellM << endl;
+      file << "        Poll Interval for the pRouteres: " << pollIntervalpRouter << endl;
+      file << "        Poll Interval for the pSwitches: " << pollIntervalpSwitch << endl;
+      file << "        Poll Interval for the vRMs: " << pollIntervalvRM << endl;
+      file << "        vRM deployment strategy: " << vRMdeploystrategy << endl;
     }
-    file << endl;
-    file << "        Initial number of Resources per vRM: " << initResPervRM << endl;
-    file << "        Initial number of vRMs per pSwitch: " << initvRMPerpSwitch << endl;
-    file << "        Initial number of pSwitches per pRouter: " << initpSwitchPerpRouter << endl;
-    file << "        Poll Interval for the Cell Manager: " << pollIntervalCellM << endl;
-    file << "        Poll Interval for the pRouteres: " << pollIntervalpRouter << endl;
-    file << "        Poll Interval for the pSwitches: " << pollIntervalpSwitch << endl;
-    file << "        Poll Interval for the vRMs: " << pollIntervalvRM << endl;
-    file << "        vRM deployment strategy: " << vRMdeploystrategy << endl;
+    else {
+      file<<"        Poll Interval for the Cell Manager: "<<pollIntervalCellM<<endl;
+    } 
     file << endl;
     file.close();
   }
@@ -1149,6 +1154,7 @@ siminputs::siminputs()
   alloc = 0;
   numOfCells = 0;
   maxTime = 0.0;
+  sosmIntegration = 0;
   upInterval = 0.0;
   cinp = NULL;
 }
@@ -1160,6 +1166,7 @@ siminputs::siminputs(const siminputs& t)
     alloc = t.alloc;
     numOfCells = t.numOfCells;
     maxTime = t.maxTime;
+    sosmIntegration = t.sosmIntegration;
     upInterval = t.upInterval;
     cinp = new cellinputs[numOfCells];
     for (i = 0; i < numOfCells; i++)
@@ -1173,6 +1180,7 @@ siminputs::~siminputs()
     alloc = 0;
     numOfCells = 0;
     maxTime = 0.0;
+    sosmIntegration = 0;
     upInterval = 0.0;
     delete[] cinp;
   }
@@ -1186,6 +1194,7 @@ siminputs& siminputs::operator=(const siminputs& t)
       alloc = 0;
       numOfCells = 0;
       maxTime = 0.0;
+      sosmIntegration = 0;
       upInterval = 0.0;
       delete[] cinp;
     }
@@ -1193,6 +1202,7 @@ siminputs& siminputs::operator=(const siminputs& t)
     if (alloc) {
       numOfCells = t.numOfCells;
       maxTime = t.maxTime;
+      sosmIntegration = t.sosmIntegration;
       upInterval = t.upInterval;
       cinp = new cellinputs[numOfCells];
       for (i = 0; i < numOfCells; i++)
@@ -1210,7 +1220,8 @@ void siminputs::parse(const string& fname, const string& bname)
   std::ifstream is(fname);
   jsoncons::json c;
   is >> c;
-
+  
+  sosmIntegration = c["SOSM Integration"].as<int>();  //0 for traditional , 1 for SOSM
   maxTime = c["Maximum Simulation Time"].as<int>();   //read maximum simulation time and assign to variable
   upInterval = c["Update Interval"].as<int>();      //read update interval and assign to variable
   numOfCells = c["Number of Cells"].as<int>();      //read number of cells and assign to variable
@@ -1368,6 +1379,12 @@ void siminputs::print()
   if (alloc) {
     cout << "=========== Global Parameters ===========" << endl;
     cout << "Maximum Simulation Time: " << maxTime << " seconds" << endl;
+    if (sosmIntegration){
+      cout<<"Resource Allocation Mechanism: SOSM"<<endl;
+    }
+    else{
+      cout<<"Resource Allocation Mechanism: Traditional"<<endl;
+    }
     cout << "Update Interval: " << upInterval << " seconds" << endl;
     cout << endl;
     cout << "=========== Cell Parameters ===========" << endl;
@@ -1447,6 +1464,12 @@ void siminputs::printfile(const string& outname, const ios::openmode& mode)
 
     file << "=========== Global Parameters ===========" << endl;
     file << "Maximum Simulation Time: " << maxTime << " seconds" << endl;
+    if (sosmIntegration){
+      file << "Resource Allocation Mechanism: SOSM" << endl;
+    }
+    else{
+      file << "Resource Allocation Mechanism: Traditional" << endl;
+    }
     file << "Update Interval: " << upInterval << " seconds" << endl;
     file << endl;
     file << "=========== Cell Parameters ===========" << endl;
@@ -1509,7 +1532,7 @@ void siminputs::printfile(const string& outname, const ios::openmode& mode)
         }
         file.close();
         if (cinp[i].binp[0].alloc) {
-          cinp[i].binp[0].printfile(outname, ios::out | ios::app);
+          cinp[i].binp[0].printfile(outname, ios::out | ios::app, sosmIntegration);
         }
         file.open(outname.c_str(), ios::out | ios::app);
       }

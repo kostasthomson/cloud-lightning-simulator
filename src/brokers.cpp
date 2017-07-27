@@ -3486,3 +3486,666 @@ list<pRouter> **broker::gpRouters() const
 {
 	return pRouters;
 }
+
+// brokerNOsosm 
+brokerNOsosm::brokerNOsosm()
+{
+	alloc=0;
+	numOfTypes=0;
+	pollInterval=0.0;
+	types=NULL;
+	numOfResourcesPerType=NULL;
+	availProc=NULL;
+	totProc=NULL;
+	availMem=NULL;
+	totMem=NULL;
+	availAcc=NULL;
+	totAcc=NULL;
+	availSto=NULL;
+	totSto=NULL;
+	availNetw=0.0;
+	totNetw=0.0;
+	queue=NULL;
+}
+
+brokerNOsosm::brokerNOsosm(const int &L_numOfTypes, const int *L_types, const int *L_numOfResourcesPerType, const double &L_pollInterval)
+{
+	int i=0;
+	alloc=1;
+	numOfTypes=L_numOfTypes;
+	pollInterval=L_pollInterval;
+	types=new int[numOfTypes];
+	numOfResourcesPerType=new int[numOfTypes];
+	for(i=0;i<numOfTypes;i++)
+	{
+		types[i]=L_types[i];
+		numOfResourcesPerType[i]=L_numOfResourcesPerType[i];
+	}
+	availProc=new double*[numOfTypes];
+	totProc=new double*[numOfTypes];
+	availMem=new double*[numOfTypes];
+	totMem=new double*[numOfTypes];
+	availAcc=new double*[numOfTypes];
+	totAcc=new double*[numOfTypes];
+	availSto=new double*[numOfTypes];
+	totSto=new double*[numOfTypes];
+	availNetw=0.0;
+	totNetw=0.0;	
+	for(i=0;i<numOfTypes;i++)
+	{
+		availProc[i]=new double[numOfResourcesPerType[i]];
+		totProc[i]=new double[numOfResourcesPerType[i]];
+		availMem[i]=new double[numOfResourcesPerType[i]];
+		totMem[i]=new double[numOfResourcesPerType[i]];
+		availAcc[i]=new double[numOfResourcesPerType[i]];
+		totAcc[i]=new double[numOfResourcesPerType[i]];
+		availSto[i]=new double[numOfResourcesPerType[i]];
+		totSto[i]=new double[numOfResourcesPerType[i]];
+	}
+	queue=new list<task>[1];
+}
+
+brokerNOsosm::brokerNOsosm(const brokerNOsosm &t)
+{
+	int i,j;
+	if(t.galloc())
+	{
+		alloc=1;
+		numOfTypes=t.gnumOfTypes();
+		pollInterval=t.gpollInterval();
+		types=new int[numOfTypes];
+		numOfResourcesPerType=new int[numOfTypes];
+		for(i=0;i<numOfTypes;i++)
+		{
+			types[i]=t.gtypes()[i];
+			numOfResourcesPerType[i]=t.gnumOfResourcesPerType()[i];
+		}
+		availProc=new double*[numOfTypes];
+		totProc=new double*[numOfTypes];
+		availMem=new double*[numOfTypes];
+		totMem=new double*[numOfTypes];
+		availAcc=new double*[numOfTypes];
+		totAcc=new double*[numOfTypes];
+		availSto=new double*[numOfTypes];
+		totSto=new double*[numOfTypes];
+		availNetw=t.gavailNetw();
+		totNetw=t.gtotNetw();	
+		for(i=0;i<numOfTypes;i++)
+		{
+			availProc[i]=new double[numOfResourcesPerType[i]];
+			totProc[i]=new double[numOfResourcesPerType[i]];
+			availMem[i]=new double[numOfResourcesPerType[i]];
+			totMem[i]=new double[numOfResourcesPerType[i]];
+			availAcc[i]=new double[numOfResourcesPerType[i]];
+			totAcc[i]=new double[numOfResourcesPerType[i]];
+			availSto[i]=new double[numOfResourcesPerType[i]];
+			totSto[i]=new double[numOfResourcesPerType[i]];
+		}
+		for(i=0;i<numOfTypes;i++)
+		{
+			for(j=0;j<numOfResourcesPerType[i];j++)
+			{
+				availProc[i][j]=t.gavailProc()[i][j];
+				totProc[i][j]=t.gtotProc()[i][j];
+				availMem[i][j]=t.gavailMem()[i][j];
+				totMem[i][j]=t.gtotMem()[i][j];
+				availAcc[i][j]=t.gavailAcc()[i][j];
+				totAcc[i][j]=t.gtotAcc()[i][j];
+				availSto[i][j]=t.gavailSto()[i][j];
+				totSto[i][j]=t.gtotSto()[i][j];			
+			}
+		}
+		queue=new list<task>[1];
+		for(list<task>::iterator it = t.gqueue()->begin(); it != t.gqueue()->end(); it++)
+			queue[0].push_back(*it);
+	}
+}
+
+brokerNOsosm & brokerNOsosm::operator=(const brokerNOsosm & t)
+{
+    int i,j;
+    if (this!=&t)
+    {
+	if (alloc)
+	{
+		alloc=0;
+		pollInterval=0.0;
+		delete[] types;
+		delete[] numOfResourcesPerType;
+		types=NULL;
+		numOfResourcesPerType=NULL;
+		for(i=0;i<numOfTypes;i++)
+		{
+			delete[] availProc[i];
+			delete[] totProc[i];
+			delete[] availMem[i];
+			delete[] totMem[i];
+			delete[] availAcc[i];
+			delete[] totAcc[i];
+			delete[] availSto[i];
+			delete[] totSto[i];
+		}
+		delete[] availProc;
+		delete[] totProc;
+		delete[] availMem;
+		delete[] totMem;
+		delete[] availAcc;
+		delete[] totAcc;
+		delete[] availSto;
+		delete[] totSto;
+		availProc=NULL;
+		totProc=NULL;
+		availMem=NULL;
+		totMem=NULL;
+		availAcc=NULL;
+		totAcc=NULL;
+		availSto=NULL;
+		totSto=NULL;
+		availNetw=0.0;
+		totNetw=0.0;
+		numOfTypes=0;
+		(*queue).clear();
+		delete[] queue;
+	}
+        alloc=t.galloc();
+        if (alloc)
+        {
+		numOfTypes=t.gnumOfTypes();
+		pollInterval=t.gpollInterval();
+		types=new int[numOfTypes];
+		numOfResourcesPerType=new int[numOfTypes];
+		for(i=0;i<numOfTypes;i++)
+		{
+			types[i]=t.gtypes()[i];
+			numOfResourcesPerType[i]=t.gnumOfResourcesPerType()[i];
+		}
+		availProc=new double*[numOfTypes];
+		totProc=new double*[numOfTypes];
+		availMem=new double*[numOfTypes];
+		totMem=new double*[numOfTypes];
+		availAcc=new double*[numOfTypes];
+		totAcc=new double*[numOfTypes];
+		availSto=new double*[numOfTypes];
+		totSto=new double*[numOfTypes];
+		availNetw=t.gavailNetw();
+		totNetw=t.gtotNetw();	
+		for(i=0;i<numOfTypes;i++)
+		{
+			availProc[i]=new double[numOfResourcesPerType[i]];
+			totProc[i]=new double[numOfResourcesPerType[i]];
+			availMem[i]=new double[numOfResourcesPerType[i]];
+			totMem[i]=new double[numOfResourcesPerType[i]];
+			availAcc[i]=new double[numOfResourcesPerType[i]];
+			totAcc[i]=new double[numOfResourcesPerType[i]];
+			availSto[i]=new double[numOfResourcesPerType[i]];
+			totSto[i]=new double[numOfResourcesPerType[i]];
+		}
+		for(i=0;i<numOfTypes;i++)
+		{
+			for(j=0;j<numOfResourcesPerType[i];j++)
+			{
+				availProc[i][j]=t.gavailProc()[i][j];
+				totProc[i][j]=t.gtotProc()[i][j];
+				availMem[i][j]=t.gavailMem()[i][j];
+				totMem[i][j]=t.gtotMem()[i][j];
+				availAcc[i][j]=t.gavailAcc()[i][j];
+				totAcc[i][j]=t.gtotAcc()[i][j];
+				availSto[i][j]=t.gavailSto()[i][j];
+				totSto[i][j]=t.gtotSto()[i][j];			
+			}
+		}
+		queue=new list<task>[1];
+		for(list<task>::iterator it = t.gqueue()->begin(); it != t.gqueue()->end(); it++)
+			queue[0].push_back(*it);
+	}
+    }
+    return *this;
+}
+
+brokerNOsosm::~brokerNOsosm()
+{
+	int i;
+	if(alloc)
+	{
+		alloc=0;
+		pollInterval=0.0;
+		delete[] types;
+		delete[] numOfResourcesPerType;
+		types=NULL;
+		numOfResourcesPerType=NULL;
+		for(i=0;i<numOfTypes;i++)
+		{
+			delete[] availProc[i];
+			delete[] totProc[i];
+			delete[] availMem[i];
+			delete[] totMem[i];
+			delete[] availAcc[i];
+			delete[] totAcc[i];
+			delete[] availSto[i];
+			delete[] totSto[i];
+		}
+		delete[] availProc;
+		delete[] totProc;
+		delete[] availMem;
+		delete[] totMem;
+		delete[] availAcc;
+		delete[] totAcc;
+		delete[] availSto;
+
+		delete[] totSto;
+		availProc=NULL;
+		totProc=NULL;
+		availMem=NULL;
+		totMem=NULL;
+		availAcc=NULL;
+		totAcc=NULL;
+		availSto=NULL;
+		totSto=NULL;
+		availNetw=0.0;
+		totNetw=0.0;
+		numOfTypes=0;
+		(*queue).clear();
+		delete[] queue;
+	}
+}
+
+void brokerNOsosm::print() const
+{
+	if(alloc)
+	{
+		cout<<"     Broker Poll Interval for Resources: "<<pollInterval<<endl;
+	}
+}
+
+void brokerNOsosm::updateStateInfo(resource **resources, netw *network, const double &tstep)
+{
+	int i,j;
+	int omp_thr=atoi(getenv("OMP_NUM_THREADS"));
+	if (alloc)
+	{
+		if(((int)tstep%(int)pollInterval)==0)
+		{
+			for(i=0;i<numOfTypes;i++)
+			{
+				#pragma omp parallel for default(shared) private(j) num_threads(omp_thr) schedule(static)
+				for(j=0;j<numOfResourcesPerType[i];j++)
+				{
+					availProc[i][j]=resources[i][j].gavailProc();
+					totProc[i][j]=resources[i][j].gtotalProc();
+					availMem[i][j]=resources[i][j].gavailMem();
+					totMem[i][j]=resources[i][j].gtotalMem();
+					availAcc[i][j]=resources[i][j].gavailAcc();
+					totAcc[i][j]=resources[i][j].gtotAcc();
+					availSto[i][j]=resources[i][j].gavailSto();
+					totSto[i][j]=resources[i][j].gtotalSto();
+				}
+			}
+			availNetw=network[0].gavailNetw();
+			totNetw=network[0].gtotalNetw();
+		}
+	}
+}
+
+void brokerNOsosm::deploy(resource **resources, netw *network, stat *stats, task *t)
+{
+
+	int type=-1,i,j;
+	int *IDs;
+	int tID;
+	int L_ID=-1;
+	double *reqPMNS;
+	int avAcc,L_numOfVMs,L_availImpl;
+	reqPMNS=t->greqPMNS();
+	avAcc=t->gavAcc()[0];
+	L_availImpl=t->gavailImpl()[0];
+	L_numOfVMs=t->gnumOfVMs();
+	int omp_thr=atoi(getenv("OMP_NUM_THREADS"));
+	for(i=0;i<numOfTypes;i++)
+	{
+		if (types[i]==L_availImpl)
+		{
+			type=i;
+			t->remapType(&i,1);
+			break;
+		}
+	}
+	if (type==-1)
+	{
+		cout<<"Broker::deploy catastrophic error: "<<endl;
+		exit(0);
+	}
+	
+	L_ID=network[0].probe(reqPMNS[2]);
+	if (L_ID==-1)
+	{
+		stats[type].rejTasks++;
+		return;
+	}
+		
+	availNetw-=reqPMNS[2];
+	IDs=new int[L_numOfVMs];
+
+	for(j=0;j<L_numOfVMs;j++)
+		IDs[j]=-1;
+
+/*	for(j=0;j<L_numOfVMs;j++)
+	{
+		L_ID=-1;
+		for(i=0;i<numOfResourcesPerType[type];i++)
+		{
+			if(availProc[type][i]>=reqPMNS[0] && availMem[type][i]>=reqPMNS[1] && availSto[type][i]>=reqPMNS[3] && availAcc[type][i]>=avAcc)
+			{
+				L_ID=resources[type][i].probe(reqPMNS[0],reqPMNS[1],reqPMNS[3],avAcc);
+				if(L_ID==i)
+				{
+					IDs[j]=i;
+					availProc[type][i]-=reqPMNS[0];
+					availMem[type][i]-=reqPMNS[1];
+					availSto[type][i]-=reqPMNS[3];
+					availAcc[type][i]-=avAcc;
+					break;
+				}
+			}
+		}
+		if(L_ID==-1)
+		{
+			break;
+		}
+	}*/
+
+
+	for(j=0;j<L_numOfVMs;j++)
+	{
+		L_ID=-1;
+		tID=-1;
+
+		#pragma omp parallel default(shared) private(i,tID) num_threads(omp_thr)
+		{
+			tID=-1;
+			i=omp_get_thread_num();
+			while (i<numOfResourcesPerType[type] && L_ID==-1)
+			{
+				if(availProc[type][i]>=reqPMNS[0] && availMem[type][i]>=reqPMNS[1] && availSto[type][i]>=reqPMNS[3] && availAcc[type][i]>=avAcc)
+				{
+					tID=resources[type][i].probe(reqPMNS[0],reqPMNS[1],reqPMNS[3],avAcc);
+					if(tID==i)
+					{
+						#pragma omp single nowait
+						{
+							if (L_ID==-1)
+							{					
+								L_ID=i;	
+								#pragma omp flush(L_ID)
+								IDs[j]=i;
+							}
+						}
+					}
+					
+				}
+
+				i+=omp_thr;
+				
+
+			}
+		}
+		if(L_ID==-1)
+		{
+			break;
+		}
+		else
+		{
+			availProc[type][L_ID]-=reqPMNS[0];
+			availMem[type][L_ID]-=reqPMNS[1];
+			availSto[type][L_ID]-=reqPMNS[3];
+			availAcc[type][L_ID]-=avAcc;
+		}
+	}
+
+	if(L_ID==-1)
+	{
+		for(j=0;j<L_numOfVMs;j++)
+		{
+			if(IDs[j]==-1)
+			{
+				break;
+			}
+			availProc[type][IDs[j]]+=reqPMNS[0];
+			availMem[type][IDs[j]]+=reqPMNS[1];
+			availSto[type][IDs[j]]+=reqPMNS[3];
+			availAcc[type][IDs[j]]+=avAcc;				
+		}
+		availNetw+=reqPMNS[2];
+		stats[type].rejTasks++;
+	}
+	else
+	{
+		for(j=0;j<L_numOfVMs;j++)
+		{
+			resources[type][IDs[j]].deploy(t);
+		}
+
+		network[0].deploy(t);
+		t->attachResources(IDs);
+		enque(t);
+		stats[type].accTasks++;		
+	}
+	delete[] IDs;
+
+}
+
+void brokerNOsosm::enque(const task *t)
+{
+	if(alloc)
+	{
+		queue->push_back(*t);
+	}
+}
+
+void brokerNOsosm::timestep(resource **resources, netw *network, stat* stats, power *powerComp)
+{
+	int i,j,rID,type=-1;
+	double insR,insRa;
+	double procUtil;
+	double rhoAcc,L_totPcons;	
+	int active,L_numOfVMs;
+	int totalAcc,len;
+	int omp_thr=atoi(getenv("OMP_NUM_THREADS"));
+	list<task>::iterator it;
+	len=(int)(*queue).size();
+	int chunk=50;
+	double L_net=0.0;
+	if(alloc)
+	{
+		
+		for(i=0;i<numOfTypes;i++)
+		{
+			#pragma omp parallel for default(shared) private(j) num_threads(omp_thr) schedule(static,chunk)
+			for(j=0;j<numOfResourcesPerType[i];j++){
+				if(resources[i][j].gnumOfTasks()>0)	
+					resources[i][j].initRunQuan();
+			}
+		}
+
+		network[0].initRunQuan();
+
+		L_net=0.0;
+	//	#pragma omp parallel for default(shared) private(i,it,type) num_threads(omp_thr) schedule(static,chunk) reduction(+:L_net)
+		for(it=queue->begin();it!=queue->end();it++)
+		{
+			type=(it->gavailImpl())[0];
+
+			it->compcUtilPMNr();
+			L_net+=it->gcUtilPMNr()[2];
+
+			for(j=0;j<it->gnumOfVMs();j++)
+			{
+				rID=it->gresourceIDs()[j];
+				resources[type][rID].incrRunQuan(it->gcUtilPMNr()[0], it->gcUtilPMNr()[1], it->gcUtilPMNr()[3]);
+			}
+			//network[0].incrRunQuan(it->gcUtilPMNr()[2]);
+		}
+		network[0].incrRunQuan(L_net);
+
+
+		for(i=0;i<numOfTypes;i++)
+		{
+			#pragma omp parallel for default(shared) private(j) num_threads(omp_thr) schedule(static,chunk)
+			for(j=0;j<numOfResourcesPerType[i];j++)
+			{
+				if(resources[i][j].gnumOfTasks()>0)
+				{
+					resources[i][j].compcCompCapPerProc();
+					resources[i][j].compcCompCapPerAcc();
+				}
+			}
+		}
+
+		for(i=0;i<numOfTypes;i++)
+		{
+			L_totPcons=0.0;
+			#pragma omp parallel for default(shared) private(j,procUtil,rhoAcc,active,totalAcc) num_threads(omp_thr) schedule(static) reduction(+:L_totPcons)
+			for(j=0;j<numOfResourcesPerType[i];j++)
+			{
+				procUtil=resources[i][j].gautilProc()/resources[i][j].gtotalProc();
+				rhoAcc=resources[i][j].garhoAcc();
+				active=resources[i][j].gactive();
+				totalAcc=resources[i][j].gtotAcc();
+				L_totPcons+=powerComp[i].cpCons(procUtil,rhoAcc,active,totalAcc);		
+			}
+			stats[i].totPcons+=L_totPcons;
+		}
+
+		#pragma omp parallel default(shared) private(i,it,j,rID,insR,insRa,type,L_numOfVMs) num_threads(omp_thr)
+		{
+			int tid=omp_get_thread_num();
+			it=queue->begin();
+			for(i=0;i<tid;i++)
+				it++;
+			i=tid;
+			double ocP=resources[type][0].goverCommitProc();
+			while(i<len)
+			{
+				type=(it->gavailImpl())[0];
+	
+				rID=(it->gresourceIDs())[0];
+				insR=resources[type][rID].gcCompCapPerProc();
+				insRa=resources[type][rID].gcCompCapPerAcc();
+				L_numOfVMs=it->gnumOfVMs();
+				for(j=1;j<L_numOfVMs;j++)
+				{
+					rID=(it->gresourceIDs())[j];		
+					insR=MY_MIN(insR,resources[type][rID].gcCompCapPerProc());
+					insRa=MY_MIN(insRa,resources[type][rID].gcCompCapPerAcc());
+				}
+				it->reduceIns(L_numOfVMs*insR*MY_MIN(it->gcUtilPMNr()[0]*ocP,1.0)+L_numOfVMs*insRa*((it->gcUtilPMNr())[3]));
+				for(j=0;j<omp_thr;j++)
+				{				
+					i++;
+					it++;
+				}
+			}
+		}
+		it=queue->begin();
+		while(it!=queue->end())
+		{
+
+			if((it->greqIns())<=0.0)
+			{
+				type=(it->gavailImpl())[0];
+				L_numOfVMs=it->gnumOfVMs();
+				for(j=0;j<L_numOfVMs;j++)
+				{
+					rID=(it->gresourceIDs())[j];
+					resources[type][rID].unload(it);
+
+				}
+
+				network[0].unload(it);
+
+				it=queue->erase(it);
+		
+			}
+			else
+				++it;
+
+		}
+
+	}
+}
+
+int brokerNOsosm::galloc() const
+{
+	return alloc;	
+}
+
+double brokerNOsosm::gpollInterval() const
+{
+	return pollInterval;
+}
+
+int brokerNOsosm::gnumOfTypes() const
+{
+	return numOfTypes;
+}
+int *brokerNOsosm::gtypes() const
+{
+	return types;
+}
+
+int *brokerNOsosm::gnumOfResourcesPerType() const
+{
+	return numOfResourcesPerType;
+}
+
+double **brokerNOsosm::gavailProc() const
+{
+	return availProc;
+}
+double **brokerNOsosm::gtotProc() const
+{
+	return totProc;
+}
+
+double **brokerNOsosm::gavailMem() const
+{
+	return availMem;
+}
+
+double **brokerNOsosm::gtotMem() const
+{
+	return totMem;
+}
+
+double **brokerNOsosm::gavailAcc() const
+{
+	return availAcc;
+}
+
+double **brokerNOsosm::gtotAcc() const
+{
+	return totAcc;
+}
+double **brokerNOsosm::gavailSto() const
+{
+	return availSto;
+}
+
+double **brokerNOsosm::gtotSto() const
+{
+	return totSto;
+}
+
+double brokerNOsosm::gavailNetw() const
+{
+	return availNetw;
+}
+
+double brokerNOsosm::gtotNetw() const
+{
+	return totNetw;
+}
+
+list<task>* brokerNOsosm::gqueue() const
+{
+	return queue;
+}

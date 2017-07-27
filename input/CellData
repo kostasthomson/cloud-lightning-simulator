@@ -1,5 +1,6 @@
 {
-  "Maximum Simulation Time": 1000,
+  "SOSM Integration": 0,
+  "Maximum Simulation Time": 600,
   "Update Interval": 200,
   "Number of Cells":3,
 

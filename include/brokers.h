@@ -340,4 +340,53 @@ class broker
   list<pRouter>** gpRouters() const;
 };
 
+class brokerNOsosm
+{
+  private:
+    int alloc;
+    double pollInterval;
+    int numOfTypes;
+    int *types;
+    int *numOfResourcesPerType;
+    double **availProc;
+    double **totProc;
+    double **availMem;
+    double **totMem;
+    double **availAcc;
+    double **totAcc;
+    double **availSto;
+    double **totSto;
+    double availNetw;
+    double totNetw;
+    list<task> *queue;
+  public:
+    brokerNOsosm();
+    brokerNOsosm(const int &L_numOfTypes, const int *L_types, const int *L_numOfResourcesPerType, const double & L_pollInterval);
+    brokerNOsosm(const brokerNOsosm &t);
+    brokerNOsosm & operator=(const brokerNOsosm & t);
+    ~brokerNOsosm();
+
+    int galloc() const;
+    int gnumOfTypes() const;
+    double gpollInterval() const;
+    int *gtypes() const;
+    int *gnumOfResourcesPerType() const;
+    double **gavailProc() const;
+    double **gtotProc() const;
+    double **gavailMem() const;
+    double **gtotMem() const;
+    double **gavailAcc() const;
+    double **gtotAcc() const;
+    double **gavailSto() const;
+    double **gtotSto() const;
+    double gavailNetw() const;
+    double gtotNetw() const;
+    list<task>* gqueue() const;
+    void print() const;
+    void updateStateInfo(resource **resources, netw *network, const double &tstep);
+    void deploy(resource **resources, netw *network, stat* stats, task * t);
+    void enque(const task *t);
+    void timestep(resource **resources, netw *network, stat *stats, power *powerComp);
+};
+
 #endif
