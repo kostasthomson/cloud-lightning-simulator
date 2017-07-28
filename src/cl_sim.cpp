@@ -175,8 +175,8 @@ int main(int argc, char** argv)
 
   if (rank == 0) {
     // Print output to json file 
-    remove("../output/outputCLsim.json");
-    gates[0].printStatsJson("../output/output", ios::out | ios::app, endTime, upInterval);
+    //remove("../output/outputCLsim.json");
+    gates[0].printStatsJson("../output/output", ios::out, endTime, upInterval);
 
     commStats(gates, clCell, rank, numtasks, MPI_COMM_WORLD);
 
