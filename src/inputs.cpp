@@ -1284,7 +1284,7 @@ void siminputs::parse(const string& fname, const string& bname)
           dummy = 0.0;
           dummy = 0.0;
         }
-        cinp[i].pinp[j].cpuC = c["Cells"][i]["HW_types"][j]["CPU Sleep Power Consumption"].as<int>();
+        cinp[i].pinp[j].cpuC = c["Cells"][i]["HW_types"][j]["CPU Sleep Power Consumption"].as<double>();
         cinp[i].pinp[j].typeAcc = c["Cells"][i]["HW_types"][j]["Type of Accelerator Model"].as<int>();        
         cinp[i].pinp[j].accPmin = c["Cells"][i]["HW_types"][j]["Accelerator Idle Power Consumption"].as<double>();
         cinp[i].pinp[j].accPmax = c["Cells"][i]["HW_types"][j]["Accelerator Max Power Consumption"].as<double>();
