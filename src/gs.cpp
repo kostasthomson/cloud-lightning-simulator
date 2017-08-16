@@ -1,17 +1,11 @@
-#include <cell.h>
 #include <gs.h>
-#include <inputs.h>
-#include <netw.h>
-#include <power.h>
-#include <stat.h>
-#include <cmath>
-#include <cstdlib>
-#include <iostream>
-#include <sstream>
-#include <vector>
+#include <inputs.h> // for siminputs, cellinputs, appinputs, string
+#include <stat.h>   // for stat
+#include <sstream>  // for stringstream
 
-gs::gs() : alloc(0), ai(NULL), si(NULL), stats(NULL) {}
+using std::stringstream;
 
+gs::gs() : alloc(0), ai(nullptr), si(nullptr), stats(nullptr) {}
 gs::gs(const std::string& sfile, const std::string& afile, const std::string& bfile)
 {
   alloc = 1;
@@ -56,9 +50,9 @@ gs& gs::operator=(const gs& t)
       delete[] stats;
       delete[] ai;
       delete[] si;
-      stats = NULL;
-      ai = NULL;
-      si = NULL;
+      stats = nullptr;
+      ai = nullptr;
+      si = nullptr;
     }
     alloc = t.galloc();
     if (alloc) {
@@ -90,9 +84,9 @@ gs::~gs()
     delete[] stats;
     delete[] ai;
     delete[] si;
-    stats = NULL;
-    ai = NULL;
-    si = NULL;
+    stats = nullptr;
+    ai = nullptr;
+    si = nullptr;
   }
 }
 
@@ -124,15 +118,18 @@ int gs::findCell(const int* rImpl, const int& numImpl, const int& rVM, const dou
         continue;
       }
       // If stats[cell][hardware type] has the required number of processors, memory, storage and accelerators
-      if (stats[i][rind].availableProcessors >= ((double)rVM) * rvProc && stats[i][rind].availableMemory >= ((double)rVM) * rMem &&
-          stats[i][rind].availableNetwork >= rNet && stats[i][rind].availableStorage >= ((double)rVM) * rSto &&
+      if (stats[i][rind].availableProcessors >= ((double)rVM) * rvProc &&
+          stats[i][rind].availableMemory >= ((double)rVM) * rMem && stats[i][rind].availableNetwork >= rNet &&
+          stats[i][rind].availableStorage >= ((double)rVM) * rSto &&
           stats[i][rind].availableAccelerators >= ((double)rVM) * rAcc[k]) {
         // Calculate max weight from the formula: total processors - requested processors
-        lweight = ((stats[i][rind].availableProcessors - ((double)rVM) * rvProc) / (stats[i][rind].availableProcessors + 1) +
-                   (stats[i][rind].availableMemory - ((double)rVM) * rMem) / (stats[i][rind].availableMemory + 1) +
-                   (stats[i][rind].availableNetwork - rNet) / (stats[i][rind].availableNetwork + 1) +
-                   (stats[i][rind].availableStorage - ((double)rVM) * rSto) / (stats[i][rind].availableStorage + 1) +
-                   (stats[i][rind].availableAccelerators - ((double)rVM) * rAcc[k]) / (stats[i][rind].availableAccelerators + 1));
+        lweight =
+          ((stats[i][rind].availableProcessors - ((double)rVM) * rvProc) / (stats[i][rind].availableProcessors + 1) +
+           (stats[i][rind].availableMemory - ((double)rVM) * rMem) / (stats[i][rind].availableMemory + 1) +
+           (stats[i][rind].availableNetwork - rNet) / (stats[i][rind].availableNetwork + 1) +
+           (stats[i][rind].availableStorage - ((double)rVM) * rSto) / (stats[i][rind].availableStorage + 1) +
+           (stats[i][rind].availableAccelerators - ((double)rVM) * rAcc[k]) /
+             (stats[i][rind].availableAccelerators + 1));
         if (lweight > weight) {
           weight = lweight;
           choice = i + 1;
@@ -204,9 +201,7 @@ void gs::printStats(const std::string& outfile, const ios::openmode& mode)
 
 void gs::printStatsJson(const std::string& outfile, const ios::openmode& mode, int endTime, int updateInterval)
 {
-  int endT = endTime;
-  int upIn = updateInterval;
-  int overallRecords = (endT / upIn) + 1;
+  int overallRecords = (endTime / updateInterval) + 1;
 
   if (alloc) {
     for (int i = 0; i < si->numOfCells; i++) {

@@ -1,8 +1,6 @@
 #include <task.h>
-#include <cmath>
-#include <cstdlib>
-#include <cstdlib>
-#include <iostream>
+#include <cstdlib>  // for rand, RAND_MAX
+#include <iostream> // for cout, endl
 
 using std::cout;
 using std::endl;
@@ -10,17 +8,17 @@ using std::endl;
 task::task()
   : type(-1),
     numberOfAvailableImplementations(0),
-    availableImplementations(NULL),
+    availableImplementations(nullptr),
     requestedInstructions(0.0),
     numberOfVMs(0),
-    reqPMNS(NULL),
-    typeactPMN(NULL),
-    minmaxactPMN(NULL),
-    rhoAcc(NULL),
-    avAcc(NULL),
+    reqPMNS(nullptr),
+    typeactPMN(nullptr),
+    minmaxactPMN(nullptr),
+    rhoAcc(nullptr),
+    avAcc(nullptr),
     alloc(0),
-    resourceIDs(NULL),
-    cUtilPMNr(NULL)
+    resourceIDs(nullptr),
+    cUtilPMNr(nullptr)
 {
 }
 
@@ -60,133 +58,17 @@ task::task(const task& t)
       rhoAcc[i] = t.grhoAcc()[i];
       avAcc[i] = t.gavAcc()[i];
     }
-    if (t.gresourceIDs() != NULL) {
+    if (t.gresourceIDs() != nullptr) {
       resourceIDs = new int[numberOfVMs];
       for (i = 0; i < numberOfVMs; i++)
         resourceIDs[i] = t.gresourceIDs()[i];
     } else
-      resourceIDs = NULL;
+      resourceIDs = nullptr;
 
     cUtilPMNr = new double[4];
     for (i = 0; i < 4; i++) {
       cUtilPMNr[i] = t.gcUtilPMNr()[i];
     }
-  }
-}
-
-task& task::operator=(const task& t)
-{
-  int i, j;
-  if (this != &t) {
-    if (alloc) {
-      numberOfAvailableImplementations = 0;
-      type = -1;
-      delete[] availableImplementations;
-      availableImplementations = NULL;
-      requestedInstructions = 0.0;
-      numberOfVMs = 0;
-      delete[] reqPMNS;
-      reqPMNS = NULL;
-      delete[] typeactPMN;
-      typeactPMN = NULL;
-      for (i = 0; i < 3; i++) {
-        delete[] minmaxactPMN[i];
-      }
-      delete[] minmaxactPMN;
-      minmaxactPMN = NULL;
-      delete[] rhoAcc;
-      delete[] avAcc;
-      rhoAcc = NULL;
-      avAcc = NULL;
-      alloc = 0;
-      if (resourceIDs != NULL) {
-        delete[] resourceIDs;
-      }
-      delete[] cUtilPMNr;
-      cUtilPMNr = NULL;
-    }
-    alloc = t.galloc();
-    if (alloc) {
-      type = t.getType();
-      numberOfAvailableImplementations = t.getNumberOfAvailableImplementations();
-      availableImplementations = new int[numberOfAvailableImplementations];
-      for (i = 0; i < numberOfAvailableImplementations; i++) {
-        availableImplementations[i] = t.getAvailableImplementations()[i];
-      }
-      requestedInstructions = t.grequestedInstructions();
-      numberOfVMs = t.getNumberOfVMs();
-      reqPMNS = new double[4];
-      for (i = 0; i < 4; i++) {
-        reqPMNS[i] = t.greqPMNS()[i];
-      }
-      typeactPMN = new int[3];
-      for (i = 0; i < 3; i++) {
-        typeactPMN[i] = t.getTypeactPMN()[i];
-      }
-      minmaxactPMN = new double*[3];
-      for (i = 0; i < 3; i++) {
-        minmaxactPMN[i] = new double[2];
-      }
-      for (i = 0; i < 3; i++) {
-        for (j = 0; j < 2; j++) {
-          minmaxactPMN[i][j] = t.gminmaxactPMN()[i][j];
-        }
-      }
-      rhoAcc = new double[numberOfAvailableImplementations];
-      avAcc = new int[numberOfAvailableImplementations];
-      for (i = 0; i < numberOfAvailableImplementations; i++) {
-        rhoAcc[i] = t.grhoAcc()[i];
-        avAcc[i] = t.gavAcc()[i];
-      }
-      if (t.gresourceIDs() != NULL) {
-        resourceIDs = new int[numberOfVMs];
-        for (i = 0; i < numberOfVMs; i++)
-          resourceIDs[i] = t.gresourceIDs()[i];
-      } else {
-        resourceIDs = NULL;
-      }
-      cUtilPMNr = new double[4];
-      for (i = 0; i < 4; i++) {
-        cUtilPMNr[i] = t.gcUtilPMNr()[i];
-      }
-    }
-  }
-  return *this;
-}
-
-task::~task()
-{
-  if (alloc) {
-    type = -1;
-    numberOfAvailableImplementations = 0;
-    delete[] availableImplementations;
-    availableImplementations = NULL;
-    requestedInstructions = 0.0;
-    numberOfVMs = 0;
-    delete[] reqPMNS;
-    reqPMNS = NULL;
-    delete[] typeactPMN;
-    typeactPMN = NULL;
-
-    for (int i = 0; i < 3; i++) {
-      delete[] minmaxactPMN[i];
-    }
-
-    delete[] minmaxactPMN;
-    minmaxactPMN = NULL;
-    delete[] avAcc;
-    delete[] rhoAcc;
-    rhoAcc = NULL;
-    avAcc = NULL;
-    alloc = 0;
-
-    if (resourceIDs != NULL) {
-      delete[] resourceIDs;
-    }
-
-    resourceIDs = NULL;
-    delete[] cUtilPMNr;
-    cUtilPMNr = NULL;
   }
 }
 
@@ -242,13 +124,129 @@ task::task(const int& L_type, const int& L_numberOfAvailableImplementations, con
     rhoAcc[i] = L_rhoAcc[i];
   }
 
-  resourceIDs = NULL;
+  resourceIDs = nullptr;
 
   cUtilPMNr = new double[4];
   for (int i = 0; i < 4; i++) {
     cUtilPMNr[i] = 0.0;
   }
   // print();
+}
+
+task& task::operator=(const task& t)
+{
+  int i, j;
+  if (this != &t) {
+    if (alloc) {
+      numberOfAvailableImplementations = 0;
+      type = -1;
+      delete[] availableImplementations;
+      availableImplementations = nullptr;
+      requestedInstructions = 0.0;
+      numberOfVMs = 0;
+      delete[] reqPMNS;
+      reqPMNS = nullptr;
+      delete[] typeactPMN;
+      typeactPMN = nullptr;
+      for (i = 0; i < 3; i++) {
+        delete[] minmaxactPMN[i];
+      }
+      delete[] minmaxactPMN;
+      minmaxactPMN = nullptr;
+      delete[] rhoAcc;
+      delete[] avAcc;
+      rhoAcc = nullptr;
+      avAcc = nullptr;
+      alloc = 0;
+      if (resourceIDs != nullptr) {
+        delete[] resourceIDs;
+      }
+      delete[] cUtilPMNr;
+      cUtilPMNr = nullptr;
+    }
+    alloc = t.galloc();
+    if (alloc) {
+      type = t.getType();
+      numberOfAvailableImplementations = t.getNumberOfAvailableImplementations();
+      availableImplementations = new int[numberOfAvailableImplementations];
+      for (i = 0; i < numberOfAvailableImplementations; i++) {
+        availableImplementations[i] = t.getAvailableImplementations()[i];
+      }
+      requestedInstructions = t.grequestedInstructions();
+      numberOfVMs = t.getNumberOfVMs();
+      reqPMNS = new double[4];
+      for (i = 0; i < 4; i++) {
+        reqPMNS[i] = t.greqPMNS()[i];
+      }
+      typeactPMN = new int[3];
+      for (i = 0; i < 3; i++) {
+        typeactPMN[i] = t.getTypeactPMN()[i];
+      }
+      minmaxactPMN = new double*[3];
+      for (i = 0; i < 3; i++) {
+        minmaxactPMN[i] = new double[2];
+      }
+      for (i = 0; i < 3; i++) {
+        for (j = 0; j < 2; j++) {
+          minmaxactPMN[i][j] = t.gminmaxactPMN()[i][j];
+        }
+      }
+      rhoAcc = new double[numberOfAvailableImplementations];
+      avAcc = new int[numberOfAvailableImplementations];
+      for (i = 0; i < numberOfAvailableImplementations; i++) {
+        rhoAcc[i] = t.grhoAcc()[i];
+        avAcc[i] = t.gavAcc()[i];
+      }
+      if (t.gresourceIDs() != nullptr) {
+        resourceIDs = new int[numberOfVMs];
+        for (i = 0; i < numberOfVMs; i++)
+          resourceIDs[i] = t.gresourceIDs()[i];
+      } else {
+        resourceIDs = nullptr;
+      }
+      cUtilPMNr = new double[4];
+      for (i = 0; i < 4; i++) {
+        cUtilPMNr[i] = t.gcUtilPMNr()[i];
+      }
+    }
+  }
+  return *this;
+}
+
+task::~task()
+{
+  if (alloc) {
+    type = -1;
+    numberOfAvailableImplementations = 0;
+    delete[] availableImplementations;
+    availableImplementations = nullptr;
+    requestedInstructions = 0.0;
+    numberOfVMs = 0;
+    delete[] reqPMNS;
+    reqPMNS = nullptr;
+    delete[] typeactPMN;
+    typeactPMN = nullptr;
+
+    for (int i = 0; i < 3; i++) {
+      delete[] minmaxactPMN[i];
+    }
+
+    delete[] minmaxactPMN;
+    minmaxactPMN = nullptr;
+    delete[] avAcc;
+    delete[] rhoAcc;
+    rhoAcc = nullptr;
+    avAcc = nullptr;
+    alloc = 0;
+
+    if (resourceIDs != nullptr) {
+      delete[] resourceIDs;
+    }
+
+    resourceIDs = nullptr;
+    delete[] cUtilPMNr;
+    cUtilPMNr = nullptr;
+  }
 }
 
 void task::reduceIns(const double& amount) { requestedInstructions -= amount; }
@@ -327,7 +325,7 @@ void task::attachResources(const int* IDs)
 {
   int i;
   if (alloc) {
-    if (resourceIDs == NULL) {
+    if (resourceIDs == nullptr) {
       resourceIDs = new int[numberOfVMs];
       for (i = 0; i < numberOfVMs; i++) {
         resourceIDs[i] = IDs[i];
@@ -339,9 +337,9 @@ void task::attachResources(const int* IDs)
 void task::detachResources()
 {
   if (alloc) {
-    if (resourceIDs != NULL) {
+    if (resourceIDs != nullptr) {
       delete[] resourceIDs;
-      resourceIDs = NULL;
+      resourceIDs = nullptr;
     }
   }
 }

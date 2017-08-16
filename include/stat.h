@@ -1,7 +1,6 @@
 #ifndef STAT_H
 #define STAT_H
 #include <fstream>
-#include <iostream>
 #include <string>
 
 using std::fstream;
@@ -9,8 +8,9 @@ using std::ifstream;
 using std::ios;
 using std::string;
 
-
-struct stat {
+class stat
+{
+ public:
   stat();
 
   stat(const stat& t);
@@ -31,36 +31,36 @@ struct stat {
   double storageOverActiveServers;
   int acceleratorsOverActiveServers;
   int alloc;
-  double currentTimestep;
-  double physicalMemory;
-  double physicalProcessors;
-  double physicalStorage;
-  double physicalNetwork;
-  double totalMemory;
-  double totalProcessors;
-  double availableProcessors;
-  double availableMemory;
-  double utilizedProcessors;
-  double utilizedMemory;
-  double totalStorage;
-  double availableStorage;
-  double utilizedStorage;
-  double totalNetwork;
-  double availableNetwork;
-  double utilizedNetwork;
-  double totalPowerConsumption;
+  double currentTimestep;       //! Time Step
+  double physicalMemory;        //! Total Physical Memory
+  double physicalProcessors;    //! Total Physical Processors
+  double physicalStorage;       //! Total Physical Storage
+  double physicalNetwork;       //! Total Physical Network
+  double totalMemory;           //! Total Memory
+  double totalProcessors;       //! Total Processors
+  double availableProcessors;   //! Available Processors
+  double availableMemory;       //! Available Memory
+  double utilizedProcessors;    //! Utilized Processors
+  double utilizedMemory;        //! Utilized Memory
+  double totalStorage;          //! Total Storage
+  double availableStorage;      //! Available Storage
+  double utilizedStorage;       //! Utilized Storage
+  double totalNetwork;          //! Total Network
+  double availableNetwork;      //! Available Network
+  double utilizedNetwork;       //! Utilized Network
+  double totalPowerConsumption; //! Total Energy Consumption
 
-  int totalAccelerators;
-  int availableAccelerators;
-  int utilizedAccelerators;
-  int activeServers;
-  int numberOfTasks;
-  int rejectedTasks;
-  int acceptedTasks;
+  int totalAccelerators;     //! Total Accelerators
+  int availableAccelerators; //! Available Accelerators
+  int utilizedAccelerators;  //! Utilized Accelerators
+  int activeServers;         //! Active Servers
+  int numberOfTasks;         //! Total Number of currently running VMs
+  int rejectedTasks;         //! Total Number of rejected Tasks
+  int acceptedTasks;         //! Total Number of accepted Tasks
 
-  double actualUtilizedProcessors;
-  double actualUtilizedMemory;
-  double actualUtilizedNetwork;
+  double actualUtilizedProcessors; //! Actual Utilized Processors
+  double actualUtilizedMemory;     //! Actual Utilized Memory
+  double actualUtilizedNetwork;    //! Actual Utilized Network
 };
 
 #endif

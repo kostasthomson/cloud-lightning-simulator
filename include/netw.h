@@ -1,9 +1,12 @@
 #ifndef NETW_H
 #define NETW_H
-using namespace std;
-#include <task.h>
-#include <iterator>
+
 #include <list>
+
+class netinputs;
+class task;
+
+using std::list;
 
 class netw
 {
@@ -36,7 +39,7 @@ class netw
 
   void print() const;
 
-  void deploy(const task* t);
+  void deploy(const task& task_);
 
   void unload(list<task>::iterator& t);
 

@@ -1,9 +1,10 @@
 #ifndef RESOURCE_H
 #define RESOURCE_H
-#include <inputs.h>
-#include <task.h>
-#include <iterator>
+
 #include <list>
+
+class resinputs;
+class task;
 
 using std::list;
 
@@ -75,7 +76,7 @@ class resource
   /// Assigns a task to a resource: Increments the number of tasks variable, reduces the resources' available
   /// processors, memory, storage and accelerators and calculates the utilized units
   /// \param t The task to be assigned to the resource
-  void deploy(const task* t);
+  void deploy(const task& task_);
 
   int probe(const double& reqProc, const double& reqMem, const double& reqSto, const int& reqAcc);
 

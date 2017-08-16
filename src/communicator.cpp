@@ -1,15 +1,11 @@
 #include <cell.h>
-#include <comm.h>
+#include <communicator.h>
 #include <gs.h>
-#include <inputs.h>
-#include <mpi.h>
-#include <string.h>
-#include <cstdlib>
-#include <fstream>
-#include <iostream>
-#include <vector>
+#include <stat.h>
+#include <task.h>
 
-void commSimParameters(struct siminputs& si, const int& rank, const int& numberOfTasks, const MPI_Comm& Comm)
+void communicator::simulationParameters(struct siminputs& si, const int& rank, const int& numberOfTasks,
+                                        const MPI_Comm& Comm)
 {
   int i, j;
   int one = 1;
@@ -19,7 +15,7 @@ void commSimParameters(struct siminputs& si, const int& rank, const int& numberO
     for (i = 0; i < numberOfTasks - 1; i++) {
       // Send simulator-specific info
       MPI_Send(&si.maxTime, 1, MPI_DOUBLE, i + 1, i + 1, Comm);
-			MPI_Send(&si.sosmIntegration,1,MPI_INT,i+1,i+1,Comm);
+      MPI_Send(&si.sosmIntegration, 1, MPI_INT, i + 1, i + 1, Comm);
       MPI_Send(&si.updateInterval, 1, MPI_DOUBLE, i + 1, i + 1, Comm);
       MPI_Send(&one, 1, MPI_INT, i + 1, i + 1, Comm);
 
@@ -76,7 +72,7 @@ void commSimParameters(struct siminputs& si, const int& rank, const int& numberO
     // Receive Simulator specific info
     si.alloc = 1;
     MPI_Recv(&si.maxTime, 1, MPI_DOUBLE, 0, rank, Comm, &status);
-		MPI_Recv(&si.sosmIntegration,1,MPI_INT,0,rank,Comm,&status);
+    MPI_Recv(&si.sosmIntegration, 1, MPI_INT, 0, rank, Comm, &status);
     MPI_Recv(&si.updateInterval, 1, MPI_DOUBLE, 0, rank, Comm, &status);
     MPI_Recv(&si.numOfCells, 1, MPI_INT, 0, rank, Comm, &status);
 
@@ -148,8 +144,8 @@ void commSimParameters(struct siminputs& si, const int& rank, const int& numberO
   }
 }
 
-void commTaskParameters(list<task>& jobs, const int& rank, const int& numberOfTasks, const int* commCell,
-                        const MPI_Comm& Comm)
+void communicator::taskParameters(list<task>& jobs, const int& rank, const int& numberOfTasks, const int* commCell,
+                                  const MPI_Comm& Comm)
 {
   int i, j, k, who;
   int L_type, L_numberOfAvailableImplementations;
@@ -271,9 +267,10 @@ void commTaskParameters(list<task>& jobs, const int& rank, const int& numberOfTa
         L_rhoAcc = new double[L_numberOfAvailableImplementations];
         MPI_Recv(L_rhoAcc, L_numberOfAvailableImplementations, MPI_DOUBLE, 0, rank, Comm, &status);
 
-        jobs.push_back(task(L_type, L_numberOfAvailableImplementations, L_availableImplementations, L_requestedInstructions, L_numberOfVMs, L_reqPMNS[0], L_reqPMNS[1],
-                            L_reqPMNS[2], L_reqPMNS[3], L_typeactPMN[0], L_typeactPMN[1], L_typeactPMN[2],
-                            &L_minmaxactPMN[0][0], &L_minmaxactPMN[1][0], &L_minmaxactPMN[2][0], L_avAcc, L_rhoAcc));
+        jobs.push_back(task(L_type, L_numberOfAvailableImplementations, L_availableImplementations,
+                            L_requestedInstructions, L_numberOfVMs, L_reqPMNS[0], L_reqPMNS[1], L_reqPMNS[2],
+                            L_reqPMNS[3], L_typeactPMN[0], L_typeactPMN[1], L_typeactPMN[2], &L_minmaxactPMN[0][0],
+                            &L_minmaxactPMN[1][0], &L_minmaxactPMN[2][0], L_avAcc, L_rhoAcc));
 
         delete[] L_availableImplementations;
         delete[] L_reqPMNS;
@@ -289,7 +286,8 @@ void commTaskParameters(list<task>& jobs, const int& rank, const int& numberOfTa
   }
 }
 
-void commStats(const gs* gates, const cell* clCell, const int& rank, const int& numberOfTasks, const MPI_Comm& Comm)
+void communicator::cellStatistics(const gs* gates, const cell* clCell, const int& rank, const int& numberOfTasks,
+                                  const MPI_Comm& Comm)
 {
   int i, j;
   MPI_Status status;

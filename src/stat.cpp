@@ -1,8 +1,7 @@
 #include <stat.h>
-#include <fstream>
-#include <iostream>
-#include <jsoncons/json.hpp>
-#include <string>
+#include <fstream>           // for endl
+#include <iostream>          // for cout
+#include <jsoncons/json.hpp> // for json
 
 using std::cout;
 using std::endl;
@@ -311,53 +310,46 @@ void stat::printfileJson(const string& outfile, const string& inputfile, const i
     file >> totalAccelerators;
     file >> totalPowerConsumption;
 
-    js = jsoncons::json::object{
-        {"Time Step", currentTimestep},
-        {"Total Energy Consumption",totalPowerConsumption},
-        {"Active Servers", activeServers},
-        {"Total Number of currently running VMs",numberOfTasks},
-        {"Total Processors over Active Servers",processorsOverActiveServers},
-        {"Total Memory over Active Servers",memoryOverActiveServers},
-        {"Total Storage over Active Servers",storageOverActiveServers},
-        {"Total Accelerators over Active Servers",acceleratorsOverActiveServers},
-        {"Total Number of accepted Tasks",acceptedTasks},
-        {"Total Number of rejected Tasks",rejectedTasks},
-        {"Total Physical Processors",physicalProcessors},
-        {"Total Processors",totalProcessors},
-        {"Utilized Processors",utilizedProcessors},
-        {"Actual Utilized Processors",actualUtilizedProcessors},
-        {"Available Processors",availableProcessors},
-        {"Total Physical Memory",physicalMemory},
-        {"Total Memory",totalMemory},
-        {"Utilized Memory",utilizedMemory},
-        {"Actual Utilized Memory",actualUtilizedMemory},
-        {"Available Memory",availableMemory},
-        {"Total Physical Storage",physicalStorage},
-        {"Total Storage",totalStorage},
-        {"Utilized Storage",utilizedStorage},
-        {"Available Storage",availableStorage},
-        {"Total Physical Network",physicalNetwork},
-        {"Total Network",totalNetwork},
-        {"Utilized Network",utilizedNetwork},
-        {"Actual Utilized Network",actualUtilizedNetwork},
-        {"Available Network",availableNetwork},
-        {"Total Accelerators",totalAccelerators},
-        {"Utilized Accelerators",utilizedAccelerators},
-        {"Available Accelerators",availableAccelerators} 
-        
-    };
+    js = jsoncons::json::object{ { "Time Step", currentTimestep },
+                                 { "Total Energy Consumption", totalPowerConsumption },
+                                 { "Active Servers", activeServers },
+                                 { "Total Number of currently running VMs", numberOfTasks },
+                                 { "Total Processors over Active Servers", processorsOverActiveServers },
+                                 { "Total Memory over Active Servers", memoryOverActiveServers },
+                                 { "Total Storage over Active Servers", storageOverActiveServers },
+                                 { "Total Accelerators over Active Servers", acceleratorsOverActiveServers },
+                                 { "Total Number of accepted Tasks", acceptedTasks },
+                                 { "Total Number of rejected Tasks", rejectedTasks },
+                                 { "Total Physical Processors", physicalProcessors },
+                                 { "Total Processors", totalProcessors },
+                                 { "Utilized Processors", utilizedProcessors },
+                                 { "Actual Utilized Processors", actualUtilizedProcessors },
+                                 { "Available Processors", availableProcessors },
+                                 { "Total Physical Memory", physicalMemory },
+                                 { "Total Memory", totalMemory },
+                                 { "Utilized Memory", utilizedMemory },
+                                 { "Actual Utilized Memory", actualUtilizedMemory },
+                                 { "Available Memory", availableMemory },
+                                 { "Total Physical Storage", physicalStorage },
+                                 { "Total Storage", totalStorage },
+                                 { "Utilized Storage", utilizedStorage },
+                                 { "Available Storage", availableStorage },
+                                 { "Total Physical Network", physicalNetwork },
+                                 { "Total Network", totalNetwork },
+                                 { "Utilized Network", utilizedNetwork },
+                                 { "Actual Utilized Network", actualUtilizedNetwork },
+                                 { "Available Network", availableNetwork },
+                                 { "Total Accelerators", totalAccelerators },
+                                 { "Utilized Accelerators", utilizedAccelerators },
+                                 { "Available Accelerators", availableAccelerators } };
     output_list.add(js);
   }
 
-  cl = jsoncons::json::object{
-      {"Cell",a},
-      {"HW Type", b},
-      {"Outputs", output_list}
-    };
+  cl = jsoncons::json::object{ { "Cell", a }, { "HW Type", b }, { "Outputs", output_list } };
 
   cl_list.add(cl);
 
-  if (a == numOfCells && j == numberOfTypes){
+  if (a == numOfCells && j == numberOfTypes) {
     ff << std::setw(4) << pretty_print(cl_list) << std::endl;
   }
   file.close();

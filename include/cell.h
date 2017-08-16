@@ -1,12 +1,17 @@
 #ifndef CELL_H
 #define CELL_H
-#include <brokers.h>
-#include <inputs.h>
-#include <netw.h>
-#include <power.h>
-#include <resource.h>
-#include <stat.h>
-#include <task.h>
+#include <sosmBroker.h>        // for sosmBroker
+#include <traditionalBroker.h> // for traditionalBroker
+#include <list>
+
+class cellinputs;
+class netw;
+class power;
+class resource;
+class stat;
+class task;
+
+using std::list;
 
 class cell
 {
@@ -14,13 +19,12 @@ class cell
   int ID;
   int alloc;
   int numberOfTypes;             //! Number of hardware types
-  int sosmIntegration;          //! Select resource allocation mechanism
+  int sosmIntegration;           //! Select resource allocation mechanism
   int* types;                    //! Hardware type
   int* numberOfResourcesPerType; //! Number of resources that correspond to each hardware type
   power* powerComp;
   netw* network;
-  broker* brok;
-  traditionalBroker* traditionalBrok;
+  baseBroker* broker;
   resource** resources; //! Two-dimensional array of computer resources (servers)
   stat* stats;          //! Array to keep cell statistics
 
@@ -29,7 +33,8 @@ class cell
 
   /// Creates a cell based on user-supplied configuration
   /// \param setup Stores cell-related configuration from the CellData file
-  cell(const cellinputs& setup, int L_sosmIntegration);
+  /// \param sosmIntegration Indicates whether to create a traditional or SOSM broker
+  cell(const cellinputs& setup, int _sosmIntegration);
 
   cell(const cell& t);
 
@@ -37,11 +42,8 @@ class cell
 
   ~cell();
 
-  /// Calls broker::timestep to perform the simulation phase, update the state information and update cell statistics
-  void timestep(const double& tstep);
-
-  /// Deploys the tasks to the appropriate vRMs by calling recursively the broker::deploy method
-  void deploy(list<task>* jobs);
+  /// Deploys the tasks to the appropriate vRMs by calling recursively the sosmBroker::deploy method
+  void deploy(list<task>& jobs);
 
   /// Updates cell-related statistics. The statistics are gathered per resource and summed.
   /// \param tstep The current time-step
@@ -55,9 +57,8 @@ class cell
   int getSosmIntegration() const;
   int* getTypes() const;
   int* getNumberOfResourcesPerType() const;
-  traditionalBroker* getTraditionalBroker() const;
   resource** getResources() const;
-  broker* getBroker() const;
+  baseBroker* getBroker() const;
   power* getPowerConsumption() const;
   netw* getNetwork() const;
   stat* getStats() const;

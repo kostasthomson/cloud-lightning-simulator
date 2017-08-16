@@ -1,10 +1,10 @@
-#include <inputs.h>
+#include <inputs.h> // for netinputs
 #include <netw.h>
-#include <task.h>
-#include <cstdlib>
+#include <task.h> // for task
 #include <iostream>
-#include <iterator>
-#include <list>
+
+using std::cout;
+using std::endl;
 
 netw::netw()
   : alloc(0),
@@ -133,9 +133,9 @@ int netw::probe(const double& requestedNetwork) const
   return choice;
 }
 
-void netw::deploy(const task* t)
+void netw::deploy(const task& task_)
 {
-  availableNetwork -= t->greqPMNS()[2];
+  availableNetwork -= task_.greqPMNS()[2];
   utilizedNetwork = totalNetwork - availableNetwork;
   numberOfTasks++;
 }

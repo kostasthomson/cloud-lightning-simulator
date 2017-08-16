@@ -1,11 +1,10 @@
 #ifndef GS_H
 #define GS_H
+
 #include <inputs.h>
-#include <netw.h>
-#include <power.h>
-#include <resource.h>
-#include <stat.h>
-#include <task.h>
+#include <string> // for string
+
+class stat;
 
 template <typename T>
 std::string num2str(T num);

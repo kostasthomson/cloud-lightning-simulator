@@ -1,14 +1,12 @@
 #include <resource.h>
-#include <cmath>
-#include <cstdlib>
-#include <iostream>
-#include <iterator>
-#include <list>
-#define MY_MIN(a, b) ((a) <= (b) ? (a) : (b))
-#define MY_MAX(a, b) ((a) >= (b) ? (a) : (b))
+#include <algorithm> // for max
+#include <iostream>  // for cout, endl
+#include "inputs.h"  // for resinputs
+#include "task.h"    // for task
 
 using std::cout;
 using std::endl;
+using std::max;
 
 resource::resource()
   : alloc(0),
@@ -286,7 +284,7 @@ void resource::compcurrentCompCapPerProc()
 {
   double ratio;
   if (alloc) {
-    ratio = (MY_MAX(utilizedProcessors, 1.0) / physicalProcessors);
+    ratio = (max(utilizedProcessors, 1.0) / physicalProcessors);
     currentCompCapPerProc = (computeCapability / physicalProcessors) / ratio;
   }
   // cap = (processor MIPS/physical processors) / (util processors/physical processsors)
@@ -296,20 +294,20 @@ void resource::compcurrentCompCapPerAcc()
 {
   double ratio;
   if (alloc && accelerator) {
-    ratio = ceil(MY_MAX(utilizedProcessors, 1.0) / physicalProcessors);
+    ratio = ceil(max(utilizedProcessors, 1.0) / physicalProcessors);
     currentCompCapPerAcc = (acceleratorComputeCapability / ratio);
   }
 }
 
-void resource::deploy(const task* t)
+void resource::deploy(const task& task_)
 {
   numberOfTasks++;
   active = 1;
 
-  availableProcessors -= t->greqPMNS()[0];
-  availableMemory -= t->greqPMNS()[1];
-  availableStorage -= t->greqPMNS()[3];
-  availableAccelerators -= t->gavAcc()[0];
+  availableProcessors -= task_.greqPMNS()[0];
+  availableMemory -= task_.greqPMNS()[1];
+  availableStorage -= task_.greqPMNS()[3];
+  availableAccelerators -= task_.gavAcc()[0];
 
   utilizedMemory = totalMemory - availableMemory;
   utilizedProcessors = totalProcessors - availableProcessors;
@@ -317,7 +315,7 @@ void resource::deploy(const task* t)
   utilizedAccelerators = totalAccelerators - availableAccelerators;
 
   // If the task requests more than 1 VMs, dont allow the resource to be moved for SOSM
-  if (t->getNumberOfVMs() > 1) {
+  if (task_.getNumberOfVMs() > 1) {
     movable = 0;
   }
 }

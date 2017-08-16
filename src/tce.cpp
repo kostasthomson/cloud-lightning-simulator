@@ -1,12 +1,8 @@
 #include <gs.h>
-#include <inputs.h>
 #include <task.h>
 #include <tce.h>
 #include <cmath>
-#include <cstdlib>
-#include <iostream>
-#include <list>
-#define my_round(x) (x < 0 ? ceil((x)-0.5) : floor((x) + 0.5))
+#include <cstdlib> // for RAND_MAX
 
 void taskCreationEngine(std::list<task>& jobs, const struct appinputs& app)
 {
@@ -24,7 +20,7 @@ void taskCreationEngine(std::list<task>& jobs, const struct appinputs& app)
       app.minmaxInsPerApp[curr_task][0] + r * (app.minmaxInsPerApp[curr_task][1] - app.minmaxInsPerApp[curr_task][0]);
 
     int curr_numberOfVMs = round(app.minmaxVMPerApp[curr_task][0] +
-                              r * (app.minmaxVMPerApp[curr_task][1] - app.minmaxVMPerApp[curr_task][0]));
+                                 r * (app.minmaxVMPerApp[curr_task][1] - app.minmaxVMPerApp[curr_task][0]));
 
     // Requirements for resources
     double curr_reqP = round(app.minmaxProcPerVM[curr_task][0] +
@@ -36,8 +32,9 @@ void taskCreationEngine(std::list<task>& jobs, const struct appinputs& app)
     double curr_reqS =
       app.minmaxStoPerVM[curr_task][0] + r * (app.minmaxStoPerVM[curr_task][1] - app.minmaxStoPerVM[curr_task][0]);
 
-    jobs.push_back(task(curr_task, app.numberOfAvailableImplementationsPerApp[curr_task], &app.availableImplementationsPerApp[curr_task][0], curr_requestedInstructions,
-                        curr_numberOfVMs, curr_reqP, curr_reqM, curr_reqN, curr_reqS, app.typeOfActP[curr_task],
+    jobs.push_back(task(curr_task, app.numberOfAvailableImplementationsPerApp[curr_task],
+                        &app.availableImplementationsPerApp[curr_task][0], curr_requestedInstructions, curr_numberOfVMs,
+                        curr_reqP, curr_reqM, curr_reqN, curr_reqS, app.typeOfActP[curr_task],
                         app.typeOfActM[curr_task], app.typeOfActN[curr_task], &app.minmaxActP[curr_task][0],
                         &app.minmaxActM[curr_task][0], &app.minmaxActN[curr_task][0], &app.accelerator[curr_task][0],
                         &app.rhoAcc[curr_task][0]));
@@ -92,9 +89,10 @@ void taskImplSelect(std::list<task>& jobs)
     L_avAcc[0] = (*it).gavAcc()[implementationType];
     L_rhoAcc[0] = (*it).grhoAcc()[implementationType];
 
-    (*it) = (task(L_type, L_numberOfAvailableImplementations, L_availableImplementations, L_requestedInstructions, L_numberOfVMs, L_reqPMNS[0], L_reqPMNS[1], L_reqPMNS[2],
-                  L_reqPMNS[3], L_typeactPMN[0], L_typeactPMN[1], L_typeactPMN[2], &L_minmaxactPMN[0][0],
-                  &L_minmaxactPMN[1][0], &L_minmaxactPMN[2][0], L_avAcc, L_rhoAcc));
+    (*it) =
+      (task(L_type, L_numberOfAvailableImplementations, L_availableImplementations, L_requestedInstructions,
+            L_numberOfVMs, L_reqPMNS[0], L_reqPMNS[1], L_reqPMNS[2], L_reqPMNS[3], L_typeactPMN[0], L_typeactPMN[1],
+            L_typeactPMN[2], &L_minmaxactPMN[0][0], &L_minmaxactPMN[1][0], &L_minmaxactPMN[2][0], L_avAcc, L_rhoAcc));
     delete[] L_availableImplementations;
     delete[] L_reqPMNS;
     delete[] L_typeactPMN;
@@ -109,9 +107,9 @@ void taskImplSelect(std::list<task>& jobs)
 
 void taskCellSelect(std::list<task>& jobs, const gs* gates, int** commCells)
 {
-  if (*commCells != NULL) {
+  if (*commCells != nullptr) {
     delete[](*commCells);
-    (*commCells) = NULL;
+    (*commCells) = nullptr;
   }
   if (jobs.size() != 0 && gates->galloc()) {
     (*commCells) = new int[jobs.size()];
@@ -120,11 +118,11 @@ void taskCellSelect(std::list<task>& jobs, const gs* gates, int** commCells)
     }
     std::list<task>::iterator it = jobs.begin();
     for (int i = 0; i < (int)jobs.size(); i++) {
-
-    	//Store an index to commCells to the most appropriate cell for each task, as found by the gs::findCell method
-      (*commCells)[i] =
-        gates->findCell((*it).getAvailableImplementations(), (*it).getNumberOfAvailableImplementations(), (*it).getNumberOfVMs(), (*it).greqPMNS()[0],
-                        (*it).greqPMNS()[1], (*it).greqPMNS()[2], (*it).greqPMNS()[3], (*it).gavAcc());
+      // Store an index to commCells to the most appropriate cell for each task,
+      // as found by the gs::findCell method
+      (*commCells)[i] = gates->findCell(
+        (*it).getAvailableImplementations(), (*it).getNumberOfAvailableImplementations(), (*it).getNumberOfVMs(),
+        (*it).greqPMNS()[0], (*it).greqPMNS()[1], (*it).greqPMNS()[2], (*it).greqPMNS()[3], (*it).gavAcc());
       it++;
     }
   }

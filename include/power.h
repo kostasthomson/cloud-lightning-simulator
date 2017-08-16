@@ -1,6 +1,7 @@
 #ifndef POWER_H
 #define POWER_H
-#include <inputs.h>
+
+class powinputs;
 
 class power
 {

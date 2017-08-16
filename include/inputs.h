@@ -8,7 +8,9 @@ using std::fstream;
 using std::ifstream;
 using std::ios;
 
-struct brinputs {
+class brinputs
+{
+ public:
   int alloc;
   int numberOfFunctions;
   double* Ws;
@@ -29,7 +31,9 @@ struct brinputs {
   void printfile(const string& outname, const ios::openmode& mode, int sosmIntegration);
 };
 
-struct appinputs {
+class appinputs
+{
+ public:
   int alloc;
   double* minmaxJobsPerSec;
   int numOfApps;
@@ -58,7 +62,9 @@ struct appinputs {
   appinputs(const appinputs& t);
 };
 
-struct netinputs {
+class netinputs
+{
+ public:
   int alloc;
   double netBW;
   double overCommitmentNetwork;
@@ -69,7 +75,9 @@ struct netinputs {
   netinputs(const netinputs& t);
 };
 
-struct powinputs {
+class powinputs
+{
+ public:
   int alloc;
   int typeCpu;
   int typeAcc;
@@ -84,7 +92,9 @@ struct powinputs {
   powinputs& operator=(const powinputs& t);
 };
 
-struct resinputs {
+class resinputs
+{
+ public:
   int alloc;
   double numOfProcUnits;
   double totalMemory;
@@ -102,13 +112,15 @@ struct resinputs {
   resinputs& operator=(const resinputs& t);
 };
 
-struct cellinputs {
+class cellinputs
+{
+ public:
   int alloc;
   int ID;
-  struct resinputs* rinp;
-  struct powinputs* pinp;
-  struct netinputs* ninp;
-  struct brinputs* binp;
+  class resinputs* rinp;
+  class powinputs* pinp;
+  class netinputs* ninp;
+  class brinputs* binp;
   int numberOfTypes;
   int* types;
   int* numberOfResourcesPerType;
@@ -118,8 +130,10 @@ struct cellinputs {
   cellinputs& operator=(const cellinputs& t);
 };
 
-struct siminputs {
-  struct cellinputs* cinp;
+class siminputs
+{
+ public:
+  class cellinputs* cinp;
   int alloc;
   int numOfCells;
   double maxTime;

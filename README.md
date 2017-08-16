@@ -46,6 +46,12 @@ To build the project documentation, navigate to the directory of the project, op
 
 Then, open the doc/html/index.html file.
 
+##Documentation Build (optional)
+
+To build the project documentation, navigate to the directory of the project, open the terminal and enter
+
+     $ make doc
+
 ##Run the CL Simulator
 
 At the directory of the project, open the terminal and enter

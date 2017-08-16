@@ -1,6 +1,7 @@
+#include <inputs.h>
 #include <power.h>
+
 #include <cmath>
-#include <cstdlib>
 #include <iostream>
 
 using std::cout;
@@ -15,15 +16,15 @@ power::power()
     cpuPmax(0.0),
     cpuC(0.0),
     numOfPoints(0),
-    cpubins(NULL),
-    cpuP(NULL),
+    cpubins(nullptr),
+    cpuP(nullptr),
     accPmin(0.0),
     accPmax(0.0),
     accC(0.0),
-    a(NULL),
-    b(NULL),
-    c(NULL),
-    d(NULL)
+    a(nullptr),
+    b(nullptr),
+    c(nullptr),
+    d(nullptr)
 {
 }
 
@@ -38,12 +39,12 @@ power::power(const powinputs& t)
   cpuC = t.cpuC;
 
   if (typeCpu < 0) {
-    cpubins = NULL;
-    cpuP = NULL;
-    a = NULL;
-    b = NULL;
-    c = NULL;
-    d = NULL;
+    cpubins = nullptr;
+    cpuP = nullptr;
+    a = nullptr;
+    b = nullptr;
+    c = nullptr;
+    d = nullptr;
     numOfPoints = 0;
   } else if (typeCpu > 0) {
     numOfPoints = t.numOfPoints;
@@ -140,12 +141,12 @@ power::power(const power& t)
     cpuPmax = t.gcpuPmax();
     cpuC = t.gcpuC();
     numOfPoints = t.gnumOfPoints();
-    a = NULL;
-    b = NULL;
-    c = NULL;
-    d = NULL;
-    cpubins = NULL;
-    cpuP = NULL;
+    a = nullptr;
+    b = nullptr;
+    c = nullptr;
+    d = nullptr;
+    cpubins = nullptr;
+    cpuP = nullptr;
     if (numOfPoints > 0) {
       cpubins = new double[numOfPoints];
       cpuP = new double[numOfPoints];
@@ -240,12 +241,12 @@ power& power::operator=(const power& t)
       cpuPmax = t.gcpuPmax();
       cpuC = t.gcpuC();
       numOfPoints = t.gnumOfPoints();
-      a = NULL;
-      b = NULL;
-      c = NULL;
-      d = NULL;
-      cpubins = NULL;
-      cpuP = NULL;
+      a = nullptr;
+      b = nullptr;
+      c = nullptr;
+      d = nullptr;
+      cpubins = nullptr;
+      cpuP = nullptr;
       if (numOfPoints > 0) {
         cpubins = new double[numOfPoints];
         cpuP = new double[numOfPoints];
@@ -343,10 +344,10 @@ double power::modelCPU(double& u)
                 d[i] * (u - cpubins[i]) * (u - cpubins[i]) * (u - cpubins[i]);
       }
       break;
-    case 3:        
-      int ii=floor(u*10);        
-      pcons=cpuP[ii]+(cpuP[ii+1]-cpuP[ii])*(u-0.1*ii)/(0.1*(ii+1)-0.1*ii);        
-    break;
+    case 3:
+      int ii = floor(u * 10);
+      pcons = cpuP[ii] + (cpuP[ii + 1] - cpuP[ii]) * (u - 0.1 * ii) / (0.1 * (ii + 1) - 0.1 * ii);
+      break;
   }
   return pcons;
 }
