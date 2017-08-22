@@ -132,7 +132,9 @@ int main(int argc, char** argv)
       // Create one or more tasks based on AppData configuration
       taskCreationEngine(jobs, gates[0].gai()[0]);
       allTasks += jobs.size();
-      //	taskImplSelect(jobs);
+      if(sosmIntegration==0){
+      	taskImplSelect(jobs);
+      }	
       // For each task, retrieve the list of candidate cells and select the most appropriate
       taskCellSelect(jobs, gates, &commCells);
 
