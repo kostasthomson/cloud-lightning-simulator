@@ -417,10 +417,10 @@ void appinputs::parse(const string& fname)
 
   int i, j;
   alloc = 1;
-  numOfApps = a["Number of Applications"].as<int>();  //read number of applications and assign to variable
+  numOfApps = a["Number of applications"].as<int>();  //read number of applications and assign to variable
   minmaxJobsPerSec=new double[2];
   for(i=0;i<2;i++){
-    minmaxJobsPerSec[i] = a["Minimum and Maximum Jobs Per Second"][i].as<double>();
+    minmaxJobsPerSec[i] = a["Minimum and maximum jobs per second"][i].as<double>();
   }
 
   // Initialization of application characteristics
@@ -443,10 +443,10 @@ void appinputs::parse(const string& fname)
 
   for(i=0;i<numOfApps;i++){
 
-    numberOfAvailableImplementationsPerApp[i] = a["Applications"][i]["Number of Available Implementations"].as<int>();
+    numberOfAvailableImplementationsPerApp[i] = a["Applications"][i]["Number of available implementations"].as<int>();
     availableImplementationsPerApp[i]=new int[numberOfAvailableImplementationsPerApp[i]];
     for(j=0;j<numberOfAvailableImplementationsPerApp[i];j++){
-        availableImplementationsPerApp[i][j] = a["Applications"][i]["Available Implementations"][j].as<int>() ;
+        availableImplementationsPerApp[i][j] = a["Applications"][i]["Available implementations"][j].as<int>() ;
       }
     minmaxInsPerApp[i]=new double[2];
     minmaxVMPerApp[i]=new int[2];
@@ -456,39 +456,39 @@ void appinputs::parse(const string& fname)
     minmaxNetPerApp[i]=new double[2];
 
       for(j=0;j<2;j++){
-        minmaxInsPerApp[i][j] = a["Applications"][i]["Minimum - Maximum Instructions Per App"][j].as<double>();
+        minmaxInsPerApp[i][j] = a["Applications"][i]["Minimum - maximum instructions per application"][j].as<double>();
       }
       for(j=0;j<2;j++){
-        minmaxVMPerApp[i][j] = a["Applications"][i]["Minimum - Maximum VMs Per App"][j].as<int>();
+        minmaxVMPerApp[i][j] = a["Applications"][i]["Minimum - maximum VMs per application"][j].as<int>();
       }
       for(j=0;j<2;j++){
-        minmaxProcPerVM[i][j] = a["Applications"][i]["Minimum - Maximum vCPUs Per VM"][j].as<int>();
+        minmaxProcPerVM[i][j] = a["Applications"][i]["Minimum - maximum vCPUs per VM"][j].as<int>();
       }
       for(j=0;j<2;j++){
-        minmaxMemPerVM[i][j] = a["Applications"][i]["Minimum - Maximum Memory Per VM"][j].as<int>();
+        minmaxMemPerVM[i][j] = a["Applications"][i]["Minimum - maximum memory per VM"][j].as<int>();
       }
       for(j=0;j<2;j++){
-        minmaxStoPerVM[i][j] = a["Applications"][i]["Minimum - Maximum Storage Per VM"][j].as<double>();
+        minmaxStoPerVM[i][j] = a["Applications"][i]["Minimum - maximum storage per VM"][j].as<double>();
       }
       for(j=0;j<2;j++){
-        minmaxNetPerApp[i][j] = a["Applications"][i]["Minimum - Maximum Network Per VM"][j].as<double>();
+        minmaxNetPerApp[i][j] = a["Applications"][i]["Minimum - maximum network per VM"][j].as<double>();
       }
 
-      typeOfActP[i] = a["Applications"][i]["Type of Actual Utilization (vCPU,Memory,Network)"][0].as<int>();
-      typeOfActM[i] = a["Applications"][i]["Type of Actual Utilization (vCPU,Memory,Network)"][1].as<int>();
-      typeOfActN[i] = a["Applications"][i]["Type of Actual Utilization (vCPU,Memory,Network)"][2].as<int>();
+      typeOfActP[i] = a["Applications"][i]["Type of actual utilization (vCPU,Memory,Network)"][0].as<int>();
+      typeOfActM[i] = a["Applications"][i]["Type of actual utilization (vCPU,Memory,Network)"][1].as<int>();
+      typeOfActN[i] = a["Applications"][i]["Type of actual utilization (vCPU,Memory,Network)"][2].as<int>();
 
       minmaxActP[i]=new double[2];
       minmaxActM[i]=new double[2];
       minmaxActN[i]=new double[2];
       for(j=0;j<2;j++){
-        minmaxActP[i][j] = a["Applications"][i]["Minimum - Maximum Actual vCPU Utilization"][j].as<double>();
+        minmaxActP[i][j] = a["Applications"][i]["Minimum - maximum actual vCPU utilization"][j].as<double>();
       }
       for(j=0;j<2;j++){
-        minmaxActM[i][j] = a["Applications"][i]["Minimum - Maximum Actual Memory Utilization"][j].as<double>();
+        minmaxActM[i][j] = a["Applications"][i]["Minimum - maximum actual memory utilization"][j].as<double>();
       }
       for(j=0;j<2;j++){
-        minmaxActN[i][j] = a["Applications"][i]["Minimum - Maximum Actual Network Utilization"][j].as<double>();
+        minmaxActN[i][j] = a["Applications"][i]["Minimum - maximum actual network utilization"][j].as<double>();
       }
       accelerator[i]=new int[numberOfAvailableImplementationsPerApp[i]];
       for(j=0;j<numberOfAvailableImplementationsPerApp[i];j++){
@@ -496,7 +496,7 @@ void appinputs::parse(const string& fname)
       }
       rhoAcc[i]=new double[numberOfAvailableImplementationsPerApp[i]];
       for(j=0;j<numberOfAvailableImplementationsPerApp[i];j++){
-        rhoAcc[i][j] = a["Applications"][i]["Rho for accelerator execution per Implementation"][j].as<double>();
+        rhoAcc[i][j] = a["Applications"][i]["Rho for accelerator execution per implementation"][j].as<double>();
       }
     }
   /*ifstream file;
