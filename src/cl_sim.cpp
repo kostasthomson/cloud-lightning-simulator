@@ -70,7 +70,7 @@ int main(int argc, char** argv)
 
   if (rank == 0) {
     gates = new gs[1];
-    gates[0] = gs("../input/CellData", "../input/AppData", "../input/BrokerData");
+    gates[0] = gs("../input/CellData.json", "../input/AppData", "../input/BrokerData");
     gates[0].printfile("systeminfo", ios::out);
 
     commSimParameters(gates[0].gsi()[0], rank, numberOfTasks, MPI_COMM_WORLD);

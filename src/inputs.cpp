@@ -1228,9 +1228,9 @@ void siminputs::parse(const string& fname, const string& bname)
   jsoncons::json c;
   is >> c;
 
-  sosmIntegration = c["SOSM Integration"].as<int>();  //0 for traditional , 1 for SOSM
-  maxTime = c["Maximum Simulation Time"].as<int>();   //read maximum simulation time and assign to variable
-  updateInterval = c["Update Interval"].as<int>();      //read update interval and assign to variable
+  sosmIntegration = c["SOSM integration"].as<int>();  //0 for traditional , 1 for SOSM
+  maxTime = c["Maximum simulation time"].as<int>();   //read maximum simulation time and assign to variable
+  updateInterval = c["Update interval"].as<int>();      //read update interval and assign to variable
   numOfCells = c["Number of Cells"].as<int>();      //read number of cells and assign to variable
   cinp=new cellinputs[numOfCells];
   alloc=1;
@@ -1244,7 +1244,7 @@ void siminputs::parse(const string& fname, const string& bname)
     cinp[i].binp=new brinputs[1];
     cinp[i].binp[0].alloc=1;
     cinp[i].binp[0].parse(bname,i);
-    cinp[i].numberOfTypes = c["Cells"][i]["Number_of_HW_types"].as<int>();
+    cinp[i].numberOfTypes = c["Cells"][i]["Number of hardware(HW) types"].as<int>();
     cinp[i].alloc=1;
     cinp[i].ID=i+1;
     cinp[i].types=new int[cinp[i].numberOfTypes];
@@ -1253,49 +1253,49 @@ void siminputs::parse(const string& fname, const string& bname)
     cinp[i].pinp=new powinputs[cinp[i].numberOfTypes];
     cinp[i].ninp=new netinputs[1];
     cinp[i].ninp[0].alloc=1;
-    cinp[i].ninp[0].netBW = c["Cells"][i]["Cell_Interconnection_Bandwidth"].as<int>();
-    cinp[i].ninp[0].overCommitmentNetwork = c["Cells"][i]["Network_Bandwidth_Overcommitment_ratio"].as<double>();
+    cinp[i].ninp[0].netBW = c["Cells"][i]["Cell interconnection bandwidth"].as<int>();
+    cinp[i].ninp[0].overCommitmentNetwork = c["Cells"][i]["Network bandwidth overcommitment ratio"].as<double>();
 
     for(j=0;j<cinp[i].numberOfTypes;j++)
     {
-        cinp[i].types[j] = c["Cells"][i]["HW_types"][j]["HW_type_ID"].as<int>();
-        cinp[i].numberOfResourcesPerType[j] = c["Cells"][i]["HW_types"][j]["Number of Servers"].as<int>();
+        cinp[i].types[j] = c["Cells"][i]["HW types"][j]["HW type ID"].as<int>();
+        cinp[i].numberOfResourcesPerType[j] = c["Cells"][i]["HW types"][j]["Number of servers"].as<int>();
         cinp[i].rinp[j].alloc=1;
         cinp[i].rinp[j].type=cinp[i].types[j];
-        cinp[i].rinp[j].numOfProcUnits = c["Cells"][i]["HW_types"][j]["Number_of_Proc_Units_per_Server"].as<int>();
-        cinp[i].rinp[j].totalMemory = c["Cells"][i]["HW_types"][j]["Memory_per_Server"].as<int>();
-        cinp[i].rinp[j].totalStorage = c["Cells"][i]["HW_types"][j]["Storage_per_Server"].as<int>();
-        cinp[i].rinp[j].overcommitmentProcessors = c["Cells"][i]["HW_types"][j]["Proc_Overcommitment_ratio"].as<double>();
-        cinp[i].rinp[j].overcommitmentMemory = c["Cells"][i]["HW_types"][j]["Memory_Overcommitment_ratio"].as<double>();
-        cinp[i].rinp[j].computeCapability = c["Cells"][i]["HW_types"][j]["Compute_Capability"].as<double>();
-        cinp[i].rinp[j].accelerator = c["Cells"][i]["HW_types"][j]["Accelerators"].as<int>();
-        cinp[i].rinp[j].totalAccelerators = c["Cells"][i]["HW_types"][j]["Total_Number_of_Accelerators_per_Server"].as<int>();
-        cinp[i].rinp[j].acceleratorComputeCapability = c["Cells"][i]["HW_types"][j]["Accelerator_Compute_Capability"].as<double>();
+        cinp[i].rinp[j].numOfProcUnits = c["Cells"][i]["HW types"][j]["Number of CPUs per server"].as<int>();
+        cinp[i].rinp[j].totalMemory = c["Cells"][i]["HW types"][j]["Memory per server"].as<int>();
+        cinp[i].rinp[j].totalStorage = c["Cells"][i]["HW types"][j]["Storage per server"].as<int>();
+        cinp[i].rinp[j].overcommitmentProcessors = c["Cells"][i]["HW types"][j]["Processors overcommitment ratio"].as<double>();
+        cinp[i].rinp[j].overcommitmentMemory = c["Cells"][i]["HW types"][j]["Memory overcommitment ratio"].as<double>();
+        cinp[i].rinp[j].computeCapability = c["Cells"][i]["HW types"][j]["Compute capability"].as<double>();
+        cinp[i].rinp[j].accelerator = c["Cells"][i]["HW types"][j]["Accelerators"].as<int>();
+        cinp[i].rinp[j].totalAccelerators = c["Cells"][i]["HW types"][j]["Number of accelerators per server"].as<int>();
+        cinp[i].rinp[j].acceleratorComputeCapability = c["Cells"][i]["HW types"][j]["Accelerator compute capability"].as<double>();
         cinp[i].pinp[j].alloc=1;
         cinp[i].pinp[j].accelerator=cinp[i].rinp[j].accelerator;
-        cinp[i].pinp[j].typeCpu = c["Cells"][i]["HW_types"][j]["Type_of_CPU_model"].as<int>();
-        cinp[i].pinp[j].cpuPmin = c["Cells"][i]["HW_types"][j]["CPU Idle Power Consumption"].as<double>();
-        cinp[i].pinp[j].cpuPmax = c["Cells"][i]["HW_types"][j]["CPU Max Power Consumption"].as<double>();
-        cinp[i].pinp[j].numOfPoints = c["Cells"][i]["HW_types"][j]["CPU_Number_of_Points_for_Interpolation"].as<int>();
+        cinp[i].pinp[j].typeCpu = c["Cells"][i]["HW types"][j]["Type of CPU model"].as<int>();
+        cinp[i].pinp[j].cpuPmin = c["Cells"][i]["HW types"][j]["CPU idle power consumption"].as<double>();
+        cinp[i].pinp[j].cpuPmax = c["Cells"][i]["HW types"][j]["CPU max power consumption"].as<double>();
+        cinp[i].pinp[j].numOfPoints = c["Cells"][i]["HW types"][j]["CPU number of points for interpolation"].as<int>();
         if(cinp[i].pinp[j].numOfPoints>0)
         {
           cinp[i].pinp[j].cpubins=new double[cinp[i].pinp[j].numOfPoints];
           for(k=0;k<cinp[i].pinp[j].numOfPoints;k++)
-            cinp[i].pinp[j].cpubins[k] = c["Cells"][i]["HW_types"][j]["CPU Utilization Bins"][k].as<double>();
+            cinp[i].pinp[j].cpubins[k] = c["Cells"][i]["HW types"][j]["CPU utilization bins"][k].as<double>();
           cinp[i].pinp[j].cpuP=new double[cinp[i].pinp[j].numOfPoints];
           for(k=0;k<cinp[i].pinp[j].numOfPoints;k++)
-            cinp[i].pinp[j].cpuP[k] = c["Cells"][i]["HW_types"][j]["CPU Power Consuption"][k].as<double>();
+            cinp[i].pinp[j].cpuP[k] = c["Cells"][i]["HW types"][j]["CPU power consumption"][k].as<double>();
         }
         else
         {
           //dummy = 0.0;
           //dummy = 0.0;
         }
-        cinp[i].pinp[j].cpuC = c["Cells"][i]["HW_types"][j]["CPU Sleep Power Consumption"].as<double>();
-        cinp[i].pinp[j].typeAcc = c["Cells"][i]["HW_types"][j]["Type of Accelerator Model"].as<int>();
-        cinp[i].pinp[j].accPmin = c["Cells"][i]["HW_types"][j]["Accelerator Idle Power Consumption"].as<double>();
-        cinp[i].pinp[j].accPmax = c["Cells"][i]["HW_types"][j]["Accelerator Max Power Consumption"].as<double>();
-        cinp[i].pinp[j].accC = c["Cells"][i]["HW_types"][j]["Accelerator Sleep Power Consumption"].as<double>();
+        cinp[i].pinp[j].cpuC = c["Cells"][i]["HW types"][j]["CPU sleep power consumption"].as<double>();
+        cinp[i].pinp[j].typeAcc = c["Cells"][i]["HW types"][j]["Type of accelerator model"].as<int>();
+        cinp[i].pinp[j].accPmin = c["Cells"][i]["HW types"][j]["Accelerator idle power consumption"].as<double>();
+        cinp[i].pinp[j].accPmax = c["Cells"][i]["HW types"][j]["Accelerator max power consumption"].as<double>();
+        cinp[i].pinp[j].accC = c["Cells"][i]["HW types"][j]["Accelerator sleep power consumption"].as<double>();
     }
   }
 
