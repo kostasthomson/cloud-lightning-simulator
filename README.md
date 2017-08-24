@@ -2,13 +2,13 @@
 
 ## Getting started
 
-Clone the project
+Clone the project:
 
-     $ git clone https://gsikotidis@bitbucket.org/cloudlightning/cloudlightning-simulator.git
+     https://bitbucket.org/cloudlightning/cloudlightning-simulator
 
 ## Prerequisites
 
-* Required gcc versions 4.9-6.0 (https://gcc.gnu.org/)
+* Required gcc versions 4.8-6.0 (https://gcc.gnu.org/)
 * Required OpenMPI version 2.1 (https://www.open-mpi.org)
 
 Install OpenMPI
