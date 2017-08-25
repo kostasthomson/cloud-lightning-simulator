@@ -343,6 +343,10 @@ double power::modelCPU(double& u)
                 d[i] * (u - cpubins[i]) * (u - cpubins[i]) * (u - cpubins[i]);
       }
       break;
+    case 3:        
+      int ii=floor(u*10);        
+      pcons=cpuP[ii]+(cpuP[ii+1]-cpuP[ii])*(u-0.1*ii)/(0.1*(ii+1)-0.1*ii);        
+    break;
   }
   return pcons;
 }
