@@ -29,6 +29,12 @@ Navigate to the directory of the project, open the terminal and enter
      $ make
      $ make install
 
+##Documentation Build (optional)
+
+To build the project documentation, navigate to the directory of the project, open the terminal and enter
+
+     $ make doc
+
 ##Run the CL Simulator
 
 Change directory to the *bin* folder and enter
