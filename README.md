@@ -1,10 +1,6 @@
 # CloudLightning Simulator
 
-CloudLightning Simulation is a generalized and extensible simulation framework that enables the seamless simulation and experimentation of emerging Cloud computing infrastructures and  HPC applications.
-The proposed framework is inherently parallel; it is written using the C/C++ programming language and the MPI and OpenMP APIs enabling the exploitation of distributed
-and shared memory parallel techniques for the acceleration of the Cloud simulation. Instead of following a Discrete Events approach as other Cloud simulation frameworks, the proposed work
-is based on a time-advancing loop where the status of the Cloud system can change at each time step. Using this approach allows for reduced memory requirements, since events need not be
-created or stored; instead the system reacts to incoming tasks based on prescribed time interval.
+CloudLightning Simulation is a generalized and extensible simulation framework that enables the seamless simulation and experimentation of emerging Cloud computing infrastructures and  HPC applications. The proposed framework is inherently parallel; it is written using the C/C++ programming language and the MPI and OpenMP APIs enabling the exploitation of distributed and shared memory parallel techniques for the acceleration of the Cloud simulation. Instead of following a Discrete Events approach as other Cloud simulation frameworks, the proposed work is based on a time-advancing loop where the status of the Cloud system can change at each time step. Using this approach allows for reduced memory requirements, since events need not be created or stored; instead the system reacts to incoming tasks based on prescribed time interval.
 
 ## Getting started
 
