@@ -1,5 +1,11 @@
 # CloudLightning Simulator
 
+CloudLightning Simulation is a generalized and extensible simulation framework that enables the seamless simulation and experimentation of emerging Cloud computing infrastructures and  HPC applications.
+The proposed framework is inherently parallel; it is written using the C/C++ programming language and the MPI and OpenMP APIs enabling the exploitation of distributed
+and shared memory parallel techniques for the acceleration of the Cloud simulation. Instead of following a Discrete Events approach as other Cloud simulation frameworks, the proposed work
+is based on a time-advancing loop where the status of the Cloud system can change at each time step. Using this approach allows for reduced memory requirements, since events need not be
+created or stored; instead the system reacts to incoming tasks based on prescribed time interval.
+
 ## Getting started
 
 Clone the project:
@@ -19,7 +25,11 @@ Install OpenMPI
 
 ## Input and Output Data
 
-Input and output JSON data files are located at the corresponding *input* and *output* folders of the project
+Input JSON data files are located at the corresponding *input* folder of the project. In *input* folder there are three JSON files containing the appropriate parameters about
+applications, brokers and cells. Each of these parameters can be configured by the user before running the simulation. *CellData.json* file, include some global information such
+as the maximum time, the update interval of the simulation, the number of the cells and the integration (or not) of the SOSM system.
+
+In *output* folder will be generated the *outputCLsim.json* file after running the simulator.
 
 ##Project Build
 
@@ -35,11 +45,16 @@ To build the project documentation, navigate to the directory of the project, op
 
      $ make doc
 
+Then, open the doc/html/index.html file.
+
 ##Run the CL Simulator
 
 Change directory to the *bin* folder and enter
 
      $ sh cl_sim.out
+
+After running the simulation, an *outputCLsim.json* file will be created in *output* folder. This file should be used as input of the GUI implementation of the CL Simulator in order
+to visualize the results of the simulator. The CL Simulator Visualization can be found on the following url: https://bitbucket.org/cloudlightning/cl-simulatorvisualization
 
 ##Deliverable
 
