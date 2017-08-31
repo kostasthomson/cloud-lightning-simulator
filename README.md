@@ -53,7 +53,7 @@ Change directory to the *bin* folder and enter
 
      $ sh cl_sim.out
 
-After running the simulation, an *outputCLsim.json* file will be created in *output* folder. This file should be used as input of the GUI implementation of the CL Simulator in order
+After running the simulation, an *outputCLsim.json* file will be created in *output* folder. This file should be used as input for the GUI implementation of the CL Simulator in order
 to visualize the results of the simulator. The CL Simulator Visualization can be found on the following url: https://bitbucket.org/cloudlightning/cl-simulatorvisualization
 
 ##Deliverable
