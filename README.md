@@ -26,8 +26,8 @@ Install OpenMPI
 ## Input and Output Data
 
 Input JSON data files are located at the corresponding *input* folder of the project. In *input* folder there are three JSON files containing the appropriate parameters about
-applications, brokers and cells. Each of these parameters can be configured by the user before running the simulation. *CellData.json* file, include some global information such
-as the maximum time, the update interval of the simulation, the number of the cells and the integration (or not) of the SOSM system.
+applications, brokers and cells. Each of these parameters can be configured by the user before running the simulation. *CellData.json* file include some global information such
+as the maximum time of the simulation, the update interval of the simulation, the number of the cells and the integration (or not) of the SOSM system.
 
 In *output* folder will be generated the *outputCLsim.json* file after running the simulator.
 
