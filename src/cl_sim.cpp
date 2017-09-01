@@ -70,8 +70,8 @@ int main(int argc, char** argv)
 
   if (rank == 0) {
     gates = new gs[1];
-    gates[0] = gs("../input/CellData.json", "../input/AppData.json", "../input/BrokerData.json");
-    gates[0].printfile("systeminfo", ios::out);
+    gates[0] = gs("input/CellData.json", "input/AppData.json", "input/BrokerData.json");
+    gates[0].printfile("output/systeminfo", ios::out);
 
     commSimParameters(gates[0].gsi()[0], rank, numberOfTasks, MPI_COMM_WORLD);
 
@@ -108,7 +108,7 @@ int main(int argc, char** argv)
   // Receive statistics from the cells
   if (rank == 0) {
     commStats(gates, clCell, rank, numberOfTasks, MPI_COMM_WORLD);
-    gates[0].printStats("../output/output", ios::out);
+    gates[0].printStats("output/output", ios::out);
   } else {
     commStats(gates, clCell, rank, numberOfTasks, MPI_COMM_WORLD);
   }
@@ -163,7 +163,7 @@ int main(int argc, char** argv)
       if (rank == 0) {
         // Receive statistics from the cells and print to files
         commStats(gates, clCell, rank, numberOfTasks, MPI_COMM_WORLD);
-        gates[0].printStats("../output/output", ios::out | ios::app);
+        gates[0].printStats("output/output", ios::out | ios::app);
         cout << std::fixed << setprecision(2) << "\r Simulation at: " << 100.0 * (time + 1) / (endTime) << " %" << flush;
       } else {
         commStats(gates, clCell, rank, numberOfTasks, MPI_COMM_WORLD);
@@ -174,11 +174,11 @@ int main(int argc, char** argv)
   if (rank == 0) {
     // Print output to json file
     //remove("../output/outputCLsim.json");
-    gates[0].printStatsJson("../output/output", ios::out, endTime, updateInterval);
+    gates[0].printStatsJson("output/output", ios::out, endTime, updateInterval);
 
     commStats(gates, clCell, rank, numberOfTasks, MPI_COMM_WORLD);
 
-    gates[0].printStats("output", ios::out | ios::app);
+  //  gates[0].printStats("output", ios::out | ios::app);
     cout << endl << "Elapsed time: " << MPI_Wtime() - startTime << " sec" << endl;
     cout << "Total number of submitted tasks: " << allTasks << endl;
     delete[] gates;
