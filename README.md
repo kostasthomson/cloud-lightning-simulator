@@ -37,7 +37,6 @@ Navigate to the directory of the project, open the terminal and enter
 
      $ cmake .
      $ make
-     $ make install
 
 ##Documentation Build (optional)
 
@@ -49,7 +48,7 @@ Then, open the doc/html/index.html file.
 
 ##Run the CL Simulator
 
-Change directory to the *bin* folder and enter
+At the directory of the project, open the terminal and enter
 
      $ sh cl_sim.out
 
