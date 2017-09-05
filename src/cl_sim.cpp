@@ -162,7 +162,6 @@ int main(int argc, char** argv)
   comm.cellStatistics(gates, clCell, rank, numberOfTasks, MPI_COMM_WORLD);
 
   if (rank == 0) {
-    gates[0].printStats("output", ios::out | ios::app);
     // Convert output file to json
     gates[0].printStatsJson("output/output", ios::out, endTime, updateInterval);
     cout << endl << "Elapsed time: " << MPI_Wtime() - startTime << " sec" << endl;
