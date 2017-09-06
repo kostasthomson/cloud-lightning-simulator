@@ -1226,7 +1226,13 @@ void siminputs::parse(const string& fname, const string& bname)
   is >> c;
   ib >> b;
 
-  sosmIntegration = b["SOSM integration"].as<int>(); // 0 for traditional , 1 for SOSM
+  string foo = b["Resource allocation mechanism"].as<string>(); //read resource allocation mechanism
+  if(foo == "SOSM"){
+    sosmIntegration = 1;
+  }
+  else if(foo == "Traditional"){
+    sosmIntegration = 0;
+  }
   maxTime = c["Maximum simulation time"].as<int>();  // read maximum simulation time and assign to variable
   updateInterval = c["Update interval"].as<int>();   // read update interval and assign to variable
   numOfCells = c["Number of Cells"].as<int>();       // read number of cells and assign to variable

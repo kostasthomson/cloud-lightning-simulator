@@ -104,7 +104,7 @@ int main(int argc, char** argv)
 
   if (rank == 0) {
     gates[0].printStats("output/output", ios::out);
-    cout << "Resource Allocation Mechanism: " << ((sosmIntegration) ? "SOSM" : "Traditional") << endl;
+    cout << "Resource allocation mechanism: " << ((sosmIntegration) ? "SOSM" : "Traditional") << endl;
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
