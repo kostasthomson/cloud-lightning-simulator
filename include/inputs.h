@@ -136,9 +136,11 @@ class siminputs
   class cellinputs* cinp;
   int alloc;
   int numOfCells;
-  double maxTime;
-  int sosmIntegration;
-  double updateInterval;
+  // General simulation configuration variables. The time related variables are parsed from the CellData.json file
+  // while the sosmIntegration variable is parsed from the BrokerData.json file
+  double maxTime;     //! Maximum simulation time
+  double updateInterval; //! Time interval to update execution statistics
+  int sosmIntegration; //! Select broker with or without SOSM capabilities
 
   siminputs();
   siminputs(const siminputs& t);

@@ -21,10 +21,10 @@ class gs
   gs();
 
   /// Parse the simulator configuration files
-  /// \param sfile The path to the CellData configuration file
-  /// \param afile The path to the AppData configuration file
-  /// \param bfile The path to the BrokerData configuration file
-  gs(const std::string& sfile, const std::string& afile, const std::string& bfile);
+  /// \param cellData The path to the CellData configuration file
+  /// \param appData The path to the AppData configuration file
+  /// \param brokerData The path to the BrokerData configuration file
+  gs(const std::string& cellData, const std::string& appData, const std::string& brokerData);
 
   gs(const gs& t);
 

@@ -6,13 +6,13 @@
 using std::stringstream;
 
 gs::gs() : alloc(0), ai(nullptr), si(nullptr), stats(nullptr) {}
-gs::gs(const std::string& sfile, const std::string& afile, const std::string& bfile)
+gs::gs(const std::string& cellData, const std::string& appData, const std::string& brokerData)
 {
   alloc = 1;
   ai = new appinputs[1];
   si = new siminputs[1];
-  ai->parse(afile);
-  si->parse(sfile, bfile);
+  ai->parse(appData);
+  si->parse(cellData, brokerData);
   stats = new stat*[si->numOfCells];
   for (int i = 0; i < si->numOfCells; i++) {
     stats[i] = new stat[si->cinp[i].numberOfTypes];

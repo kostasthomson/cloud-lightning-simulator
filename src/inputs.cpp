@@ -1220,10 +1220,13 @@ void siminputs::parse(const string& fname, const string& bname)
   // double dummy;
 
   std::ifstream is(fname);
-  jsoncons::json c;
+  std::ifstream ib(bname);
+  jsoncons::json c;     //json object for CellData parsing
+  jsoncons::json b;     //json object for BrokerData parsing
   is >> c;
+  ib >> b;
 
-  sosmIntegration = c["SOSM integration"].as<int>(); // 0 for traditional , 1 for SOSM
+  sosmIntegration = b["SOSM integration"].as<int>(); // 0 for traditional , 1 for SOSM
   maxTime = c["Maximum simulation time"].as<int>();  // read maximum simulation time and assign to variable
   updateInterval = c["Update interval"].as<int>();   // read update interval and assign to variable
   numOfCells = c["Number of Cells"].as<int>();       // read number of cells and assign to variable
