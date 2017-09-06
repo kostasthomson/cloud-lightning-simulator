@@ -163,7 +163,7 @@ int main(int argc, char** argv)
 
   if (rank == 0) {
     // Convert output file to json
-    gates[0].printStatsJson("output/output", ios::out, endTime, updateInterval);
+    gates[0].printStatsJson("output/output", ios::out, endTime, updateInterval, sosmIntegration);
     cout << endl << "Elapsed time: " << MPI_Wtime() - startTime << " sec" << endl;
     cout << "Total number of submitted tasks: " << allTasks << endl;
     delete[] gates;

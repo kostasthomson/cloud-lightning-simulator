@@ -6,10 +6,11 @@
 using std::cout;
 using std::endl;
 
-jsoncons::json js;
-jsoncons::json cl;
-jsoncons::json output_list = jsoncons::json::array();
-jsoncons::json cl_list = jsoncons::json::array();
+jsoncons::ojson js;
+jsoncons::ojson cl;
+jsoncons::ojson output_list = jsoncons::ojson::array();
+jsoncons::ojson cl_list = jsoncons::ojson::array();
+jsoncons::ojson cl_output;
 
 stat::stat()
   : processorsOverActiveServers(0),
@@ -268,7 +269,7 @@ void stat::printfile(const string& outfile, const ios::openmode& mode)
 }
 
 void stat::printfileJson(const string& outfile, const string& inputfile, const ios::openmode& mode, int a, int b,
-                         int overallRecords, int numOfCells, int numberOfTypes, int j)
+                         int overallRecords, int numOfCells, int numberOfTypes, int j, int l_sosmIntegration)
 {
   ifstream file;
   file.open(inputfile.c_str());
@@ -310,47 +311,54 @@ void stat::printfileJson(const string& outfile, const string& inputfile, const i
     file >> totalAccelerators;
     file >> totalPowerConsumption;
 
-    js = jsoncons::json::object{ { "Time Step", currentTimestep },
-                                 { "Total Energy Consumption", totalPowerConsumption },
-                                 { "Active Servers", activeServers },
-                                 { "Total Number of currently running VMs", numberOfTasks },
-                                 { "Total Processors over Active Servers", processorsOverActiveServers },
-                                 { "Total Memory over Active Servers", memoryOverActiveServers },
-                                 { "Total Storage over Active Servers", storageOverActiveServers },
-                                 { "Total Accelerators over Active Servers", acceleratorsOverActiveServers },
-                                 { "Total Number of accepted Tasks", acceptedTasks },
-                                 { "Total Number of rejected Tasks", rejectedTasks },
-                                 { "Total Physical Processors", physicalProcessors },
-                                 { "Total Processors", totalProcessors },
-                                 { "Utilized Processors", utilizedProcessors },
-                                 { "Actual Utilized Processors", actualUtilizedProcessors },
-                                 { "Available Processors", availableProcessors },
-                                 { "Total Physical Memory", physicalMemory },
-                                 { "Total Memory", totalMemory },
-                                 { "Utilized Memory", utilizedMemory },
-                                 { "Actual Utilized Memory", actualUtilizedMemory },
-                                 { "Available Memory", availableMemory },
-                                 { "Total Physical Storage", physicalStorage },
-                                 { "Total Storage", totalStorage },
-                                 { "Utilized Storage", utilizedStorage },
-                                 { "Available Storage", availableStorage },
-                                 { "Total Physical Network", physicalNetwork },
-                                 { "Total Network", totalNetwork },
-                                 { "Utilized Network", utilizedNetwork },
-                                 { "Actual Utilized Network", actualUtilizedNetwork },
-                                 { "Available Network", availableNetwork },
-                                 { "Total Accelerators", totalAccelerators },
-                                 { "Utilized Accelerators", utilizedAccelerators },
-                                 { "Available Accelerators", availableAccelerators } };
+    js = jsoncons::ojson::object{ { "Time Step", currentTimestep },
+                                  { "Active Servers", activeServers },
+                                  { "Actual Utilized Memory", actualUtilizedMemory },
+                                  { "Actual Utilized Network", actualUtilizedNetwork },
+                                  { "Actual Utilized Processors", actualUtilizedProcessors },
+                                  { "Available Accelerators", availableAccelerators },
+                                  { "Available Memory", availableMemory },
+                                  { "Available Network", availableNetwork },
+                                  { "Available Processors", availableProcessors },
+                                  { "Available Storage", availableStorage },
+                                  { "Total Accelerators", totalAccelerators },
+                                  { "Total Accelerators over Active Servers", acceleratorsOverActiveServers },
+                                  { "Total Energy Consumption", totalPowerConsumption },
+                                  { "Total Memory", totalMemory },
+                                  { "Total Memory over Active Servers", memoryOverActiveServers },
+                                  { "Total Network", totalNetwork },
+                                  { "Total Number of accepted Tasks", acceptedTasks },
+                                  { "Total Number of currently running VMs", numberOfTasks },
+                                  { "Total Number of rejected Tasks", rejectedTasks },
+                                  { "Total Physical Memory", physicalMemory },
+                                  { "Total Physical Network", physicalNetwork },
+                                  { "Total Physical Processors", physicalProcessors },
+                                  { "Total Physical Storage", physicalStorage },
+                                  { "Total Processors", totalProcessors },
+                                  { "Total Processors over Active Servers", processorsOverActiveServers },
+                                  { "Total Storage", totalStorage },
+                                  { "Total Storage over Active Servers", storageOverActiveServers },
+                                  { "Utilized Accelerators", utilizedAccelerators },
+                                  { "Utilized Memory", utilizedMemory },
+                                  { "Utilized Network", utilizedNetwork },
+                                  { "Utilized Processors", utilizedProcessors },
+                                  { "Utilized Storage", utilizedStorage }
+                                };
     output_list.add(js);
   }
 
-  cl = jsoncons::json::object{ { "Cell", a }, { "HW Type", b }, { "Outputs", output_list } };
+  cl = jsoncons::ojson::object{ { "Cell", a }, { "HW Type", b }, { "Outputs", output_list } };
 
   cl_list.add(cl);
-
+  int sosmIntegration = l_sosmIntegration;
+  if (sosmIntegration){
+    cl_output = jsoncons::ojson::object{ {"Resource allocation mechanism", "SOSM"}, { "CLSim outputs", cl_list } };
+  }
+  else{
+    cl_output = jsoncons::ojson::object{ {"Resource allocation mechanism", "Traditional"}, { "CLSim outputs", cl_list } };
+  }
   if (a == numOfCells && j == numberOfTypes) {
-    ff << std::setw(4) << pretty_print(cl_list) << std::endl;
+    ff << std::setw(4) << pretty_print(cl_output) << std::endl;
   }
   file.close();
 }
