@@ -1233,6 +1233,9 @@ void siminputs::parse(const string& fname, const string& bname)
   else if(foo == "Traditional"){
     sosmIntegration = 0;
   }
+  else
+    cout << "Define proper resource allocation mechanism on BrokerData.json file. By default the simulator is running on Traditional mode." << endl;
+
   maxTime = c["Maximum simulation time"].as<int>();  // read maximum simulation time and assign to variable
   updateInterval = c["Update interval"].as<int>();   // read update interval and assign to variable
   numOfCells = c["Number of Cells"].as<int>();       // read number of cells and assign to variable

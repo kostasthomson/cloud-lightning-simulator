@@ -202,14 +202,13 @@ void gs::printStats(const std::string& outfile, const ios::openmode& mode)
 void gs::printStatsJson(const std::string& outfile, const ios::openmode& mode, int endTime, int updateInterval, int sosmIntegration)
 {
   int overallRecords = (endTime / updateInterval) + 1;
-  int l_sosmIntegration = sosmIntegration;
   if (alloc) {
     for (int i = 0; i < si->numOfCells; i++) {
       for (int j = 0; j < si->cinp[i].numberOfTypes; j++) {
         std::string tmp = outfile + num2str(si->cinp[i].ID) + num2str(si->cinp[i].types[j]);
         std::string temp = outfile + "CLSim.json";
         stats[i][j].printfileJson(temp, tmp, mode, si->cinp[i].ID, si->cinp[i].types[j], overallRecords, si->numOfCells,
-                                  si->cinp[i].numberOfTypes, j + 1, l_sosmIntegration);
+                                  si->cinp[i].numberOfTypes, j + 1, sosmIntegration);
       }
     }
   }

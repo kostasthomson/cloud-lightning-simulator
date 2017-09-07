@@ -269,7 +269,7 @@ void stat::printfile(const string& outfile, const ios::openmode& mode)
 }
 
 void stat::printfileJson(const string& outfile, const string& inputfile, const ios::openmode& mode, int a, int b,
-                         int overallRecords, int numOfCells, int numberOfTypes, int j, int l_sosmIntegration)
+                         int overallRecords, int numOfCells, int numberOfTypes, int j, int sosmIntegration)
 {
   ifstream file;
   file.open(inputfile.c_str());
@@ -350,7 +350,6 @@ void stat::printfileJson(const string& outfile, const string& inputfile, const i
   cl = jsoncons::ojson::object{ { "Cell", a }, { "HW Type", b }, { "Outputs", output_list } };
 
   cl_list.add(cl);
-  int sosmIntegration = l_sosmIntegration;
   if (sosmIntegration){
     cl_output = jsoncons::ojson::object{ {"Resource allocation mechanism", "SOSM"}, { "CLSim outputs", cl_list } };
   }
