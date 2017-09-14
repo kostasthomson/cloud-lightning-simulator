@@ -221,7 +221,7 @@ void stat::print() const
     cout << "         Total Memory over Active Servers: " << memoryOverActiveServers << endl;
     cout << "         Total Storage over Active Servers: " << storageOverActiveServers << endl;
     cout << "         Total Accelerators over Active Servers: " << acceleratorsOverActiveServers << endl;
-    cout << "         Total Number of currently running VMs: " << numberOfTasks << endl;
+    cout << "         Total Number of submitted Tasks: " << numberOfTasks << endl;
     cout << "         Total Number of accepted Tasks: " << acceptedTasks << endl;
     cout << "         Total Number of rejected Tasks: " << rejectedTasks << endl;
     cout << "         Total Physical Processors: " << physicalProcessors << " Proc. Units" << endl;
@@ -328,7 +328,7 @@ void stat::printfileJson(const string& outfile, const string& inputfile, const i
                                   { "Total Memory over Active Servers", memoryOverActiveServers },
                                   { "Total Network", totalNetwork },
                                   { "Total Number of accepted Tasks", acceptedTasks },
-                                  { "Total Number of currently running VMs", numberOfTasks },
+                                  { "Total Number of submitted Tasks", numberOfTasks },
                                   { "Total Number of rejected Tasks", rejectedTasks },
                                   { "Total Physical Memory", physicalMemory },
                                   { "Total Physical Network", physicalNetwork },
