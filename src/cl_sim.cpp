@@ -25,11 +25,11 @@ int main(int argc, char** argv)
   }
 
   // Get ranks and cluster size
-  int numberOfTasks = 0, rank = 0, len = 0;
+  int clusterSize = 0, rank = 0, len = 0;
   char hostname[MPI_MAX_PROCESSOR_NAME];
   MPI_Comm mpiComm;
 
-  MPI_Comm_size(MPI_COMM_WORLD, &numberOfTasks);
+  MPI_Comm_size(MPI_COMM_WORLD, &clusterSize);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Get_processor_name(hostname, &len);
   MPI_Comm_dup(MPI_COMM_WORLD, &mpiComm);
@@ -42,7 +42,7 @@ int main(int argc, char** argv)
     startTime = MPI_Wtime();
     cout << endl << "INITIALIZATION PHASE" << endl;
     cout << "------------------------------- " << endl;
-    cout << "Cluster Size        : " << numberOfTasks << endl;
+    cout << "Cluster Size        : " << clusterSize << endl;
     cout << "Threads per machine : " << omp_thr << endl;
     cout << "------------------------------- " << endl;
   }
@@ -69,7 +69,7 @@ int main(int argc, char** argv)
     gates[0] = gs("input/CellData.json", "input/AppData.json", "input/BrokerData.json");
     gates[0].printfile("output/systeminfo", ios::out);
 
-    comm.simulationParameters(gates[0].gsi()[0], rank, numberOfTasks, MPI_COMM_WORLD);
+    comm.simulationParameters(gates[0].gsi()[0], rank, clusterSize, MPI_COMM_WORLD);
 
     endTime = gates[0].gsi()[0].maxTime;
     updateInterval = gates[0].gsi()[0].updateInterval;
@@ -80,7 +80,7 @@ int main(int argc, char** argv)
     siminputs* si = new siminputs[1];
 
     // Receive program values from the master
-    comm.simulationParameters(*si, rank, numberOfTasks, MPI_COMM_WORLD);
+    comm.simulationParameters(*si, rank, clusterSize, MPI_COMM_WORLD);
 
     sosmIntegration = si->sosmIntegration;
     clCell = new cell[1];
@@ -100,7 +100,7 @@ int main(int argc, char** argv)
   MPI_Barrier(MPI_COMM_WORLD);
 
   // Send statistics from the cells to the gateway
-  comm.cellStatistics(gates, clCell, rank, numberOfTasks, MPI_COMM_WORLD);
+  comm.cellStatistics(gates, clCell, rank, clusterSize, MPI_COMM_WORLD);
 
   if (rank == 0) {
     gates[0].printStats("output/output", ios::out);
@@ -129,7 +129,7 @@ int main(int argc, char** argv)
     }
 
     // Send the task from the gateway to the selected cell
-    comm.taskParameters(jobs, rank, numberOfTasks, commCells, MPI_COMM_WORLD);
+    comm.taskParameters(jobs, rank, clusterSize, commCells, MPI_COMM_WORLD);
 
     if (rank != 0) {
       // Task deployment: Traverse the components tree to locate the most suitable vRM
@@ -150,7 +150,7 @@ int main(int argc, char** argv)
     // On every defined interval
     if (((int)time + 1) % ((int)updateInterval) == 0) {
       // Receive statistics from the cells
-      comm.cellStatistics(gates, clCell, rank, numberOfTasks, MPI_COMM_WORLD);
+      comm.cellStatistics(gates, clCell, rank, clusterSize, MPI_COMM_WORLD);
 
       if (rank == 0) {
         gates[0].printStats("output/output", ios::out | ios::app);
@@ -159,7 +159,7 @@ int main(int argc, char** argv)
       }
     }
   }
-  comm.cellStatistics(gates, clCell, rank, numberOfTasks, MPI_COMM_WORLD);
+  comm.cellStatistics(gates, clCell, rank, clusterSize, MPI_COMM_WORLD);
 
   if (rank == 0) {
     // Convert output file to json

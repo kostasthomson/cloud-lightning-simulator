@@ -4,7 +4,7 @@
 #include <stat.h>
 #include <task.h>
 
-void communicator::simulationParameters(struct siminputs& si, const int& rank, const int& numberOfTasks,
+void communicator::simulationParameters(struct siminputs& si, const int& rank, const int& clusterSize,
                                         const MPI_Comm& Comm)
 {
   int i, j;
@@ -12,7 +12,7 @@ void communicator::simulationParameters(struct siminputs& si, const int& rank, c
   MPI_Status status;
 
   if (rank == 0) {
-    for (i = 0; i < numberOfTasks - 1; i++) {
+    for (i = 0; i < clusterSize - 1; i++) {
       // Send simulator-specific info
       MPI_Send(&si.maxTime, 1, MPI_DOUBLE, i + 1, i + 1, Comm);
       MPI_Send(&si.sosmIntegration, 1, MPI_INT, i + 1, i + 1, Comm);
@@ -144,7 +144,7 @@ void communicator::simulationParameters(struct siminputs& si, const int& rank, c
   }
 }
 
-void communicator::taskParameters(list<task>& jobs, const int& rank, const int& numberOfTasks, const int* commCell,
+void communicator::taskParameters(list<task>& jobs, const int& rank, const int& clusterSize, const int* commCell,
                                   const MPI_Comm& Comm)
 {
   int i, j, k, who;
@@ -161,7 +161,7 @@ void communicator::taskParameters(list<task>& jobs, const int& rank, const int& 
   int establish;
   if (rank == 0) {
     establish = jobs.size();
-    for (i = 0; i < numberOfTasks - 1; i++) {
+    for (i = 0; i < clusterSize - 1; i++) {
       MPI_Send(&establish, 1, MPI_INT, i + 1, i + 1, Comm);
     }
   } else {
@@ -173,7 +173,7 @@ void communicator::taskParameters(list<task>& jobs, const int& rank, const int& 
     list<task>::iterator it = jobs.begin();
     for (i = 0; i < establish; i++) {
       who = commCell[i];
-      for (j = 0; j < numberOfTasks - 1; j++) {
+      for (j = 0; j < clusterSize - 1; j++) {
         MPI_Send(&who, 1, MPI_INT, j + 1, j + 1, Comm);
       }
       if (who > 0) {
@@ -286,13 +286,13 @@ void communicator::taskParameters(list<task>& jobs, const int& rank, const int& 
   }
 }
 
-void communicator::cellStatistics(const gs* gates, const cell* clCell, const int& rank, const int& numberOfTasks,
+void communicator::cellStatistics(const gs* gates, const cell* clCell, const int& rank, const int& clusterSize,
                                   const MPI_Comm& Comm)
 {
   int i, j;
   MPI_Status status;
   if (rank == 0) {
-    for (i = 0; i < numberOfTasks - 1; i++) {
+    for (i = 0; i < clusterSize - 1; i++) {
       for (j = 0; j < gates[0].gsi()[0].cinp[i].numberOfTypes; j++) {
         MPI_Recv(&gates[0].getStats()[i][j].alloc, 1, MPI_INT, i + 1, i + 1, Comm, &status);
         MPI_Recv(&gates[0].getStats()[i][j].currentTimestep, 1, MPI_DOUBLE, i + 1, i + 1, Comm, &status);
