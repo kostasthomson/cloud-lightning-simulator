@@ -199,7 +199,7 @@ void gs::printStats(const std::string& outfile, const ios::openmode& mode)
   }
 }
 
-void gs::printStatsJson(const std::string& outfile, const ios::openmode& mode, int endTime, int updateInterval, int sosmIntegration)
+void gs::printStatsJson(const std::string& outfile, const ios::openmode& mode, int endTime, int updateInterval, int sosmIntegration, int allTasks)
 {
   int overallRecords = (endTime / updateInterval) + 1;
   if (alloc) {
@@ -208,7 +208,7 @@ void gs::printStatsJson(const std::string& outfile, const ios::openmode& mode, i
         std::string tmp = outfile + num2str(si->cinp[i].ID) + num2str(si->cinp[i].types[j]);
         std::string temp = outfile + "CLSim.json";
         stats[i][j].printfileJson(temp, tmp, mode, si->cinp[i].ID, si->cinp[i].types[j], overallRecords, si->numOfCells,
-                                  si->cinp[i].numberOfTypes, j + 1, sosmIntegration);
+                                  si->cinp[i].numberOfTypes, j + 1, sosmIntegration, allTasks);
       }
     }
   }

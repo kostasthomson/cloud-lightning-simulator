@@ -13,31 +13,31 @@ void taskCreationEngine(std::list<task>& jobs, const struct appinputs& app)
 
   for (int i = 0; i < numberOfTasks; i++) {
     r = ((double)rand()) / RAND_MAX;
-    int curr_task = floor(app.numOfApps * r);
+    int applicationType = floor(app.numOfApps * r);   // Choose randomly an application type of the input AppData.json file
     r = ((double)rand()) / RAND_MAX;
-
+    
     double curr_requestedInstructions =
-      app.minmaxInsPerApp[curr_task][0] + r * (app.minmaxInsPerApp[curr_task][1] - app.minmaxInsPerApp[curr_task][0]);
+      app.minmaxInsPerApp[applicationType][0] + r * (app.minmaxInsPerApp[applicationType][1] - app.minmaxInsPerApp[applicationType][0]);
 
-    int curr_numberOfVMs = round(app.minmaxVMPerApp[curr_task][0] +
-                                 r * (app.minmaxVMPerApp[curr_task][1] - app.minmaxVMPerApp[curr_task][0]));
+    int curr_numberOfVMs = round(app.minmaxVMPerApp[applicationType][0] +
+                                 r * (app.minmaxVMPerApp[applicationType][1] - app.minmaxVMPerApp[applicationType][0]));
 
     // Requirements for resources
-    double curr_reqP = round(app.minmaxProcPerVM[curr_task][0] +
-                             r * (app.minmaxProcPerVM[curr_task][1] - app.minmaxProcPerVM[curr_task][0]));
+    double curr_reqP = round(app.minmaxProcPerVM[applicationType][0] +
+                             r * (app.minmaxProcPerVM[applicationType][1] - app.minmaxProcPerVM[applicationType][0]));
     double curr_reqM =
-      app.minmaxMemPerVM[curr_task][0] + r * (app.minmaxMemPerVM[curr_task][1] - app.minmaxMemPerVM[curr_task][0]);
+      app.minmaxMemPerVM[applicationType][0] + r * (app.minmaxMemPerVM[applicationType][1] - app.minmaxMemPerVM[applicationType][0]);
     double curr_reqN =
-      app.minmaxNetPerApp[curr_task][0] + r * (app.minmaxNetPerApp[curr_task][1] - app.minmaxNetPerApp[curr_task][0]);
+      app.minmaxNetPerApp[applicationType][0] + r * (app.minmaxNetPerApp[applicationType][1] - app.minmaxNetPerApp[applicationType][0]);
     double curr_reqS =
-      app.minmaxStoPerVM[curr_task][0] + r * (app.minmaxStoPerVM[curr_task][1] - app.minmaxStoPerVM[curr_task][0]);
+      app.minmaxStoPerVM[applicationType][0] + r * (app.minmaxStoPerVM[applicationType][1] - app.minmaxStoPerVM[applicationType][0]);
 
-    jobs.push_back(task(curr_task, app.numberOfAvailableImplementationsPerApp[curr_task],
-                        &app.availableImplementationsPerApp[curr_task][0], curr_requestedInstructions, curr_numberOfVMs,
-                        curr_reqP, curr_reqM, curr_reqN, curr_reqS, app.typeOfActP[curr_task],
-                        app.typeOfActM[curr_task], app.typeOfActN[curr_task], &app.minmaxActP[curr_task][0],
-                        &app.minmaxActM[curr_task][0], &app.minmaxActN[curr_task][0], &app.accelerator[curr_task][0],
-                        &app.rhoAcc[curr_task][0]));
+    jobs.push_back(task(applicationType, app.numberOfAvailableImplementationsPerApp[applicationType],
+                        &app.availableImplementationsPerApp[applicationType][0], curr_requestedInstructions, curr_numberOfVMs,
+                        curr_reqP, curr_reqM, curr_reqN, curr_reqS, app.typeOfActP[applicationType],
+                        app.typeOfActM[applicationType], app.typeOfActN[applicationType], &app.minmaxActP[applicationType][0],
+                        &app.minmaxActM[applicationType][0], &app.minmaxActN[applicationType][0], &app.accelerator[applicationType][0],
+                        &app.rhoAcc[applicationType][0]));
   }
 }
 

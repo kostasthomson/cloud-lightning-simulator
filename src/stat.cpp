@@ -221,7 +221,7 @@ void stat::print() const
     cout << "         Total Memory over Active Servers: " << memoryOverActiveServers << endl;
     cout << "         Total Storage over Active Servers: " << storageOverActiveServers << endl;
     cout << "         Total Accelerators over Active Servers: " << acceleratorsOverActiveServers << endl;
-    cout << "         Total Number of submitted Tasks: " << numberOfTasks << endl;
+    cout << "         Active VMs: " << numberOfTasks << endl;
     cout << "         Total Number of accepted Tasks: " << acceptedTasks << endl;
     cout << "         Total Number of rejected Tasks: " << rejectedTasks << endl;
     cout << "         Total Physical Processors: " << physicalProcessors << " Proc. Units" << endl;
@@ -269,7 +269,7 @@ void stat::printfile(const string& outfile, const ios::openmode& mode)
 }
 
 void stat::printfileJson(const string& outfile, const string& inputfile, const ios::openmode& mode, int a, int b,
-                         int overallRecords, int numOfCells, int numberOfTypes, int j, int sosmIntegration)
+                         int overallRecords, int numOfCells, int numberOfTypes, int j, int sosmIntegration, int allTasks)
 {
   ifstream file;
   file.open(inputfile.c_str());
@@ -313,6 +313,7 @@ void stat::printfileJson(const string& outfile, const string& inputfile, const i
 
     js = jsoncons::ojson::object{ { "Time Step", currentTimestep },
                                   { "Active Servers", activeServers },
+                                  { "Active VMs", numberOfTasks },
                                   { "Actual Utilized Memory", actualUtilizedMemory },
                                   { "Actual Utilized Network", actualUtilizedNetwork },
                                   { "Actual Utilized Processors", actualUtilizedProcessors },
@@ -327,8 +328,7 @@ void stat::printfileJson(const string& outfile, const string& inputfile, const i
                                   { "Total Memory", totalMemory },
                                   { "Total Memory over Active Servers", memoryOverActiveServers },
                                   { "Total Network", totalNetwork },
-                                  { "Total Number of accepted Tasks", acceptedTasks },
-                                  { "Total Number of submitted Tasks", numberOfTasks },
+                                  { "Total Number of accepted Tasks", acceptedTasks },     
                                   { "Total Number of rejected Tasks", rejectedTasks },
                                   { "Total Physical Memory", physicalMemory },
                                   { "Total Physical Network", physicalNetwork },
@@ -351,10 +351,10 @@ void stat::printfileJson(const string& outfile, const string& inputfile, const i
 
   cl_list.add(cl);
   if (sosmIntegration){
-    cl_output = jsoncons::ojson::object{ {"Resource allocation mechanism", "SOSM"}, { "CLSim outputs", cl_list } };
+    cl_output = jsoncons::ojson::object{ {"Resource allocation mechanism", "SOSM"}, {"Total number of submitted tasks", allTasks}, { "CLSim outputs", cl_list } };
   }
   else{
-    cl_output = jsoncons::ojson::object{ {"Resource allocation mechanism", "Traditional"}, { "CLSim outputs", cl_list } };
+    cl_output = jsoncons::ojson::object{ {"Resource allocation mechanism", "Traditional"}, {"Total number of submitted tasks", allTasks}, { "CLSim outputs", cl_list } };
   }
   if (a == numOfCells && j == numberOfTypes) {
     ff << std::setw(4) << pretty_print(cl_output) << std::endl;
