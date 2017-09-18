@@ -221,7 +221,7 @@ void stat::print() const
     cout << "         Total Memory over Active Servers: " << memoryOverActiveServers << endl;
     cout << "         Total Storage over Active Servers: " << storageOverActiveServers << endl;
     cout << "         Total Accelerators over Active Servers: " << acceleratorsOverActiveServers << endl;
-    cout << "         Active VMs: " << numberOfTasks << endl;
+    cout << "         Running VMs: " << numberOfTasks << endl;
     cout << "         Total Number of accepted Tasks: " << acceptedTasks << endl;
     cout << "         Total Number of rejected Tasks: " << rejectedTasks << endl;
     cout << "         Total Physical Processors: " << physicalProcessors << " Proc. Units" << endl;
@@ -312,8 +312,7 @@ void stat::printfileJson(const string& outfile, const string& inputfile, const i
     file >> totalPowerConsumption;
 
     js = jsoncons::ojson::object{ { "Time Step", currentTimestep },
-                                  { "Active Servers", activeServers },
-                                  { "Active VMs", numberOfTasks },
+                                  { "Active Servers", activeServers },                                
                                   { "Actual Utilized Memory", actualUtilizedMemory },
                                   { "Actual Utilized Network", actualUtilizedNetwork },
                                   { "Actual Utilized Processors", actualUtilizedProcessors },
@@ -322,6 +321,7 @@ void stat::printfileJson(const string& outfile, const string& inputfile, const i
                                   { "Available Network", availableNetwork },
                                   { "Available Processors", availableProcessors },
                                   { "Available Storage", availableStorage },
+                                  { "Running VMs", numberOfTasks },
                                   { "Total Accelerators", totalAccelerators },
                                   { "Total Accelerators over Active Servers", acceleratorsOverActiveServers },
                                   { "Total Energy Consumption", totalPowerConsumption },
