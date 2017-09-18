@@ -37,7 +37,7 @@ resource::resource()
     actualUtilizedProcessors(0.0),
     actualUtilizedMemory(0.0),
     actualRhoAccelerators(0.0),
-    numberOfTasks(0),
+    runningVMs(0),
     currentCompCapPerProc(0.0),
     currentCompCapPerAcc(0.0)
 {
@@ -54,7 +54,7 @@ resource::resource(const resinputs& setup, const int& _ID)
     actualUtilizedProcessors(0.0),
     actualUtilizedMemory(0.0),
     actualRhoAccelerators(0.0),
-    numberOfTasks(0),
+    runningVMs(0),
     currentCompCapPerProc(0.0),
     currentCompCapPerAcc(0.0)
 {
@@ -119,7 +119,7 @@ resource::resource(const resource& t)
     actualUtilizedMemory = t.getActualUtilizedMemory();
     actualRhoAccelerators = t.getActualRhoAccelerators();
 
-    numberOfTasks = t.getNumberOfTasks();
+    runningVMs = t.getRunningVMs();
     currentCompCapPerProc = t.getCurrentCompCapPerProc();
     currentCompCapPerAcc = t.getCurrentCompCapPerAcc();
   }
@@ -166,7 +166,7 @@ resource& resource::operator=(const resource& t)
       actualUtilizedMemory = 0.0;
       actualRhoAccelerators = 0.0;
 
-      numberOfTasks = 0;
+      runningVMs = 0;
       currentCompCapPerProc = 0.0;
       currentCompCapPerAcc = 0.0;
     }
@@ -208,7 +208,7 @@ resource& resource::operator=(const resource& t)
       actualUtilizedMemory = t.getActualUtilizedMemory();
       actualRhoAccelerators = t.getActualRhoAccelerators();
 
-      numberOfTasks = t.getNumberOfTasks();
+      runningVMs = t.getRunningVMs();
       currentCompCapPerProc = t.getCurrentCompCapPerProc();
       currentCompCapPerAcc = t.getCurrentCompCapPerAcc();
     }
@@ -256,7 +256,7 @@ resource::~resource()
     actualUtilizedMemory = 0.0;
     actualRhoAccelerators = 0.0;
 
-    numberOfTasks = 0;
+    runningVMs = 0;
     currentCompCapPerProc = 0.0;
     currentCompCapPerAcc = 0.0;
   }
@@ -301,7 +301,7 @@ void resource::compcurrentCompCapPerAcc()
 
 void resource::deploy(const task& task_)
 {
-  numberOfTasks++;
+  runningVMs++;
   active = 1;
 
   availableProcessors -= task_.greqPMNS()[0];
@@ -322,10 +322,10 @@ void resource::deploy(const task& task_)
 
 void resource::unload(const list<task>::iterator& t)
 {
-  numberOfTasks--;
+  runningVMs--;
 
   // There are no remaining tasks assigned on the resource
-  if (numberOfTasks == 0) {
+  if (runningVMs == 0) {
     active = 0;
 
     availableProcessors = totalProcessors;
@@ -413,7 +413,7 @@ void resource::print() const
     cout << "Actual Memory Utilization: " << actualUtilizedMemory << endl;
     cout << "Actual rho of Accelerators: " << actualRhoAccelerators << endl;
 
-    cout << "Number of Tasks: " << numberOfTasks << endl;
+    cout << "Running VMs: " << runningVMs << endl;
     cout << "Current Processors Computational Capability (per unit): " << currentCompCapPerProc << endl;
     cout << "Current Acc Computational Capability (per unit): " << currentCompCapPerAcc << endl;
   }
@@ -447,6 +447,6 @@ double resource::getOvercommitmentMemory() const { return overcommitmentMemory; 
 double resource::getActualUtilizedProcessors() const { return actualUtilizedProcessors; }
 double resource::getActualUtilizedMemory() const { return actualUtilizedMemory; }
 double resource::getActualRhoAccelerators() const { return actualRhoAccelerators; }
-int resource::getNumberOfTasks() const { return numberOfTasks; }
+int resource::getRunningVMs() const { return runningVMs; }
 double resource::getCurrentCompCapPerProc() const { return currentCompCapPerProc; }
 double resource::getCurrentCompCapPerAcc() const { return currentCompCapPerAcc; }

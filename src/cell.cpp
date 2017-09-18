@@ -282,7 +282,7 @@ void cell::updateStats(const double& tstep)
     int totalAccelerators = 0;
 
     int activeServers = 0;
-    int numberOfTasks = 0;
+    int runningVMs = 0;
 
     double actualUtilizedProcessors = 0.0;
     double actualUtilizedMemory = 0.0;
@@ -290,7 +290,7 @@ void cell::updateStats(const double& tstep)
 #pragma omp parallel for default(shared) private(j) num_threads(omp_thr) schedule(static)              \
   reduction(+ : physicalProcessors, totalProcessors, availableProcessors, physicalMemory, totalMemory, \
             availableMemory, physicalStorage, totalStorage, availableStorage, totalAccelerators,       \
-            availableAccelerators, activeServers, numberOfTasks, actualUtilizedProcessors, actualUtilizedMemory)
+            availableAccelerators, activeServers, runningVMs, actualUtilizedProcessors, actualUtilizedMemory)
     for (j = 0; j < numberOfResourcesPerType[i]; j++) {
       physicalProcessors += resources[i][j].getPhysicalProcessors();
       totalProcessors += resources[i][j].getTotalProcessors();
@@ -304,7 +304,7 @@ void cell::updateStats(const double& tstep)
       totalAccelerators += resources[i][j].getTotalAccelerators();
       availableAccelerators += resources[i][j].getAvailableAccelerators();
       activeServers += resources[i][j].getActive();
-      numberOfTasks += resources[i][j].getNumberOfTasks();
+      runningVMs += resources[i][j].getRunningVMs();
 
       actualUtilizedProcessors += resources[i][j].getActualUtilizedProcessors();
       actualUtilizedMemory += resources[i][j].getActualUtilizedMemory();
@@ -325,7 +325,7 @@ void cell::updateStats(const double& tstep)
     stats[i].availableAccelerators = availableAccelerators;
     stats[i].utilizedAccelerators = totalAccelerators - availableAccelerators;
     stats[i].activeServers = activeServers;
-    stats[i].numberOfTasks = numberOfTasks;
+    stats[i].runningVMs = runningVMs;
     stats[i].actualUtilizedProcessors = actualUtilizedProcessors;
     stats[i].actualUtilizedMemory = actualUtilizedMemory;
 

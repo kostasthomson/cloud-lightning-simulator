@@ -444,7 +444,7 @@ void traditionalBroker::timestep(const cell* clCell)
     for (i = 0; i < numberOfTypes; i++) {
 #pragma omp parallel for default(shared) private(j) num_threads(omp_thr) schedule(static, chunk)
       for (j = 0; j < numberOfResourcesPerType[i]; j++) {
-        if (clCell->getResources()[i][j].getNumberOfTasks() > 0)
+        if (clCell->getResources()[i][j].getRunningVMs() > 0)
           clCell->getResources()[i][j].initializeRunningQuantities();
       }
     }
@@ -472,7 +472,7 @@ void traditionalBroker::timestep(const cell* clCell)
     for (i = 0; i < numberOfTypes; i++) {
 #pragma omp parallel for default(shared) private(j) num_threads(omp_thr) schedule(static, chunk)
       for (j = 0; j < numberOfResourcesPerType[i]; j++) {
-        if (clCell->getResources()[i][j].getNumberOfTasks() > 0) {
+        if (clCell->getResources()[i][j].getRunningVMs() > 0) {
           clCell->getResources()[i][j].compcurrentCompCapPerProc();
           clCell->getResources()[i][j].compcurrentCompCapPerAcc();
         }

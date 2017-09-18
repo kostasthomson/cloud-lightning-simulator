@@ -40,7 +40,7 @@ stat::stat()
     availableAccelerators(0),
     utilizedAccelerators(0),
     activeServers(0),
-    numberOfTasks(0),
+    runningVMs(0),
     rejectedTasks(0),
     acceptedTasks(0),
     actualUtilizedProcessors(0.0),
@@ -80,7 +80,7 @@ stat::stat(const stat& t)
     availableAccelerators = t.availableAccelerators;
     utilizedAccelerators = t.utilizedAccelerators;
     activeServers = t.activeServers;
-    numberOfTasks = t.numberOfTasks;
+    runningVMs = t.runningVMs;
     rejectedTasks = t.rejectedTasks;
     acceptedTasks = t.acceptedTasks;
 
@@ -122,7 +122,7 @@ stat& stat::operator=(const stat& t)
       availableAccelerators = 0;
       utilizedAccelerators = 0;
       activeServers = 0;
-      numberOfTasks = 0;
+      runningVMs = 0;
       rejectedTasks = 0;
       acceptedTasks = 0;
 
@@ -159,7 +159,7 @@ stat& stat::operator=(const stat& t)
       availableAccelerators = t.availableAccelerators;
       utilizedAccelerators = t.utilizedAccelerators;
       activeServers = t.activeServers;
-      numberOfTasks = t.numberOfTasks;
+      runningVMs = t.runningVMs;
       rejectedTasks = t.rejectedTasks;
       acceptedTasks = t.acceptedTasks;
 
@@ -202,7 +202,7 @@ stat::~stat()
     availableAccelerators = 0;
     utilizedAccelerators = 0;
     activeServers = 0;
-    numberOfTasks = 0;
+    runningVMs = 0;
     rejectedTasks = 0;
     acceptedTasks = 0;
 
@@ -221,7 +221,7 @@ void stat::print() const
     cout << "         Total Memory over Active Servers: " << memoryOverActiveServers << endl;
     cout << "         Total Storage over Active Servers: " << storageOverActiveServers << endl;
     cout << "         Total Accelerators over Active Servers: " << acceleratorsOverActiveServers << endl;
-    cout << "         Running VMs: " << numberOfTasks << endl;
+    cout << "         Running VMs: " << runningVMs << endl;
     cout << "         Total Number of accepted Tasks: " << acceptedTasks << endl;
     cout << "         Total Number of rejected Tasks: " << rejectedTasks << endl;
     cout << "         Total Physical Processors: " << physicalProcessors << " Proc. Units" << endl;
@@ -257,7 +257,7 @@ void stat::printfile(const string& outfile, const ios::openmode& mode)
     file.open(outfile.c_str(), mode);
     file << currentTimestep << " " << activeServers << " " << processorsOverActiveServers << " "
          << memoryOverActiveServers << " " << storageOverActiveServers << " " << acceleratorsOverActiveServers << " "
-         << numberOfTasks << " " << acceptedTasks << " " << rejectedTasks << " " << availableProcessors << " "
+         << runningVMs << " " << acceptedTasks << " " << rejectedTasks << " " << availableProcessors << " "
          << utilizedProcessors << " " << actualUtilizedProcessors << " " << totalProcessors << " " << physicalProcessors
          << " " << availableMemory << " " << utilizedMemory << " " << actualUtilizedMemory << " " << totalMemory << " "
          << physicalMemory << " " << availableStorage << " " << utilizedStorage << " " << availableStorage << " "
@@ -284,7 +284,7 @@ void stat::printfileJson(const string& outfile, const string& inputfile, const i
     file >> memoryOverActiveServers;
     file >> storageOverActiveServers;
     file >> acceleratorsOverActiveServers;
-    file >> numberOfTasks;
+    file >> runningVMs;
     file >> acceptedTasks;
     file >> rejectedTasks;
     file >> availableProcessors;
@@ -321,7 +321,7 @@ void stat::printfileJson(const string& outfile, const string& inputfile, const i
                                   { "Available Network", availableNetwork },
                                   { "Available Processors", availableProcessors },
                                   { "Available Storage", availableStorage },
-                                  { "Running VMs", numberOfTasks },
+                                  { "Running VMs", runningVMs },
                                   { "Total Accelerators", totalAccelerators },
                                   { "Total Accelerators over Active Servers", acceleratorsOverActiveServers },
                                   { "Total Energy Consumption", totalPowerConsumption },

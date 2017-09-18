@@ -54,7 +54,7 @@ class stat
   int availableAccelerators; //! Available Accelerators
   int utilizedAccelerators;  //! Utilized Accelerators
   int activeServers;         //! Active Servers
-  int numberOfTasks;         //! Total Number of currently running VMs
+  int runningVMs;         //! Total Number of currently running VMs
   int rejectedTasks;         //! Total Number of rejected Tasks
   int acceptedTasks;         //! Total Number of accepted Tasks
 

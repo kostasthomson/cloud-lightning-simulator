@@ -50,7 +50,7 @@ class resource
   double currentCompCapPerProc;
   double currentCompCapPerAcc;
 
-  int numberOfTasks;
+  int runningVMs;
 
  public:
   resource();
@@ -124,7 +124,7 @@ class resource
   double getCurrentCompCapPerProc() const;
   double getCurrentCompCapPerAcc() const;
 
-  int getNumberOfTasks() const;
+  int getRunningVMs() const;
   void print() const;
 };
 

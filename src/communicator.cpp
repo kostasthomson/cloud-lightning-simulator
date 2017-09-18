@@ -345,7 +345,7 @@ void communicator::cellStatistics(const gs* gates, const cell* clCell, const int
           gates[0].getStats()[i][j].totalAccelerators - gates[0].getStats()[i][j].availableAccelerators;
 
         MPI_Recv(&gates[0].getStats()[i][j].activeServers, 1, MPI_INT, i + 1, i + 1, Comm, &status);
-        MPI_Recv(&gates[0].getStats()[i][j].numberOfTasks, 1, MPI_INT, i + 1, i + 1, Comm, &status);
+        MPI_Recv(&gates[0].getStats()[i][j].runningVMs, 1, MPI_INT, i + 1, i + 1, Comm, &status);
         MPI_Recv(&gates[0].getStats()[i][j].rejectedTasks, 1, MPI_INT, i + 1, i + 1, Comm, &status);
         MPI_Recv(&gates[0].getStats()[i][j].acceptedTasks, 1, MPI_INT, i + 1, i + 1, Comm, &status);
       }
@@ -390,7 +390,7 @@ void communicator::cellStatistics(const gs* gates, const cell* clCell, const int
       //			MPI_Send(&clCell[0].getStats()[i].utilizedAccelerators,1,MPI_INT,0,rank,Comm);
 
       MPI_Send(&clCell[0].getStats()[i].activeServers, 1, MPI_INT, 0, rank, Comm);
-      MPI_Send(&clCell[0].getStats()[i].numberOfTasks, 1, MPI_INT, 0, rank, Comm);
+      MPI_Send(&clCell[0].getStats()[i].runningVMs, 1, MPI_INT, 0, rank, Comm);
       MPI_Send(&clCell[0].getStats()[i].rejectedTasks, 1, MPI_INT, 0, rank, Comm);
       MPI_Send(&clCell[0].getStats()[i].acceptedTasks, 1, MPI_INT, 0, rank, Comm);
     }
