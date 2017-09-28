@@ -1,10 +1,12 @@
 # CloudLightning Simulator
 
-CloudLightning Simulation is a generalized and extensible simulation framework that enables the seamless simulation and experimentation of emerging Cloud computing 
-infrastructures and  HPC applications. The proposed framework is inherently parallel; it is written using the C/C++ programming language and the MPI and OpenMP APIs enabling 
-the exploitation of distributed and shared memory parallel techniques for the acceleration of the Cloud simulation. Instead of following a Discrete Events approach as other Cloud 
-simulation frameworks, the proposed work is based on a time-advancing loop where the status of the Cloud system can change at each time step. Using this approach allows for 
-reduced memory requirements, since events need not be created or stored; instead the system reacts to incoming tasks based on prescribed time interval.
+CloudLightning Simulation is a generalized and extensible simulation framework that enables the seamless simulation and experimentation of emerging Cloud computing infrastructures and  HPC applications. The framework is inherently parallel; it is written using the C/C++ programming language and the MPI and OpenMP APIs and enables the exploitation of distributed and shared memory parallel techniques for the acceleration of Cloud simulation.
+
+Instead of following a Discrete Events approach as other Cloud simulation frameworks, the proposed work is based on a time-advancing loop where the status of the Cloud system can change at each time step. Using this approach allows for reduced memory requirements, since events need not be created or stored; instead the system reacts to incoming tasks based on a prescribed time interval.
+
+The project documentation can be found online at:
+
+     http://www.iti.gr/~kouzinopoulos/
 
 ## Getting started
 
@@ -40,7 +42,7 @@ Navigate to the directory of the project, open the terminal and enter
 
 ##Documentation Build (optional)
 
-To build the project documentation, navigate to the directory of the project, open the terminal and enter
+To build the project documentation locally, navigate to the directory of the project, open the terminal and enter
 
      $ make doc
 
@@ -52,10 +54,15 @@ At the directory of the project, open the terminal and enter
 
      $ sh cl_sim.out
 
-After running the simulation, an *outputCLsim.json* file will be created in *output* folder. This file should be used as input for the GUI implementation of the CL Simulator in order
-to visualize the results of the simulator. The CL Simulator Visualization can be found on the following url: https://bitbucket.org/cloudlightning/cl-simulatorvisualization
+After running the simulation, an *outputCLsim.json* file will be created in the *output* folder. This file can be used as an input for the GUI implementation of the CL Simulator in order
+to visualize the results of the simulator.
+
+The Simulator Visualization tool can be found at the following url:
+
+     https://bitbucket.org/cloudlightning/cl-simulatorvisualization
 
 ##Deliverable
 
-The deliverable 7.1.1 of the CloudLightning Project can be found on the following url:
-http://cloudlightning.eu/work-packages/public-deliverables/
+The deliverable 7.1.1 of the CloudLightning Project can be found at the following url:
+
+     http://cloudlightning.eu/work-packages/public-deliverables/
