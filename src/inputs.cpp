@@ -1230,6 +1230,9 @@ void siminputs::parse(const string& fname, const string& bname)
   if(foo == "SOSM"){
     sosmIntegration = 1;
   }
+  else if(foo == "Improved SOSM"){
+    sosmIntegration = 2;
+  }
   else if(foo == "Traditional"){
     sosmIntegration = 0;
   }

@@ -4,6 +4,7 @@
 #include <power.h>      // for power
 #include <resource.h>   // for resource
 #include <sosmBroker.h> // for sosmBroker
+#include <improvedSosmBroker.h>  // for improvedSosmBroker
 #include <stat.h>       // for stat
 #include <task.h>
 #include <traditionalBroker.h> // for traditionalBroker
@@ -59,10 +60,20 @@ cell::cell(const cellinputs& setup, int _sosmIntegration) : alloc(1), sosmIntegr
   network[0] = netw(setup.ninp[0]);
 
   // Initialize the *broker classes polymorphism based on the value of sosmIntegration
-  if (sosmIntegration) {
+/*  if (sosmIntegration) {
     broker = new sosmBroker[1];
   } else {
     broker = new traditionalBroker[1];
+  }*/
+
+  if (sosmIntegration == 0){
+    broker = new traditionalBroker[1];
+  }
+  else if (sosmIntegration == 1){
+    broker = new sosmBroker[1];
+  }
+  else if (sosmIntegration == 2){
+    broker = new improvedSosmBroker[1];
   }
 
   stats = new stat[numberOfTypes];
@@ -106,10 +117,20 @@ cell::cell(const cell& t)
     network = new netw[1];
     network[0] = t.getNetwork()[0];
 
-    if (sosmIntegration) {
+    /*  if (sosmIntegration) {
       broker = new sosmBroker[1];
     } else {
       broker = new traditionalBroker[1];
+    }*/
+
+    if (sosmIntegration == 0){
+      broker = new traditionalBroker[1];
+    }
+    else if (sosmIntegration ==1){
+      broker = new sosmBroker[1];
+    }
+    else if (sosmIntegration == 2){
+      broker = new improvedSosmBroker[1];
     }
     broker[0] = t.getBroker()[0];
 
@@ -179,10 +200,20 @@ cell& cell::operator=(const cell& t)
       network = new netw[1];
       network[0] = t.getNetwork()[0];
 
-      if (sosmIntegration) {
+      /*    if (sosmIntegration) {
         broker = new sosmBroker[1];
       } else {
         broker = new traditionalBroker[1];
+      }*/
+
+      if (sosmIntegration == 0){
+        broker = new traditionalBroker[1];
+      }
+      else if (sosmIntegration ==1){
+        broker = new sosmBroker[1];
+      }
+      else if (sosmIntegration == 2){
+       broker = new improvedSosmBroker[1];
       }
       broker[0] = t.getBroker()[0];
 

@@ -104,7 +104,17 @@ int main(int argc, char** argv)
 
   if (rank == 0) {
     gates[0].printStats("output/output", ios::out);
-    cout << "Resource allocation mechanism: " << ((sosmIntegration) ? "SOSM" : "Traditional") << endl;
+    //cout << "Resource allocation mechanism: " << ((sosmIntegration) ? "SOSM" : "Traditional") << endl;
+    cout << "Resource allocation mechanism: ";
+    if (sosmIntegration == 0){
+      cout << "Traditional" << endl;
+    }
+    else if (sosmIntegration == 1){
+      cout << "SOSM" << endl;
+    }
+    else if (sosmIntegration == 2){
+      cout << "Improved SOSM" << endl;
+    }
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
@@ -121,7 +131,7 @@ int main(int argc, char** argv)
       taskCreationEngine(jobs, gates[0].gai()[0]);
       allTasks += jobs.size();
 
-      if (!sosmIntegration) {
+      if (sosmIntegration == 0) {
         taskImplSelect(jobs);
       }
       // For each task, retrieve the list of candidate cells and select the most appropriate

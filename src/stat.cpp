@@ -312,7 +312,7 @@ void stat::printfileJson(const string& outfile, const string& inputfile, const i
     file >> totalPowerConsumption;
 
     js = jsoncons::ojson::object{ { "Time Step", currentTimestep },
-                                  { "Active Servers", activeServers },                                
+                                  { "Active Servers", activeServers },
                                   { "Actual Utilized Memory", actualUtilizedMemory },
                                   { "Actual Utilized Network", actualUtilizedNetwork },
                                   { "Actual Utilized Processors", actualUtilizedProcessors },
@@ -328,7 +328,7 @@ void stat::printfileJson(const string& outfile, const string& inputfile, const i
                                   { "Total Memory", totalMemory },
                                   { "Total Memory over Active Servers", memoryOverActiveServers },
                                   { "Total Network", totalNetwork },
-                                  { "Total Number of accepted Tasks", acceptedTasks },     
+                                  { "Total Number of accepted Tasks", acceptedTasks },
                                   { "Total Number of rejected Tasks", rejectedTasks },
                                   { "Total Physical Memory", physicalMemory },
                                   { "Total Physical Network", physicalNetwork },
@@ -350,11 +350,14 @@ void stat::printfileJson(const string& outfile, const string& inputfile, const i
   cl = jsoncons::ojson::object{ { "Cell", a }, { "HW Type", b }, { "Outputs", output_list } };
 
   cl_list.add(cl);
-  if (sosmIntegration){
+  if (sosmIntegration == 0){
+    cl_output = jsoncons::ojson::object{ {"Resource allocation mechanism", "Traditional"}, {"Total number of submitted tasks", allTasks}, { "CLSim outputs", cl_list } };
+  }
+  else if (sosmIntegration == 1){
     cl_output = jsoncons::ojson::object{ {"Resource allocation mechanism", "SOSM"}, {"Total number of submitted tasks", allTasks}, { "CLSim outputs", cl_list } };
   }
-  else{
-    cl_output = jsoncons::ojson::object{ {"Resource allocation mechanism", "Traditional"}, {"Total number of submitted tasks", allTasks}, { "CLSim outputs", cl_list } };
+  else if (sosmIntegration == 2){
+    cl_output = jsoncons::ojson::object{ {"Resource allocation mechanism", "Improved SOSM"}, {"Total number of submitted tasks", allTasks}, { "CLSim outputs", cl_list } };
   }
   if (a == numOfCells && j == numberOfTypes) {
     ff << std::setw(4) << pretty_print(cl_output) << std::endl;
