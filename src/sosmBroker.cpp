@@ -971,6 +971,7 @@ void sosmBroker::timestep(const cell* clCell)
             insR = clCell->getResources()[i][rID].getCurrentCompCapPerProc();
             insRa = clCell->getResources()[i][rID].getCurrentCompCapPerAcc();
             L_numberOfVMs = ittt->getNumberOfVMs();
+            double L_vCPU=ittt->greqPMNS()[0];
             // For each VM of the server (resource)
             for (j = 1; j < L_numberOfVMs; j++) {
               rID = (ittt->gresourceIDs())[j];
@@ -984,7 +985,7 @@ void sosmBroker::timestep(const cell* clCell)
               insRa = min(insRa, clCell->getResources()[i][rID].getCurrentCompCapPerAcc());
             }
             // Reduce the instructions left to compute of the given task
-            ittt->reduceIns(L_numberOfVMs * insR * min(ittt->gcUtilPMNr()[0] * ocP, 1.0) +
+            ittt->reduceIns(L_numberOfVMs * insR * min(ittt->gcUtilPMNr()[0] * ocP / L_vCPU, 1.0) * L_vCPU +
                             L_numberOfVMs * insRa * ((ittt->gcUtilPMNr())[3]));
           }
           itt++;

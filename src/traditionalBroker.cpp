@@ -525,12 +525,13 @@ void traditionalBroker::timestep(const cell* clCell)
         insR = clCell->getResources()[type][rID].getCurrentCompCapPerProc();
         insRa = clCell->getResources()[type][rID].getCurrentCompCapPerAcc();
         L_numberOfVMs = it->getNumberOfVMs();
+        double L_vCPU=it->greqPMNS()[0];
         for (j = 1; j < L_numberOfVMs; j++) {
           rID = (it->gresourceIDs())[j];
           insR = min(insR, clCell->getResources()[type][rID].getCurrentCompCapPerProc());
           insRa = min(insRa, clCell->getResources()[type][rID].getCurrentCompCapPerAcc());
         }
-        it->reduceIns(L_numberOfVMs * insR * min(it->gcUtilPMNr()[0] * ocP, 1.0) +
+        it->reduceIns(L_numberOfVMs * insR * min(it->gcUtilPMNr()[0]/L_vCPU*ocP,1.0) * L_vCPU +
                       L_numberOfVMs * insRa * ((it->gcUtilPMNr())[3]));
         for (j = 0; j < omp_thr; j++) {
           i++;
