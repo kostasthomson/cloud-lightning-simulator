@@ -78,7 +78,11 @@ class gs
 
   void printfile(const std::string& outfile, const ios::openmode& mode);
 
-  void printStatsJson(const std::string& outfile, const ios::openmode& mode, int endTime, int updateInterval, int sosmIntegration, int allTasks);
+  void printStatsJson(const std::string& outfile, const ios::openmode& mode, int endTime, int updateInterval,
+                      int sosmIntegration, int allTasks);
+
+  void printStatsToJsonDirect(const std::string& outfile, const ios::openmode& mode, int endTime, int updateInterval,
+                              int sosmIntegration, int allTasks, int currentTime);
 };
 
 #endif

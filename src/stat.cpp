@@ -27,6 +27,7 @@ jsoncons::ojson cl;
 jsoncons::ojson output_list = jsoncons::ojson::array();
 jsoncons::ojson cl_list = jsoncons::ojson::array();
 jsoncons::ojson cl_output;
+jsoncons::ojson allrecords = jsoncons::ojson::array();
 
 stat::stat()
   : processorsOverActiveServers(0),
@@ -379,4 +380,75 @@ void stat::printfileJson(const string& outfile, const string& inputfile, const i
     ff << std::setw(4) << pretty_print(cl_output) << std::endl;
   }
   file.close();
+}
+
+void stat::printfileJsonDirect(const string& outfile, const ios::openmode& mode, int a, int b,
+                               int numOfCells, int numberOfTypes, int j, int sosmIntegration, int allTasks, int k, int timeStep)
+{
+  // We need to create an array in which we will save the stats for each Cell and HardType (size), and for each time step
+  int size=numOfCells*numberOfTypes;      // max value of k, variable needed later for locating the prooper element we look for
+
+  std::ofstream ff(outfile, mode);
+
+  output_list.clear();  //clear the list for avoiding duplicate records
+
+  js = jsoncons::ojson::object{
+                                  { "Time Step", currentTimestep },
+                                  { "Active Servers", activeServers },
+                                  { "Actual Utilized Memory", actualUtilizedMemory },
+                                  { "Actual Utilized Network", actualUtilizedNetwork },
+                                  { "Actual Utilized Processors", actualUtilizedProcessors },
+                                  { "Available Accelerators", availableAccelerators },
+                                  { "Available Memory", availableMemory },
+                                  { "Available Network", availableNetwork },
+                                  { "Available Processors", availableProcessors },
+                                  { "Available Storage", availableStorage },
+                                  { "Running VMs", runningVMs },
+                                  { "Total Accelerators", totalAccelerators },
+                                  { "Total Accelerators over Active Servers", acceleratorsOverActiveServers },
+                                  { "Total Energy Consumption", totalPowerConsumption },
+                                  { "Total Memory", totalMemory },
+                                  { "Total Memory over Active Servers", memoryOverActiveServers },
+                                  { "Total Network", totalNetwork },
+                                  { "Total Number of accepted Tasks", acceptedTasks },
+                                  { "Total Number of rejected Tasks", rejectedTasks },
+                                  { "Total Physical Memory", physicalMemory },
+                                  { "Total Physical Network", physicalNetwork },
+                                  { "Total Physical Processors", physicalProcessors },
+                                  { "Total Physical Storage", physicalStorage },
+                                  { "Total Processors", totalProcessors },
+                                  { "Total Processors over Active Servers", processorsOverActiveServers },
+                                  { "Total Storage", totalStorage },
+                                  { "Total Storage over Active Servers", storageOverActiveServers },
+                                  { "Utilized Accelerators", utilizedAccelerators },
+                                  { "Utilized Memory", utilizedMemory },
+                                  { "Utilized Network", utilizedNetwork },
+                                  { "Utilized Processors", utilizedProcessors },
+                                  { "Utilized Storage", utilizedStorage }
+  };
+
+  allrecords.add(js);
+
+  // cout<<"k = "<<k<<"    Time step: "<<timeStep<<endl;    //for debugging
+
+  for(int tt=0;tt<timeStep+1;tt++){
+      output_list.add(allrecords[k+(size*tt)]);     //collecting the proper records for the proper Cell and HW Type
+  }
+
+  cl = jsoncons::ojson::object{ { "Cell", a }, { "HW Type", b }, { "Outputs", output_list } };
+
+  cl_list.add(cl);
+  if (sosmIntegration == 0){
+    cl_output = jsoncons::ojson::object{ {"Resource allocation mechanism", "Traditional"}, {"Total number of submitted tasks", allTasks}, { "CLSim outputs", cl_list } };
+  }
+  else if (sosmIntegration == 1){
+    cl_output = jsoncons::ojson::object{ {"Resource allocation mechanism", "SOSM"}, {"Total number of submitted tasks", allTasks}, { "CLSim outputs", cl_list } };
+  }
+  else if (sosmIntegration == 2){
+    cl_output = jsoncons::ojson::object{ {"Resource allocation mechanism", "Improved SOSM"}, {"Total number of submitted tasks", allTasks}, { "CLSim outputs", cl_list } };
+  }
+  if (a == numOfCells && j == numberOfTypes) {
+    ff << std::setw(4) << pretty_print(cl_output) << std::endl;
+    cl_list.clear();
+  }
 }

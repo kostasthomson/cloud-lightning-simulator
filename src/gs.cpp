@@ -18,6 +18,7 @@ limitations under the License.
 #include <inputs.h> // for siminputs, cellinputs, appinputs, string
 #include <stat.h>   // for stat
 #include <sstream>  // for stringstream
+#include <iostream>
 
 using std::stringstream;
 
@@ -215,6 +216,7 @@ void gs::printStats(const std::string& outfile, const ios::openmode& mode)
   }
 }
 
+// Print statistics to json, first reading data from txt output files and then creating the json
 void gs::printStatsJson(const std::string& outfile, const ios::openmode& mode, int endTime, int updateInterval, int sosmIntegration, int allTasks)
 {
   int overallRecords = (endTime / updateInterval) + 1;
@@ -225,6 +227,25 @@ void gs::printStatsJson(const std::string& outfile, const ios::openmode& mode, i
         std::string temp = outfile + "CLSim.json";
         stats[i][j].printfileJson(temp, tmp, mode, si->cinp[i].ID, si->cinp[i].types[j], overallRecords, si->numOfCells,
                                   si->cinp[i].numberOfTypes, j + 1, sosmIntegration, allTasks);
+      }
+    }
+  }
+}
+
+// Print statistics to json directly, without reading first the txt output files
+void gs::printStatsToJsonDirect(const std::string& outfile, const ios::openmode& mode, int endTime, int updateInterval, int sosmIntegration,
+                                int allTasks, int currentTime)
+{
+  int timeStep = (currentTime+1)/updateInterval;
+  int k=0;  //variable suitable in printfileJsonDirect for calculating the prooper location of the needed element in the array of json objects
+  if (alloc) {
+    for (int i = 0; i < si->numOfCells; i++) {
+      for (int j = 0; j < si->cinp[i].numberOfTypes; j++) {
+        //std::string tmp = outfile + num2str(si->cinp[i].ID) + num2str(si->cinp[i].types[j]);
+        std::string temp = outfile + "CLSim.json";
+        stats[i][j].printfileJsonDirect(temp, mode, si->cinp[i].ID, si->cinp[i].types[j], si->numOfCells,
+                                  si->cinp[i].numberOfTypes, j + 1, sosmIntegration, allTasks, k, timeStep);
+        k++;
       }
     }
   }

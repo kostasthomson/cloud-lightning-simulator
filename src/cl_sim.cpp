@@ -119,8 +119,9 @@ int main(int argc, char** argv)
   comm.cellStatistics(gates, clCell, rank, clusterSize, MPI_COMM_WORLD);
 
   if (rank == 0) {
-    gates[0].printStats("output/output", ios::out);
-    //cout << "Resource allocation mechanism: " << ((sosmIntegration) ? "SOSM" : "Traditional") << endl;
+    // print stats to txt files
+    //gates[0].printStats("output/output", ios::out);
+
     cout << "Resource allocation mechanism: ";
     if (sosmIntegration == 0){
       cout << "Traditional" << endl;
@@ -142,6 +143,12 @@ int main(int argc, char** argv)
 
   // For every time step
   for (double time = 0.0; time < endTime; time += 1.0) {
+
+    if ((int)time==0)
+      if (rank==0){
+          gates[0].printStatsToJsonDirect("output/output", ios::out, endTime, updateInterval, sosmIntegration, allTasks, time);
+      }
+
     if (rank == 0) {
       // Create one or more tasks based on AppData configuration
       taskCreationEngine(jobs, gates[0].gai()[0]);
@@ -179,9 +186,12 @@ int main(int argc, char** argv)
       comm.cellStatistics(gates, clCell, rank, clusterSize, MPI_COMM_WORLD);
 
       if (rank == 0) {
-        gates[0].printStats("output/output", ios::out | ios::app);
+        // print stats to txt files
+        //gates[0].printStats("output/output", ios::out | ios::app);
         cout << std::fixed << setprecision(2) << "\r Simulation at: " << 100.0 * (time + 1) / (endTime) << " %"
              << flush;
+        // print stats to json file
+        gates[0].printStatsToJsonDirect("output/output", ios::out, endTime, updateInterval, sosmIntegration, allTasks, time);
       }
     }
   }
@@ -189,7 +199,7 @@ int main(int argc, char** argv)
 
   if (rank == 0) {
     // Convert output file to json
-    gates[0].printStatsJson("output/output", ios::out, endTime, updateInterval, sosmIntegration, allTasks);
+    //gates[0].printStatsJson("output/output", ios::out, endTime, updateInterval, sosmIntegration, allTasks);
     cout << endl << "Elapsed time: " << MPI_Wtime() - startTime << " sec" << endl;
     cout << "Total number of submitted tasks: " << allTasks << endl;
     delete[] gates;
