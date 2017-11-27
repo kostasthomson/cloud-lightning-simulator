@@ -1,3 +1,19 @@
+/* Copyright 2015 The CloudLightning Simulation Framework Authors. All
+Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+==============================================================================*/
+
 #include <gs.h>
 #include <task.h>
 #include <tce.h>
@@ -15,7 +31,7 @@ void taskCreationEngine(std::list<task>& jobs, const struct appinputs& app)
     r = ((double)rand()) / RAND_MAX;
     int applicationType = floor(app.numOfApps * r);   // Choose randomly an application type of the input AppData.json file
     r = ((double)rand()) / RAND_MAX;
-    
+
     double curr_requestedInstructions =
       app.minmaxInsPerApp[applicationType][0] + r * (app.minmaxInsPerApp[applicationType][1] - app.minmaxInsPerApp[applicationType][0]);
 
