@@ -144,7 +144,7 @@ int main(int argc, char** argv)
   // For every time step
   for (double time = 0.0; time < endTime; time += 1.0) {
 
-    if ((int)time==0)
+    if ((int)time == 0)
       if (rank==0){
           gates[0].printStatsToJsonDirect("output/output", ios::out, endTime, updateInterval, sosmIntegration, allTasks, time);
       }
@@ -186,7 +186,7 @@ int main(int argc, char** argv)
       comm.cellStatistics(gates, clCell, rank, clusterSize, MPI_COMM_WORLD);
 
       if (rank == 0) {
-        // print stats to txt files
+        // print stats to txt files (older versions)
         //gates[0].printStats("output/output", ios::out | ios::app);
         cout << std::fixed << setprecision(2) << "\r Simulation at: " << 100.0 * (time + 1) / (endTime) << " %"
              << flush;
@@ -198,7 +198,7 @@ int main(int argc, char** argv)
   comm.cellStatistics(gates, clCell, rank, clusterSize, MPI_COMM_WORLD);
 
   if (rank == 0) {
-    // Convert output file to json
+    // Convert output file to json after reading the txt outputs (older versions)
     //gates[0].printStatsJson("output/output", ios::out, endTime, updateInterval, sosmIntegration, allTasks);
     cout << endl << "Elapsed time: " << MPI_Wtime() - startTime << " sec" << endl;
     cout << "Total number of submitted tasks: " << allTasks << endl;
