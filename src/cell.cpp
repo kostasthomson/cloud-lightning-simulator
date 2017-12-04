@@ -76,11 +76,6 @@ cell::cell(const cellinputs& setup, int _sosmIntegration) : alloc(1), sosmIntegr
   network[0] = netw(setup.ninp[0]);
 
   // Initialize the *broker classes polymorphism based on the value of sosmIntegration
-/*  if (sosmIntegration) {
-    broker = new sosmBroker[1];
-  } else {
-    broker = new traditionalBroker[1];
-  }*/
 
   if (sosmIntegration == 0){
     broker = new traditionalBroker[1];
@@ -132,12 +127,6 @@ cell::cell(const cell& t)
 
     network = new netw[1];
     network[0] = t.getNetwork()[0];
-
-    /*  if (sosmIntegration) {
-      broker = new sosmBroker[1];
-    } else {
-      broker = new traditionalBroker[1];
-    }*/
 
     if (sosmIntegration == 0){
       broker = new traditionalBroker[1];
@@ -215,12 +204,6 @@ cell& cell::operator=(const cell& t)
 
       network = new netw[1];
       network[0] = t.getNetwork()[0];
-
-      /*    if (sosmIntegration) {
-        broker = new sosmBroker[1];
-      } else {
-        broker = new traditionalBroker[1];
-      }*/
 
       if (sosmIntegration == 0){
         broker = new traditionalBroker[1];

@@ -237,15 +237,16 @@ void gs::printStatsToJsonDirect(const std::string& outfile, const ios::openmode&
                                 int allTasks, int currentTime)
 {
   int timeStep;
-  int static a = 0;
-  if (updateInterval == 1 && a == 0){
+  static int flag = 0;  // checking and proper calculation timeStep variable value in case of setting update interval = 1. First value of
+                        // timeStep variable must be 0
+  if (updateInterval == 1 && flag == 0){
     timeStep = (currentTime+1)/(updateInterval + 1);
-    a++;
+    flag++;
   }else{
     timeStep = (currentTime+1)/updateInterval;
   }
   //std::cout << "time step: " << timeStep << std::endl;  //only for debugging
-  int k=0;  //variable suitable in printfileJsonDirect for calculating the prooper location of the needed element in the array of json objects
+  int k = 0;  //variable suitable in printfileJsonDirect for calculating the prooper location of the needed element in the array of json objects
   if (alloc) {
     for (int i = 0; i < si->numOfCells; i++) {
       for (int j = 0; j < si->cinp[i].numberOfTypes; j++) {

@@ -144,10 +144,9 @@ int main(int argc, char** argv)
   // For every time step
   for (double time = 0.0; time < endTime; time += 1.0) {
 
-    if ((int)time == 0)
-      if (rank==0){
-          gates[0].printStatsToJsonDirect("output/output", ios::out, endTime, updateInterval, sosmIntegration, allTasks, time);
-      }
+    if (time == 0 && rank == 0){
+      gates[0].printStatsToJsonDirect("output/output", ios::out, endTime, updateInterval, sosmIntegration, allTasks, time);
+    }
 
     if (rank == 0) {
       // Create one or more tasks based on AppData configuration
