@@ -48,13 +48,13 @@ To build the project documentation locally, navigate to the directory of the pro
 
 Then, open the doc/html/index.html file.
 
-##Run the CL Simulator
+##Run the CloudLightning Simulator
 
 At the directory of the project, open the terminal and enter
 
      $ sh cl_sim.out
 
-After running the simulation, an *outputCLsim.json* file will be created in the *output* folder. This file can be used as an input for the GUI implementation of the CL Simulator in order
+After running the simulation, an *outputCLsim.json* file will be created in the *output* folder. This file can be used as an input for the GUI implementation of the CloudLightning Simulator in order
 to visualize the results of the simulator.
 
 The Simulator Visualization tool can be found at the following url:
