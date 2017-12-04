@@ -3,8 +3,8 @@
   "Resource allocation mechanism":"Improved SOSM",
   "Brokers"                      :[
     {
-      "Number of functions"          :5,
-      "Weights of functions"         :[1,1,1,1,1],
+      "Number of functions"          :1,
+      "Weights of functions"         :[1,0,0,0,0],
       "Number of Resources per vRM"  :100,
       "Number of vRMs per pSwitch"   :10,
       "Number of pSwitch per pRouter":5,
@@ -15,8 +15,8 @@
       "vRM deployment strategy"      :1
     },
     {
-      "Number of functions"          :5,
-      "Weights of functions"         :[1,1,1,1,1],
+      "Number of functions"          :1,
+      "Weights of functions"         :[1,0,0,0,0],
       "Number of Resources per vRM"  :100,
       "Number of vRMs per pSwitch"   :10,
       "Number of pSwitch per pRouter":5,
@@ -27,8 +27,8 @@
       "vRM deployment strategy"      :1
     },
     {
-      "Number of functions"          :5,
-      "Weights of functions"         :[1,1,1,1,1],
+      "Number of functions"          :1,
+      "Weights of functions"         :[1,0,0,0,0],
       "Number of Resources per vRM"  :100,
       "Number of vRMs per pSwitch"   :10,
       "Number of pSwitch per pRouter":5,
