@@ -63,6 +63,6 @@ The Simulator Visualization tool can be found at the following url:
 
 ##Deliverable
 
-The deliverable 7.1.1 of the CloudLightning Project can be found at the following url:
+The deliverables of the CloudLightning Project can be found at the following url:
 
      http://cloudlightning.eu/work-packages/public-deliverables/
