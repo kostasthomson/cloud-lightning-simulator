@@ -1,0 +1,59 @@
+{
+  "Resource allocation mechanism": {
+    "type": "string"
+  },
+  "Brokers": {
+    "items": {
+      "properties": {
+        "Number of functions": {
+          "type": "integer"
+        },
+        "Weights of functions": {
+          "type": "array"
+        },
+        "Number of resources per vRM": {
+          "type": "integer"
+        },
+        "Number of vRMs per pSwitch": {
+          "type": "integer"
+        },
+        "Number of pSwitches per pRouter": {
+          "type": "integer"
+        },
+        "Poll interval Cell Manager": {
+          "type": "integer"
+        },
+        "Poll interval pRouter": {
+          "type": "integer"
+        },
+        "Poll interval pSwitch": {
+          "type": "integer"
+        },
+        "Poll interval vRM": {
+          "type": "integer"
+        },
+        "vRM deployment strategy": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "Number of functions",
+        "Weights of functions",
+        "Number of resources per vRM",
+        "Number of vRMs per pSwitch",
+        "Number of pSwitches per pRouter",
+        "Poll interval Cell Manager",
+        "Poll interval pRouter",
+        "Poll interval pSwitch",
+        "Poll interval vRM",
+        "vRM deployment strategy"
+      ],
+      "type": "object"
+    },
+    "type": "array"
+  },
+  "required": [
+    "Resource allocation mechanism"
+  ],
+  "type": "object"
+}

@@ -1,0 +1,147 @@
+{
+  "title": "Simulation set",
+  "Maximum simulation time": {
+    "type": "number"
+  },
+  "Update interval": {
+    "type": "number"
+  },
+  "Number of Cells": {
+    "type": "number"
+  },
+  "Cells": {
+    "type": "array",
+    "items": {
+      "title": "Cell",
+      "type": "object",
+      "properties": {
+        "Cell ID": {
+          "type": "number"
+        },
+        "Cell interconnection bandwidth": {
+          "type": "number"
+        },
+        "Network bandwidth overcommitment ratio": {
+          "type": "number"
+        },
+        "Number of hardware(HW) types": {
+          "type": "number"
+        },
+        "HW types": {
+          "type": "array",
+          "items": {
+            "title": "HW type name",
+            "type": "object",
+            "properties": {
+              "HW type ID": {
+                "type": "number"
+              },
+              "Number of servers": {
+                "type": "number"
+              },
+              "Number of CPUs per server": {
+                "type": "number"
+              },
+              "Memory per server": {
+                "type": "number"
+              },
+              "Storage per server": {
+                "type": "number"
+              },
+              "Processors overcommitment ratio": {
+                "type": "number"
+              },
+              "Memory overcommitment ratio": {
+                "type": "number"
+              },
+              "Compute capability": {
+                "type": "number"
+              },
+              "Accelerators": {
+                "type": "number"
+              },
+              "Number of accelerators per server": {
+                "type": "number"
+              },
+              "Accelerator compute capability": {
+                "type": "number"
+              },
+              "Type of CPU model": {
+                "type": "number"
+              },
+              "CPU idle power consumption": {
+                "type": "number"
+              },
+              "CPU max power consumption": {
+                "type": "number"
+              },
+              "CPU number of points for interpolation": {
+                "type": "number"
+              },
+              "CPU power consuption": {
+                "type": "array"
+              },
+              "CPU sleep power consumption": {
+                "type": "number"
+              },
+              "CPU utilization bins": {
+                "type": "array"
+              },
+              "Type of accelerator model": {
+                "type": "number"
+              },
+              "Accelerator idle power consumption": {
+                "type": "number"
+              },
+              "Accelerator max power consumption": {
+                "type": "number"
+              },
+              "Accelerator sleep power consumption": {
+                "type": "number"
+              },
+              "required": [
+                "HW type ID",
+                "Number of servers",
+                "Number of CPUs per server",
+                "Memory per server",
+                "Storage per server",
+                "Processors overcommitment ratio",
+                "Memory overcommitment ratio",
+                "Compute capability",
+                "Accelerators",
+                "Number of accelerators per server",
+                "Accelerator compute capability",
+                "Type of CPU model",
+                "CPU idle power consumption",
+                "CPU max power consumption",
+                "CPU number of points for interpolation",
+                "CPU power consuption",
+                "CPU sleep power consumption",
+                "CPU utilization bins",
+                "Type of accelerator model",
+                "Accelerator idle power consumption",
+                "Accelerator max power consumption",
+                "Accelerator sleep power consumption"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "required": [
+          "Cell ID",
+          "Cell interconnection bandwidth",
+          "Network bandwidth overcommitment ratio",
+          "Number of hardware(HW) types"
+        ],
+        "type": "object"
+      }
+    }
+  },
+  "required": [
+    "Maximum simulation time",
+    "Update interval",
+    "Number of Cells",
+    "Cells"
+  ],
+  "type": "object"
+}

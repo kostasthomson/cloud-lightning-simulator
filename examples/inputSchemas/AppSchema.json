@@ -1,0 +1,86 @@
+{
+  "title": "Application set",
+  "Number of applications": {
+    "type": "number"
+  },
+  "Minimum and maximum jobs per second": {
+    "type": "array"
+  },
+  "Applications": {
+    "type": "array",
+    "items": {
+      "title": "Application",
+      "type": "array",
+      "properties": {
+        "Application ID": {
+          "type": "number"
+        },
+        "Number of available implementations": {
+          "type": "number"
+        },
+        "Available implementations": {
+          "type": "number"
+        },
+        "Minimum - maximum instructions per application": {
+          "type": "array"
+        },
+        "Minimum - maximum VMs per application": {
+          "type": "array"
+        },
+        "Minimum - maximum vCPUs per VM": {
+          "type": "array"
+        },
+        "Minimum - maximum memory per VM": {
+          "type": "array"
+        },
+        "Minimum - maximum storage per VM": {
+          "type": "array"
+        },
+        "Minimum - maximum network per VM": {
+          "type": "array"
+        },
+        "Type of actual utilization (vCPU,Memory,Network)": {
+          "type": "array"
+        },
+        "Minimum - maximum actual vCPU utilization": {
+          "type": "array"
+        },
+        "Minimum - maximum actual memory utilization": {
+          "type": "array"
+        },
+        "Minimum - maximum actual network utilization": {
+          "type": "array"
+        },
+        "Accelerator support": {
+          "type": "array"
+        },
+        "Rho for accelerator execution per implementation": {
+          "type": "array"
+        },
+        "required": [
+          "Number of available implementations",
+          "Available implementations",
+          "Minimum - maximum instructions per application",
+          "Minimum - maximum VMs per application",
+          "Minimum - maximum vCPUs per VM",
+          "Minimum - maximum memory per VM",
+          "Minimum - maximum storage per VM",
+          "Minimum - maximum network per VM",
+          "Type of actual utilization (vCPU,Memory,Network)",
+          "Minimum - maximum actual vCPU utilization",
+          "Minimum - maximum actual memory utilization",
+          "Minimum - maximum actual network utilization",
+          "Accelerator support",
+          "Rho for accelerator execution per implementation"
+        ],
+        "type": "object"
+      }
+    }
+  },
+  "required": [
+    "Number of applications",
+    "Minimum and maximum jobs per second",
+    "Applications"
+  ],
+  "type": "object"
+}

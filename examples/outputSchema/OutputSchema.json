@@ -1,0 +1,171 @@
+{
+  "Resource allocation mechanism": {
+    "type": "string"
+  },
+  "Total number of submitted tasks": {
+    "type": "integer"
+  },
+  "CLSim outputs": {
+    "items": {
+      "properties": {
+        "Cell": {
+          "type": "integer"
+        },
+        "HW Type": {
+          "type": "integer"
+        },
+        "Outputs": {
+          "items": {
+            "properties": {
+              "Active Servers": {
+                "type": "integer"
+              },
+              "Actual Utilized Memory": {
+                "type": "number"
+              },
+              "Actual Utilized Network": {
+                "type": "number"
+              },
+              "Actual Utilized Processors": {
+                "type": "number"
+              },
+              "Available Accelerators": {
+                "type": "number"
+              },
+              "Available Memory": {
+                "type": "number"
+              },
+              "Available Network": {
+                "type": "number"
+              },
+              "Available Processors": {
+                "type": "number"
+              },
+              "Available Storage": {
+                "type": "number"
+              },
+              "Running VMs": {
+                "type": "integer"
+              },
+              "Time Step": {
+                "type": "number"
+              },
+              "Total Accelerators": {
+                "type": "number"
+              },
+              "Total Accelerators over Active Servers": {
+                "type": "integer"
+              },
+              "Total Energy Consumption": {
+                "type": "number"
+              },
+              "Total Memory": {
+                "type": "number"
+              },
+              "Total Memory over Active Servers": {
+                "type": "number"
+              },
+              "Total Network": {
+                "type": "number"
+              },
+              "Total Number of accepted Tasks": {
+                "type": "integer"
+              },
+              "Total Number of rejected Tasks": {
+                "type": "integer"
+              },
+              "Total Physical Memory": {
+                "type": "number"
+              },
+              "Total Physical Network": {
+                "type": "number"
+              },
+              "Total Physical Processors": {
+                "type": "number"
+              },
+              "Total Physical Storage": {
+                "type": "number"
+              },
+              "Total Processors": {
+                "type": "number"
+              },
+              "Total Processors over Active Servers": {
+                "type": "integer"
+              },
+              "Total Storage": {
+                "type": "number"
+              },
+              "Total Storage over Active Servers": {
+                "type": "number"
+              },
+              "Utilized Accelerators": {
+                "type": "number"
+              },
+              "Utilized Memory": {
+                "type": "number"
+              },
+              "Utilized Network": {
+                "type": "number"
+              },
+              "Utilized Processors": {
+                "type": "number"
+              },
+              "Utilized Storage": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "Active Servers",
+              "Actual Utilized Memory",
+              "Actual Utilized Network",
+              "Actual Utilized Processors",
+              "Available Accelerators",
+              "Available Memory",
+              "Available Network",
+              "Available Processors",
+              "Available Storage",
+              "Running VMs",
+              "Time Step",
+              "Total Accelerators",
+              "Total Accelerators over Active Servers",
+              "Total Energy Consumption",
+              "Total Memory",
+              "Total Memory over Active Servers",
+              "Total Network",
+              "Total Number of accepted Tasks",
+              "Total Number of rejected Tasks",
+              "Total Physical Memory",
+              "Total Physical Network",
+              "Total Physical Processors",
+              "Total Physical Storage",
+              "Total Processors",
+              "Total Processors over Active Servers",
+              "Total Storage",
+              "Total Storage over Active Servers",
+              "Utilized Accelerators",
+              "Utilized Memory",
+              "Utilized Network",
+              "Utilized Processors",
+              "Utilized Storage"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "Cell",
+        "HW Type",
+        "Outputs"
+      ],
+      "type": "object"
+    },
+    "type": "array"
+  },
+  "required": [
+    "Resource allocation mechanism",
+    "Total number of submitted tasks",
+    "CLSim outputs"
+  ],
+  "type": "object"
+}
