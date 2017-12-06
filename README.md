@@ -1,12 +1,22 @@
 # CloudLightning Simulator
 
-CloudLightning Simulation is a generalized and extensible simulation framework that enables the seamless simulation and experimentation of emerging Cloud computing infrastructures and  HPC applications. The framework is inherently parallel; it is written using the C/C++ programming language and the MPI and OpenMP APIs and enables the exploitation of distributed and shared memory parallel techniques for the acceleration of Cloud simulation.
+The CloudLightning Simulator is a generalized and extensible simulation framework, funded by the European Commission's Horizon 2020 Programme for Research and Innovation, that enables the seamless simulation and experimentation of emerging Cloud computing infrastructures and  HPC applications. The framework is inherently parallel; it is written using the C/C++ programming language and the MPI and OpenMP APIs and enables the exploitation of distributed and shared memory parallel techniques for the acceleration of Cloud simulation.
 
-Instead of following a Discrete Events approach as other Cloud simulation frameworks, the proposed work is based on a time-advancing loop where the status of the Cloud system can change at each time step. Using this approach allows for reduced memory requirements, since events need not be created or stored; instead the system reacts to incoming tasks based on a prescribed time interval.
+The project proposes to create a new way of provisioning heterogeneous cloud resources to deliver services, specified by the user, using a bespoke service description language.
+
+Our goal is to address energy inefficiencies particularly in the use of resources and consequently to deliver savings to the cloud provider and the cloud consumer in terms of reduced power consumption and improved service delivery, with hyperscale systems particularly in mind.
+
+The architecture of the CloudLightning Simulator is presented in the following articles, please cite them if you use the simulator:
+
+* Christos K. Filelis-Papadopoulos, George A. Gravvanis, Panagiotis E. Kyziropoulos: A framework for simulating large scale cloud infrastructures, Future Generation Computer Systems, Volume 79, Part 2, 2018, Pages 703-714, ISSN 0167-739X, https://doi.org/10.1016/j.future.2017.06.017.
+
+* Christos K. Filelis-Papadopoulos, Konstantinos M. Giannoutakis, George A. Gravvanis, Tzovaras Dimitrios: Large-scale simulation of a self-organizing self-management cloud computing framework, The Journal of Supercomputing, 2017, https://doi.org/10.1007/s11227-017-2143-2
 
 The project documentation can be found online at:
 
      http://www.iti.gr/~kouzinopoulos/
+
+For feedback, troubleshooting and technical inquiries, please contact cpapad@ee.duth.gr or kgiannou@iti.gr
 
 ## Getting started
 
@@ -16,14 +26,8 @@ Clone the project:
 
 ## Prerequisites
 
-* Required gcc versions 4.8-6.0 (https://gcc.gnu.org/)
-* Required OpenMPI version 2.1 (https://www.open-mpi.org)
-
-Install OpenMPI
-
-     $ ./configure --prefix=/where/to/install
-     $ make all install
-     $ sudo apt-get install libopenmpi-dev
+* Required GCC version 4.8 or higher
+* Required OpenMPI version 2.1 or higher
 
 ## Input and Output Data
 
@@ -46,7 +50,7 @@ To build the project documentation locally, navigate to the directory of the pro
 
      $ make doc
 
-Then, open the doc/html/index.html file.
+The documentation is created in the doc/html/ directory.
 
 ##Run the CloudLightning Simulator
 
