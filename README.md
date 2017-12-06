@@ -1,6 +1,6 @@
 # CloudLightning Simulator
 
-The CloudLightning Simulator is a generalized and extensible simulation framework, funded by the European Commission's Horizon 2020 Programme for Research and Innovation, that enables the seamless simulation and experimentation of emerging Cloud computing infrastructures and  HPC applications. The framework is inherently parallel; it is written using the C/C++ programming language and the MPI and OpenMP APIs and enables the exploitation of distributed and shared memory parallel techniques for the acceleration of Cloud simulation.
+The CloudLightning Simulator is a generalized and extensible simulation framework that enables the seamless simulation and experimentation of emerging Cloud computing infrastructures and  HPC applications. The framework is inherently parallel; it is written using the C/C++ programming language and the MPI and OpenMP APIs and enables the exploitation of distributed and shared memory parallel techniques for the acceleration of Cloud simulation.
 
 The project proposes to create a new way of provisioning heterogeneous cloud resources to deliver services, specified by the user, using a bespoke service description language.
 
@@ -31,20 +31,20 @@ Clone the project:
 
 ## Input and Output Data
 
-Input JSON data files are located at the corresponding *input* folder of the project. In *input* folder there are three JSON files containing the appropriate parameters about
-applications, brokers and cells. Each of these parameters can be configured by the user before running the simulation. *CellData.json* file include some global information such
+Input JSON data files are located at the corresponding *input* folder of the project. In the *input* folder, there are three JSON files containing the appropriate parameters about
+applications, brokers and cells. Each of these parameters can be configured by the user before running the simulation. The *CellData.json* file includes some global information such
 as the maximum time of the simulation, the update interval of the simulation, the number of the cells and the integration (or not) of the SOSM system.
 
-In *output* folder will be generated the *outputCLsim.json* file after running the simulator.
+The *outputCLsim.json* file will be generated in the *output* folder, after the execution of the simulator.
 
-##Project Build
+## Project Build
 
 Navigate to the directory of the project, open the terminal and enter
 
      $ cmake .
      $ make
 
-##Documentation Build (optional)
+## Documentation Build (optional)
 
 To build the project documentation locally, navigate to the directory of the project, open the terminal and enter
 
@@ -52,7 +52,7 @@ To build the project documentation locally, navigate to the directory of the pro
 
 The documentation is created in the doc/html/ directory.
 
-##Run the CloudLightning Simulator
+## Run the CloudLightning Simulator
 
 At the directory of the project, open the terminal and enter
 
@@ -65,8 +65,12 @@ The Simulator Visualization tool can be found at the following url:
 
      https://bitbucket.org/cloudlightning/cl-simulatorvisualization
 
-##Deliverable
+## Deliverables
 
 The deliverables of the CloudLightning Project can be found at the following url:
 
      http://cloudlightning.eu/work-packages/public-deliverables/
+
+## Acknowledgements
+
+Cloudlightning was funded by the European Commission’s Horizon 2020 Programme for Research and Innovation under Grand Agreement No. 643946.
