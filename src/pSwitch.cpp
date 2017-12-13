@@ -609,7 +609,7 @@ void pSwitch::deploy(resource** resources, netw* network, stat* stats, task& tas
         else
           for (j = 0; j < 4; j++) {
             ssum += Ws[j] * deassessmentFunctions(
-                              ((double)ores.size()) * ((*pores.begin())->getTotalProcessors()), totalProcessors[choice],
+                              ((double)ores.size()) * ((*ores.begin())->getTotalProcessors()), totalProcessors[choice],
                               ((double)ores.size()) * ((*ores.begin())->getTotalMemory()), totalMemory[choice], j);
           }
 
