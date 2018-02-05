@@ -476,7 +476,7 @@ void appinputs::parse(const string& fname)
       minmaxProcPerVM[i][j] = a["Applications"][i]["Minimum - maximum vCPUs per VM"][j].as<int>();
     }
     for (j = 0; j < 2; j++) {
-      minmaxMemPerVM[i][j] = a["Applications"][i]["Minimum - maximum memory per VM"][j].as<int>();
+      minmaxMemPerVM[i][j] = a["Applications"][i]["Minimum - maximum memory per VM"][j].as<double>();
     }
     for (j = 0; j < 2; j++) {
       minmaxStoPerVM[i][j] = a["Applications"][i]["Minimum - maximum storage per VM"][j].as<double>();
