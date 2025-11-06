@@ -1,0 +1,11 @@
+/.vscode
+/build
+
+/doc
+/CMakeFiles
+/output
+
+/CMakeCache.txt
+/cmake_install.cmake
+/Makefile
+/cl_sim

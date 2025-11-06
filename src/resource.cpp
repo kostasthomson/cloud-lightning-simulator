@@ -15,10 +15,11 @@ limitations under the License.
 ==============================================================================*/
 
 #include <resource.h>
-#include <algorithm> // for max
-#include <iostream>  // for cout, endl
-#include "inputs.h"  // for resinputs
-#include "task.h"    // for task
+#include <cmath>       // for ceil
+#include <algorithm>   // for max
+#include <iostream>    // for cout, endl
+#include "inputs.h"    // for resinputs
+#include "task.h"      // for task
 
 using std::cout;
 using std::endl;
