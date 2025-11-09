@@ -1252,6 +1252,9 @@ void siminputs::parse(const string& fname, const string& bname)
   else if(foo == "Traditional"){
     sosmIntegration = 0;
   }
+  else if(foo == "ML Broker"){
+    sosmIntegration = 3;
+  }
   else
     cout << "Define proper resource allocation mechanism on BrokerData.json file. By default the simulator is running on Traditional mode." << endl;
 

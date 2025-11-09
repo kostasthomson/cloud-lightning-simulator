@@ -65,3 +65,53 @@ bool checkHealth()
     curl_easy_cleanup(curl);
     return http_code >= 200 && http_code < 300;
 }
+
+std::string postJSON(const std::string& endpoint, const std::string& jsonPayload)
+{
+    CURL *curl = curl_easy_init();
+    if (!curl)
+    {
+        std::cerr << "Failed to initialize curl for POST request" << std::endl;
+        return "";
+    }
+
+    std::string response;
+    std::string url = "http://" + getWindowsHostIP() + ":8000" + endpoint;
+
+    struct curl_slist *headers = NULL;
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonPayload.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 30L);
+
+    CURLcode res = curl_easy_perform(curl);
+
+    if (res != CURLE_OK)
+    {
+        std::cerr << "[CURL Error] POST to " << endpoint << ": "
+                  << curl_easy_strerror(res) << std::endl;
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+        return "";
+    }
+
+    long http_code = 0;
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+
+    if (http_code < 200 || http_code >= 300)
+    {
+        std::cerr << "[HTTP Error] POST to " << endpoint << " returned code: "
+                  << http_code << std::endl;
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+        return "";
+    }
+
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    return response;
+}

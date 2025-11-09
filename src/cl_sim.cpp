@@ -19,6 +19,7 @@ limitations under the License.
 #include <gs.h>           // for gs
 #include <inputs.h>       // for siminputs, brinputs, cellinputs
 #include <sosmBroker.h>   // for sosmBroker
+#include <mlBroker.h>     // for mlBroker
 #include <task.h>
 #include <tce.h>
 #include <traditionalBroker.h> // for traditionalBroker
@@ -141,6 +142,9 @@ int main(int argc, char** argv)
     }
     else if (sosmIntegration == 2){
       cout << "Improved SOSM" << endl;
+    }
+    else if (sosmIntegration == 3){
+      cout << "ML-Based with Traditional Fallback" << endl;
     }
   }
 

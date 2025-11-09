@@ -21,6 +21,7 @@ limitations under the License.
 #include <resource.h>   // for resource
 #include <sosmBroker.h> // for sosmBroker
 #include <improvedSosmBroker.h>  // for improvedSosmBroker
+#include <mlBroker.h>   // for mlBroker
 #include <stat.h>       // for stat
 #include <task.h>
 #include <traditionalBroker.h> // for traditionalBroker
@@ -86,6 +87,9 @@ cell::cell(const cellinputs& setup, int _sosmIntegration) : alloc(1), sosmIntegr
   else if (sosmIntegration == 2){
     broker = new improvedSosmBroker[1];
   }
+  else if (sosmIntegration == 3){
+    broker = new mlBroker[1];
+  }
 
   stats = new stat[numberOfTypes];
   for (int i = 0; i < numberOfTypes; i++) {
@@ -136,6 +140,9 @@ cell::cell(const cell& t)
     }
     else if (sosmIntegration == 2){
       broker = new improvedSosmBroker[1];
+    }
+    else if (sosmIntegration == 3){
+      broker = new mlBroker[1];
     }
     broker[0] = t.getBroker()[0];
 
@@ -213,6 +220,9 @@ cell& cell::operator=(const cell& t)
       }
       else if (sosmIntegration == 2){
        broker = new improvedSosmBroker[1];
+      }
+      else if (sosmIntegration == 3){
+        broker = new mlBroker[1];
       }
       broker[0] = t.getBroker()[0];
 

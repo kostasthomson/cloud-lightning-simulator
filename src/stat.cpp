@@ -376,6 +376,9 @@ void stat::printfileJson(const string& outfile, const string& inputfile, const i
   else if (sosmIntegration == 2){
     cl_output = jsoncons::ojson::object{ {"Resource allocation mechanism", "Improved SOSM"}, {"Total number of submitted tasks", allTasks}, { "CLSim outputs", cl_list } };
   }
+  else if (sosmIntegration == 3){
+    cl_output = jsoncons::ojson::object{ {"Resource allocation mechanism", "ML Broker"}, {"Total number of submitted tasks", allTasks}, { "CLSim outputs", cl_list } };
+  }
   if (a == numOfCells && j == numberOfTypes) {
     ff << std::setw(4) << pretty_print(cl_output) << std::endl;
   }
@@ -446,6 +449,9 @@ void stat::printfileJsonDirect(const string& outfile, const ios::openmode& mode,
   }
   else if (sosmIntegration == 2){
     cl_output = jsoncons::ojson::object{ {"Resource allocation mechanism", "Improved SOSM"}, {"Total number of submitted tasks", allTasks}, { "CLSim outputs", cl_list } };
+  }
+  else if (sosmIntegration == 3){
+    cl_output = jsoncons::ojson::object{ {"Resource allocation mechanism", "ML Broker"}, {"Total number of submitted tasks", allTasks}, { "CLSim outputs", cl_list } };
   }
   if (a == numOfCells && j == numberOfTypes) {
     ff << std::setw(4) << pretty_print(cl_output) << std::endl;
