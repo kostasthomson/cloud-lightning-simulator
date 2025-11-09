@@ -24,6 +24,7 @@ limitations under the License.
 #include <traditionalBroker.h> // for traditionalBroker
 #include <iomanip>
 #include <iostream>
+#include <httpClient.h>
 
 using std::cout;
 using std::endl;
@@ -33,6 +34,15 @@ using std::setprecision;
 
 int main(int argc, char** argv)
 {
+  // test http client
+  std::cout << "Checking connection to external service..." << std::endl;
+  if (!checkHealth()) {
+    std::cerr << "Failed to connect to external service" << std::endl;
+    return 1;
+  }
+  std::cout << "Connection successful!!!" << std::endl;
+
+
   // Initialize MPI
   int rc = MPI_Init(&argc, &argv);
   if (rc != MPI_SUCCESS) {

@@ -1,0 +1,67 @@
+#include <httpClient.h>
+#include <iostream>
+#include <string>
+#include <curl/curl.h>
+#include <fstream>
+#include <regex>
+
+std::string getWindowsHostIP()
+{
+    std::ifstream resolv("/etc/resolv.conf");
+    std::string line;
+    std::regex ns_regex("^nameserver ([0-9\\.]+)$");
+
+    while (std::getline(resolv, line))
+    {
+        std::smatch match;
+        if (std::regex_match(line, match, ns_regex))
+        {
+            return match[1];
+        }
+    }
+    return "127.0.0.1";
+}
+
+size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
+{
+    ((std::string *)userp)->append((char *)contents, size * nmemb);
+    return size * nmemb;
+}
+
+bool checkHealth()
+{
+    CURL *curl = curl_easy_init();
+    if (!curl)
+    {
+        std::cerr << "Failed to initialize curl" << std::endl;
+        return false;
+    }
+
+    std::string response;
+    std::string url = "http://" + getWindowsHostIP() + ":8000/";
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5L);
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+
+    std::cout << "Connecting to FastAPI at: " << url << std::endl;
+
+    CURLcode res = curl_easy_perform(curl);
+
+    if (res != CURLE_OK)
+    {
+        std::cerr << "[CURL Error] " << curl_easy_strerror(res) << std::endl;
+        curl_easy_cleanup(curl);
+        return false;
+    }
+
+    long http_code = 0;
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+
+    std::cout << "HTTP Response Code: " << http_code << "\n";
+    std::cout << "Response: " << response << std::endl;
+
+    curl_easy_cleanup(curl);
+    return http_code >= 200 && http_code < 300;
+}

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.1)
+cmake_minimum_required(VERSION 3.10)
 project(CloudLightning)
 
 ###############################################################################
@@ -24,6 +24,8 @@ if (OPENMP_FOUND)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
+find_package(CURL REQUIRED)
+
 add_subdirectory(doc)
 
 ###############################################################################
@@ -32,7 +34,9 @@ add_subdirectory(doc)
 
 # The data is just added to the executable, because in some IDEs (QtCreator)
 # files are invisible when they are not explicitly part of the project.
-add_executable(cl_sim ${sources} ${data})
+add_executable(cl_sim ${sources})
+
+target_compile_features(cl_sim PUBLIC cxx_std_11)
 
 # Just for example add some compiler flags.
 target_compile_options(cl_sim PUBLIC -O3 -std=c++11 -lm -Wall)
@@ -40,7 +44,10 @@ target_compile_options(cl_sim PUBLIC -O3 -std=c++11 -lm -Wall)
 # This allows to include files relative to the root of the src directory with a <> pair
 target_include_directories(cl_sim PUBLIC include/)
 
-target_link_libraries(cl_sim ${MPI_C_LIBRARIES})
+target_link_libraries(cl_sim 
+  ${MPI_C_LIBRARIES} 
+  CURL::libcurl
+)
 
 # Added support for the include what you use tool
 find_program(iwyu_path NAMES include-what-you-use iwyu)
