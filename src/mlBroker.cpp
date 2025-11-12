@@ -133,11 +133,14 @@ void mlBroker::print() const
   }
 }
 
-void mlBroker::updateStateInfo(const cell* clCell, const double& tstep)
+void mlBroker::updateStateInfo(const cell *clCell, const double &tstep)
 {
-  if (alloc) {
-    for (int i = 0; i < numberOfTypes; i++) {
-      for (int j = 0; j < numberOfResourcesPerType[i]; j++) {
+  if (alloc)
+  {
+    for (int i = 0; i < numberOfTypes; i++)
+    {
+      for (int j = 0; j < numberOfResourcesPerType[i]; j++)
+      {
         availableProcesses[i][j] = clCell[0].getResources()[i][j].getAvailableProcessors();
         totalProcesses[i][j] = clCell[0].getResources()[i][j].getTotalProcessors();
         availableMemory[i][j] = clCell[0].getResources()[i][j].getAvailableMemory();
@@ -148,11 +151,11 @@ void mlBroker::updateStateInfo(const cell* clCell, const double& tstep)
         totalStorage[i][j] = clCell[0].getResources()[i][j].getTotalStorage();
       }
     }
-    availableNetwork = clCell[0].getNetwork()[0].getAvailable();
-    totalNetwork = clCell[0].getNetwork()[0].getTotal();
+    availableNetwork = clCell[0].getNetwork()[0].getAvailableNetwork();
+    totalNetwork = clCell[0].getNetwork()[0].getTotalNetwork();
   }
-
-  if (fallbackBroker) {
+  if (fallbackBroker)
+  {
     fallbackBroker->updateStateInfo(clCell, tstep);
   }
 }
@@ -281,7 +284,7 @@ string mlBroker::buildAllocationRequest(const cell* clCell, const task& _task, d
   json << "}}],\"task\":{";
 
   json << "\"task_id\":\"task_" << timestamp << "\""
-       << ",\"application_id\":" << _task.getApplicationID()
+       << ",\"application_id\":" << _task.getType()
        << ",\"implementation_id\":" << _task.getAvailableImplementations()[0]
        << ",\"num_vms\":" << _task.getNumberOfVMs()
        << ",\"vcpus_per_vm\":" << (int)_task.greqPMNS()[0]
