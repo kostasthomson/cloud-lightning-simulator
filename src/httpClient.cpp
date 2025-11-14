@@ -7,18 +7,18 @@
 
 std::string getWindowsHostIP()
 {
-    std::ifstream resolv("/etc/resolv.conf");
-    std::string line;
-    std::regex ns_regex("^nameserver ([0-9\\.]+)$");
+    // std::ifstream resolv("/etc/resolv.conf");
+    // std::string line;
+    // std::regex ns_regex("^nameserver ([0-9\\.]+)$");
 
-    while (std::getline(resolv, line))
-    {
-        std::smatch match;
-        if (std::regex_match(line, match, ns_regex))
-        {
-            return match[1];
-        }
-    }
+    // while (std::getline(resolv, line))
+    // {
+    //     std::smatch match;
+    //     if (std::regex_match(line, match, ns_regex))
+    //     {
+    //         return match[1];
+    //     }
+    // }
     return "127.0.0.1";
 }
 
