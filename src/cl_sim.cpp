@@ -78,7 +78,7 @@ int main(int argc, char** argv)
 
   // Initialization phase
   // Communicate Cell and Resource parameters and create all components
-  int sosmIntegration = 0;
+  int decisionMaking = 0;
   double endTime = 0.0, updateInterval = 0;
 
   // Pointer to siminputs
@@ -100,7 +100,7 @@ int main(int argc, char** argv)
 
     endTime = gates[0].gsi()[0].maxTime;
     updateInterval = gates[0].gsi()[0].updateInterval;
-    sosmIntegration = gates[0].gsi()[0].sosmIntegration;
+    decisionMaking = gates[0].gsi()[0].decisionMaking;
   } else {
     cout << "Cell            : " << rank << " Running on " << hostname << endl;
 
@@ -109,11 +109,11 @@ int main(int argc, char** argv)
     // Receive program values from the master
     comm.simulationParameters(*si, rank, clusterSize, MPI_COMM_WORLD);
 
-    sosmIntegration = si->sosmIntegration;
+    decisionMaking = si->decisionMaking;
     clCell = new cell[1];
 
     // Initialize cells based on user-defined configuration
-    *clCell = cell(*(si->cinp), sosmIntegration);
+    *clCell = cell(*(si->cinp), decisionMaking);
 
     // Initialization and update outside of the constructor to avoid changing the values of the pointers to components
     // (can be avoided with move copy constructor in (>=C++11))
@@ -134,16 +134,16 @@ int main(int argc, char** argv)
     //gates[0].printStats("output/output", ios::out);
 
     cout << "Resource allocation mechanism: ";
-    if (sosmIntegration == 0){
+    if (decisionMaking == 0){
       cout << "Traditional" << endl;
     }
-    else if (sosmIntegration == 1){
+    else if (decisionMaking == 1){
       cout << "SOSM" << endl;
     }
-    else if (sosmIntegration == 2){
+    else if (decisionMaking == 2){
       cout << "Improved SOSM" << endl;
     }
-    else if (sosmIntegration == 3){
+    else if (decisionMaking == 3){
       cout << "ML-Based with Traditional Fallback" << endl;
     }
   }
@@ -159,7 +159,7 @@ int main(int argc, char** argv)
   for (double time = 0.0; time < endTime; time += 1.0) {
 
     if (time == 0 && rank == 0){
-      gates[0].printStatsToJsonDirect("output/output", ios::out, endTime, updateInterval, sosmIntegration, allTasks, time);
+      gates[0].printStatsToJsonDirect("output/output", ios::out, endTime, updateInterval, decisionMaking, allTasks, time);
     }
 
     if (rank == 0) {
@@ -167,7 +167,7 @@ int main(int argc, char** argv)
       taskCreationEngine(jobs, gates[0].gai()[0]);
       allTasks += jobs.size();
 
-      if (sosmIntegration == 0) {
+      if (decisionMaking == 0) {
         taskImplSelect(jobs);
       }
       // For each task, retrieve the list of candidate cells and select the most appropriate
@@ -204,15 +204,17 @@ int main(int argc, char** argv)
         cout << std::fixed << setprecision(2) << "\r Simulation at: " << 100.0 * (time + 1) / (endTime) << " %"
              << flush;
         // print stats to json file
-        gates[0].printStatsToJsonDirect("output/output", ios::out, endTime, updateInterval, sosmIntegration, allTasks, time);
+        gates[0].printStatsToJsonDirect("output/output", ios::out, endTime, updateInterval, decisionMaking, allTasks, time);
       }
     }
   }
   comm.cellStatistics(gates, clCell, rank, clusterSize, MPI_COMM_WORLD);
 
   if (rank == 0) {
+    // save model logs to file
+    postJSON("/save_logs", "");
     // Convert output file to json after reading the txt outputs (older versions)
-    //gates[0].printStatsJson("output/output", ios::out, endTime, updateInterval, sosmIntegration, allTasks);
+    //gates[0].printStatsJson("output/output", ios::out, endTime, updateInterval, decisionMaking, allTasks);
     cout << endl << "Elapsed time: " << MPI_Wtime() - startTime << " sec" << endl;
     cout << "Total number of submitted tasks: " << allTasks << endl;
     delete[] gates;

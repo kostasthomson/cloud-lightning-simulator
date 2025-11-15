@@ -27,62 +27,62 @@ std::string num2str(T num);
 
 class gs
 {
- private:
-  int alloc;
-  appinputs* ai;
-  siminputs* si;
-  stat** stats;
+private:
+    int alloc;
+    appinputs *ai;
+    siminputs *si;
+    stat **stats;
 
- public:
-  gs();
+public:
+    gs();
 
-  /// Parse the simulator configuration files
-  /// \param cellData The path to the CellData configuration file
-  /// \param appData The path to the AppData configuration file
-  /// \param brokerData The path to the BrokerData configuration file
-  gs(const std::string& cellData, const std::string& appData, const std::string& brokerData);
+    /// Parse the simulator configuration files
+    /// \param cellData The path to the CellData configuration file
+    /// \param appData The path to the AppData configuration file
+    /// \param brokerData The path to the BrokerData configuration file
+    gs(const std::string &cellData, const std::string &appData, const std::string &brokerData);
 
-  gs(const gs& t);
+    gs(const gs &t);
 
-  gs& operator=(const gs& t);
+    gs &operator=(const gs &t);
 
-  ~gs();
+    ~gs();
 
-  /// Retrieve the list of candidate cells for each task and select the most appropriate
-  /// \param numImpl Number of implementations (hardware types)
-  /// \param rVM Required number of VMs
-  /// \param rvProc Required number of processing units
-  /// \param rMem Required memory size
-  /// \param rNet Required netowrk bandwidth
-  /// \param rSto Required storage size
-  /// \param rAcc Required accelerators
-  int findCell(const int* rImpl, const int& numImpl, const int& rVM, const double& rvProc, const double& rMem,
-               const double& rNet, const double& rSto, const int* rAcc) const;
+    /// Retrieve the list of candidate cells for each task and select the most appropriate
+    /// \param numImpl Number of implementations (hardware types)
+    /// \param rVM Required number of VMs
+    /// \param rvProc Required number of processing units
+    /// \param rMem Required memory size
+    /// \param rNet Required netowrk bandwidth
+    /// \param rSto Required storage size
+    /// \param rAcc Required accelerators
+    int findCell(const int *rImpl, const int &numImpl, const int &rVM, const double &rvProc, const double &rMem,
+                 const double &rNet, const double &rSto, const int *rAcc) const;
 
-  std::string num2str(int num);
+    std::string num2str(int num);
 
-  // Gateways
-  int galloc() const;
+    // Gateways
+    int galloc() const;
 
-  appinputs* gai() const;
+    appinputs *gai() const;
 
-  siminputs* gsi() const;
+    siminputs *gsi() const;
 
-  stat** getStats() const;
+    stat **getStats() const;
 
-  void print();
+    void print();
 
-  void printStats();
+    void printStats();
 
-  void printStats(const std::string& outfile, const ios::openmode& mode);
+    void printStats(const std::string &outfile, const ios::openmode &mode);
 
-  void printfile(const std::string& outfile, const ios::openmode& mode);
+    void printfile(const std::string &outfile, const ios::openmode &mode);
 
-  void printStatsJson(const std::string& outfile, const ios::openmode& mode, int endTime, int updateInterval,
-                      int sosmIntegration, int allTasks);
+    void printStatsJson(const std::string &outfile, const ios::openmode &mode, int endTime, int updateInterval,
+                        int decisionMaking, int allTasks);
 
-  void printStatsToJsonDirect(const std::string& outfile, const ios::openmode& mode, int endTime, int updateInterval,
-                              int sosmIntegration, int allTasks, int currentTime);
+    void printStatsToJsonDirect(const std::string &outfile, const ios::openmode &mode, int endTime, int updateInterval,
+                                int decisionMaking, int allTasks, int currentTime);
 };
 
 #endif

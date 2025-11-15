@@ -181,14 +181,14 @@ void brinputs::parse(const string& outname, int i)
   */
 }
 
-void brinputs::printfile(const string& outname, const ios::openmode& mode, int sosmIntegration)
+void brinputs::printfile(const string& outname, const ios::openmode& mode, int decisionMaking)
 {
   fstream file;
   int i;
   if (alloc) {
     file.open(outname.c_str(), mode);
     file << "    =========== Broker ===========" << endl;
-    if (sosmIntegration) {
+    if (decisionMaking) {
       file << "        Number of Assessment Functions: " << numberOfFunctions << endl;
       file << "        Weights: ";
       for (i = 0; i < numberOfFunctions; i++) {
@@ -1172,7 +1172,7 @@ siminputs::siminputs()
   alloc = 0;
   numOfCells = 0;
   maxTime = 0.0;
-  sosmIntegration = 0;
+  decisionMaking = 0;
   updateInterval = 0.0;
   cinp = nullptr;
 }
@@ -1184,7 +1184,7 @@ siminputs::siminputs(const siminputs& t)
     alloc = t.alloc;
     numOfCells = t.numOfCells;
     maxTime = t.maxTime;
-    sosmIntegration = t.sosmIntegration;
+    decisionMaking = t.decisionMaking;
     updateInterval = t.updateInterval;
     cinp = new cellinputs[numOfCells];
     for (i = 0; i < numOfCells; i++)
@@ -1198,7 +1198,7 @@ siminputs::~siminputs()
     alloc = 0;
     numOfCells = 0;
     maxTime = 0.0;
-    sosmIntegration = 0;
+    decisionMaking = 0;
     updateInterval = 0.0;
     delete[] cinp;
   }
@@ -1212,7 +1212,7 @@ siminputs& siminputs::operator=(const siminputs& t)
       alloc = 0;
       numOfCells = 0;
       maxTime = 0.0;
-      sosmIntegration = 0;
+      decisionMaking = 0;
       updateInterval = 0.0;
       delete[] cinp;
     }
@@ -1220,7 +1220,7 @@ siminputs& siminputs::operator=(const siminputs& t)
     if (alloc) {
       numOfCells = t.numOfCells;
       maxTime = t.maxTime;
-      sosmIntegration = t.sosmIntegration;
+      decisionMaking = t.decisionMaking;
       updateInterval = t.updateInterval;
       cinp = new cellinputs[numOfCells];
       for (i = 0; i < numOfCells; i++)
@@ -1244,16 +1244,16 @@ void siminputs::parse(const string& fname, const string& bname)
 
   string foo = b["Resource allocation mechanism"].as<string>(); //read resource allocation mechanism
   if(foo == "SOSM"){
-    sosmIntegration = 1;
+    decisionMaking = 1;
   }
   else if(foo == "Improved SOSM"){
-    sosmIntegration = 2;
+    decisionMaking = 2;
   }
   else if(foo == "Traditional"){
-    sosmIntegration = 0;
+    decisionMaking = 0;
   }
   else if(foo == "ML Broker"){
-    sosmIntegration = 3;
+    decisionMaking = 3;
   }
   else
     cout << "Define proper resource allocation mechanism on BrokerData.json file. By default the simulator is running on Traditional mode." << endl;
@@ -1409,7 +1409,7 @@ void siminputs::print()
   if (alloc) {
     cout << "=========== Global Parameters ===========" << endl;
     cout << "Maximum Simulation Time: " << maxTime << " seconds" << endl;
-    if (sosmIntegration) {
+    if (decisionMaking) {
       cout << "Resource Allocation Mechanism: SOSM" << endl;
     } else {
       cout << "Resource Allocation Mechanism: Traditional" << endl;
@@ -1495,7 +1495,7 @@ void siminputs::printfile(const string& outname, const ios::openmode& mode)
 
     file << "=========== Global Parameters ===========" << endl;
     file << "Maximum Simulation Time: " << maxTime << " seconds" << endl;
-    if (sosmIntegration) {
+    if (decisionMaking) {
       file << "Resource Allocation Mechanism: SOSM" << endl;
     } else {
       file << "Resource Allocation Mechanism: Traditional" << endl;
@@ -1564,7 +1564,7 @@ void siminputs::printfile(const string& outname, const ios::openmode& mode)
         }
         file.close();
         if (cinp[i].binp[0].alloc) {
-          cinp[i].binp[0].printfile(outname, ios::out | ios::app, sosmIntegration);
+          cinp[i].binp[0].printfile(outname, ios::out | ios::app, decisionMaking);
         }
         file.open(outname.c_str(), ios::out | ios::app);
       }

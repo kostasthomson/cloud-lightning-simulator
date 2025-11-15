@@ -19,17 +19,17 @@ limitations under the License.
 #include <fstream>
 #include <string>
 
-using std::string;
 using std::fstream;
 using std::ifstream;
 using std::ios;
+using std::string;
 
 class brinputs
 {
- public:
+public:
   int alloc;
   int numberOfFunctions;
-  double* Ws;
+  double *Ws;
   int initResPervRM;
   int initvRMPerpSwitch;
   int initpSwitchPerpRouter;
@@ -39,61 +39,61 @@ class brinputs
   double pollIntervalvRM;
   int vRMdeploystrategy;
   brinputs();
-  brinputs(const brinputs& t);
-  brinputs& operator=(const brinputs& t);
+  brinputs(const brinputs &t);
+  brinputs &operator=(const brinputs &t);
   ~brinputs();
-  void parse(const string& outname, int cell_id);
+  void parse(const string &outname, int cell_id);
   void print();
-  void printfile(const string& outname, const ios::openmode& mode, int sosmIntegration);
+  void printfile(const string &outname, const ios::openmode &mode, int decisionMaking);
 };
 
 class appinputs
 {
- public:
+public:
   int alloc;
-  double* minmaxJobsPerSec;
+  double *minmaxJobsPerSec;
   int numOfApps;
-  int* numberOfAvailableImplementationsPerApp;
-  int** availableImplementationsPerApp;
-  int** minmaxVMPerApp;
-  double** minmaxInsPerApp;
-  double** minmaxProcPerVM;
-  double** minmaxMemPerVM;
-  double** minmaxStoPerVM;
-  double** minmaxNetPerApp;
-  int* typeOfActP;
-  int* typeOfActM;
-  int* typeOfActN;
-  double** minmaxActP;
-  double** minmaxActM;
-  double** minmaxActN;
-  int** accelerator;
-  double** rhoAcc;
-  void parse(const string& fname);
+  int *numberOfAvailableImplementationsPerApp;
+  int **availableImplementationsPerApp;
+  int **minmaxVMPerApp;
+  double **minmaxInsPerApp;
+  double **minmaxProcPerVM;
+  double **minmaxMemPerVM;
+  double **minmaxStoPerVM;
+  double **minmaxNetPerApp;
+  int *typeOfActP;
+  int *typeOfActM;
+  int *typeOfActN;
+  double **minmaxActP;
+  double **minmaxActM;
+  double **minmaxActN;
+  int **accelerator;
+  double **rhoAcc;
+  void parse(const string &fname);
   void print();
-  void printfile(const string& outname, const ios::openmode& mode);
+  void printfile(const string &outname, const ios::openmode &mode);
   appinputs();
   ~appinputs();
-  appinputs& operator=(const appinputs& t);
-  appinputs(const appinputs& t);
+  appinputs &operator=(const appinputs &t);
+  appinputs(const appinputs &t);
 };
 
 class netinputs
 {
- public:
+public:
   int alloc;
   double netBW;
   double overCommitmentNetwork;
   void print();
   netinputs();
   ~netinputs();
-  netinputs& operator=(const netinputs& t);
-  netinputs(const netinputs& t);
+  netinputs &operator=(const netinputs &t);
+  netinputs(const netinputs &t);
 };
 
 class powinputs
 {
- public:
+public:
   int alloc;
   int typeCpu;
   int typeAcc;
@@ -103,14 +103,14 @@ class powinputs
   int accelerator;
   double accPmin, accPmax, accC;
   powinputs();
-  powinputs(const powinputs& t);
+  powinputs(const powinputs &t);
   ~powinputs();
-  powinputs& operator=(const powinputs& t);
+  powinputs &operator=(const powinputs &t);
 };
 
 class resinputs
 {
- public:
+public:
   int alloc;
   double numOfProcUnits;
   double totalMemory;
@@ -123,48 +123,48 @@ class resinputs
   int totalAccelerators;
   int type;
   resinputs();
-  resinputs(const resinputs& t);
+  resinputs(const resinputs &t);
   ~resinputs();
-  resinputs& operator=(const resinputs& t);
+  resinputs &operator=(const resinputs &t);
 };
 
 class cellinputs
 {
- public:
+public:
   int alloc;
   int ID;
-  class resinputs* rinp;
-  class powinputs* pinp;
-  class netinputs* ninp;
-  class brinputs* binp;
+  class resinputs *rinp;
+  class powinputs *pinp;
+  class netinputs *ninp;
+  class brinputs *binp;
   int numberOfTypes;
-  int* types;
-  int* numberOfResourcesPerType;
+  int *types;
+  int *numberOfResourcesPerType;
   cellinputs();
-  cellinputs(const cellinputs& t);
+  cellinputs(const cellinputs &t);
   ~cellinputs();
-  cellinputs& operator=(const cellinputs& t);
+  cellinputs &operator=(const cellinputs &t);
 };
 
 class siminputs
 {
- public:
-  class cellinputs* cinp;
+public:
+  class cellinputs *cinp;
   int alloc;
   int numOfCells;
   // General simulation configuration variables. The time related variables are parsed from the CellData.json file
-  // while the sosmIntegration variable is parsed from the BrokerData.json file
-  double maxTime;     //! Maximum simulation time
+  // while the decisionMaking variable is parsed from the BrokerData.json file
+  double maxTime;        //! Maximum simulation time
   double updateInterval; //! Time interval to update execution statistics
-  int sosmIntegration; //! Select broker with or without SOSM capabilities
+  int decisionMaking;    //! Select broker with or without SOSM capabilities
 
   siminputs();
-  siminputs(const siminputs& t);
-  void parse(const string& fname, const string& bname);
+  siminputs(const siminputs &t);
+  void parse(const string &fname, const string &bname);
   ~siminputs();
-  siminputs& operator=(const siminputs& t);
+  siminputs &operator=(const siminputs &t);
   void print();
-  void printfile(const string& outname, const ios::openmode& mode);
+  void printfile(const string &outname, const ios::openmode &mode);
 };
 
 #endif

@@ -20,18 +20,20 @@ limitations under the License.
 #include <stat.h>
 #include <task.h>
 
-void communicator::simulationParameters(struct siminputs& si, const int& rank, const int& clusterSize,
-                                        const MPI_Comm& Comm)
+void communicator::simulationParameters(struct siminputs &si, const int &rank, const int &clusterSize,
+                                        const MPI_Comm &Comm)
 {
   int i, j;
   int one = 1;
   MPI_Status status;
 
-  if (rank == 0) {
-    for (i = 0; i < clusterSize - 1; i++) {
+  if (rank == 0)
+  {
+    for (i = 0; i < clusterSize - 1; i++)
+    {
       // Send simulator-specific info
       MPI_Send(&si.maxTime, 1, MPI_DOUBLE, i + 1, i + 1, Comm);
-      MPI_Send(&si.sosmIntegration, 1, MPI_INT, i + 1, i + 1, Comm);
+      MPI_Send(&si.decisionMaking, 1, MPI_INT, i + 1, i + 1, Comm);
       MPI_Send(&si.updateInterval, 1, MPI_DOUBLE, i + 1, i + 1, Comm);
       MPI_Send(&one, 1, MPI_INT, i + 1, i + 1, Comm);
 
@@ -56,7 +58,8 @@ void communicator::simulationParameters(struct siminputs& si, const int& rank, c
       MPI_Send(&si.cinp[i].ninp[0].overCommitmentNetwork, 1, MPI_DOUBLE, i + 1, i + 1, Comm);
 
       // Send resource-specific info
-      for (j = 0; j < si.cinp[i].numberOfTypes; j++) {
+      for (j = 0; j < si.cinp[i].numberOfTypes; j++)
+      {
         MPI_Send(&si.cinp[i].rinp[j].type, 1, MPI_INT, i + 1, i + 1, Comm);
         MPI_Send(&si.cinp[i].rinp[j].numOfProcUnits, 1, MPI_DOUBLE, i + 1, i + 1, Comm);
         MPI_Send(&si.cinp[i].rinp[j].totalMemory, 1, MPI_DOUBLE, i + 1, i + 1, Comm);
@@ -72,7 +75,8 @@ void communicator::simulationParameters(struct siminputs& si, const int& rank, c
         MPI_Send(&si.cinp[i].pinp[j].cpuPmin, 1, MPI_DOUBLE, i + 1, i + 1, Comm);
         MPI_Send(&si.cinp[i].pinp[j].cpuPmax, 1, MPI_DOUBLE, i + 1, i + 1, Comm);
         MPI_Send(&si.cinp[i].pinp[j].numOfPoints, 1, MPI_INT, i + 1, i + 1, Comm);
-        if (si.cinp[i].pinp[j].numOfPoints > 0) {
+        if (si.cinp[i].pinp[j].numOfPoints > 0)
+        {
           MPI_Send(si.cinp[i].pinp[j].cpubins, si.cinp[i].pinp[j].numOfPoints, MPI_DOUBLE, i + 1, i + 1, Comm);
 
           MPI_Send(si.cinp[i].pinp[j].cpuP, si.cinp[i].pinp[j].numOfPoints, MPI_DOUBLE, i + 1, i + 1, Comm);
@@ -84,11 +88,13 @@ void communicator::simulationParameters(struct siminputs& si, const int& rank, c
         MPI_Send(&si.cinp[i].pinp[j].accC, 1, MPI_DOUBLE, i + 1, i + 1, Comm);
       }
     }
-  } else {
+  }
+  else
+  {
     // Receive Simulator specific info
     si.alloc = 1;
     MPI_Recv(&si.maxTime, 1, MPI_DOUBLE, 0, rank, Comm, &status);
-    MPI_Recv(&si.sosmIntegration, 1, MPI_INT, 0, rank, Comm, &status);
+    MPI_Recv(&si.decisionMaking, 1, MPI_INT, 0, rank, Comm, &status);
     MPI_Recv(&si.updateInterval, 1, MPI_DOUBLE, 0, rank, Comm, &status);
     MPI_Recv(&si.numOfCells, 1, MPI_INT, 0, rank, Comm, &status);
 
@@ -126,7 +132,8 @@ void communicator::simulationParameters(struct siminputs& si, const int& rank, c
     // Receive Resource specific info
     si.cinp->rinp = new resinputs[si.cinp->numberOfTypes];
     si.cinp->pinp = new powinputs[si.cinp->numberOfTypes];
-    for (j = 0; j < si.cinp->numberOfTypes; j++) {
+    for (j = 0; j < si.cinp->numberOfTypes; j++)
+    {
       si.cinp->rinp[j].alloc = 1;
       MPI_Recv(&si.cinp->rinp[j].type, 1, MPI_INT, 0, rank, Comm, &status);
       MPI_Recv(&si.cinp->rinp[j].numOfProcUnits, 1, MPI_DOUBLE, 0, rank, Comm, &status);
@@ -145,7 +152,8 @@ void communicator::simulationParameters(struct siminputs& si, const int& rank, c
       MPI_Recv(&si.cinp->pinp[j].cpuPmin, 1, MPI_DOUBLE, 0, rank, Comm, &status);
       MPI_Recv(&si.cinp->pinp[j].cpuPmax, 1, MPI_DOUBLE, 0, rank, Comm, &status);
       MPI_Recv(&si.cinp->pinp[j].numOfPoints, 1, MPI_INT, 0, rank, Comm, &status);
-      if (si.cinp->pinp[j].numOfPoints > 0) {
+      if (si.cinp->pinp[j].numOfPoints > 0)
+      {
         si.cinp->pinp[j].cpubins = new double[si.cinp->pinp[j].numOfPoints];
         MPI_Recv(si.cinp->pinp[j].cpubins, si.cinp->pinp[j].numOfPoints, MPI_DOUBLE, 0, rank, Comm, &status);
         si.cinp->pinp[j].cpuP = new double[si.cinp->pinp[j].numOfPoints];
@@ -160,39 +168,47 @@ void communicator::simulationParameters(struct siminputs& si, const int& rank, c
   }
 }
 
-void communicator::taskParameters(list<task>& jobs, const int& rank, const int& clusterSize, const int* commCell,
-                                  const MPI_Comm& Comm)
+void communicator::taskParameters(list<task> &jobs, const int &rank, const int &clusterSize, const int *commCell,
+                                  const MPI_Comm &Comm)
 {
   int i, j, k, who;
   int L_type, L_numberOfAvailableImplementations;
-  int* L_availableImplementations;
+  int *L_availableImplementations;
   double L_requestedInstructions;
   int L_numberOfVMs;
-  double* L_reqPMNS;
-  int* L_typeactPMN;
-  double** L_minmaxactPMN;
-  int* L_avAcc;
-  double* L_rhoAcc;
+  double *L_reqPMNS;
+  int *L_typeactPMN;
+  double **L_minmaxactPMN;
+  int *L_avAcc;
+  double *L_rhoAcc;
   MPI_Status status;
   int establish;
-  if (rank == 0) {
+  if (rank == 0)
+  {
     establish = jobs.size();
-    for (i = 0; i < clusterSize - 1; i++) {
+    for (i = 0; i < clusterSize - 1; i++)
+    {
       MPI_Send(&establish, 1, MPI_INT, i + 1, i + 1, Comm);
     }
-  } else {
+  }
+  else
+  {
     MPI_Recv(&establish, 1, MPI_INT, 0, rank, Comm, &status);
   }
   if (!establish)
     return;
-  if (rank == 0) {
+  if (rank == 0)
+  {
     list<task>::iterator it = jobs.begin();
-    for (i = 0; i < establish; i++) {
+    for (i = 0; i < establish; i++)
+    {
       who = commCell[i];
-      for (j = 0; j < clusterSize - 1; j++) {
+      for (j = 0; j < clusterSize - 1; j++)
+      {
         MPI_Send(&who, 1, MPI_INT, j + 1, j + 1, Comm);
       }
-      if (who > 0) {
+      if (who > 0)
+      {
         L_type = (*it).getType();
         MPI_Send(&L_type, 1, MPI_INT, who, who, Comm);
 
@@ -220,26 +236,31 @@ void communicator::taskParameters(list<task>& jobs, const int& rank, const int& 
           L_typeactPMN[j] = (*it).getTypeactPMN()[j];
         MPI_Send(L_typeactPMN, 3, MPI_INT, who, who, Comm);
 
-        L_minmaxactPMN = new double*[3];
+        L_minmaxactPMN = new double *[3];
         for (j = 0; j < 3; j++)
           L_minmaxactPMN[j] = new double[2];
-        for (j = 0; j < 3; j++) {
-          for (k = 0; k < 2; k++) {
+        for (j = 0; j < 3; j++)
+        {
+          for (k = 0; k < 2; k++)
+          {
             L_minmaxactPMN[j][k] = (*it).gminmaxactPMN()[j][k];
           }
         }
-        for (j = 0; j < 3; j++) {
+        for (j = 0; j < 3; j++)
+        {
           MPI_Send(&L_minmaxactPMN[j][0], 2, MPI_DOUBLE, who, who, Comm);
         }
 
         L_avAcc = new int[L_numberOfAvailableImplementations];
-        for (j = 0; j < L_numberOfAvailableImplementations; j++) {
+        for (j = 0; j < L_numberOfAvailableImplementations; j++)
+        {
           L_avAcc[j] = (*it).gavAcc()[j];
         }
         MPI_Send(L_avAcc, L_numberOfAvailableImplementations, MPI_INT, who, who, Comm);
 
         L_rhoAcc = new double[L_numberOfAvailableImplementations];
-        for (j = 0; j < L_numberOfAvailableImplementations; j++) {
+        for (j = 0; j < L_numberOfAvailableImplementations; j++)
+        {
           L_rhoAcc[j] = (*it).grhoAcc()[j];
         }
         MPI_Send(L_rhoAcc, L_numberOfAvailableImplementations, MPI_DOUBLE, who, who, Comm);
@@ -247,7 +268,8 @@ void communicator::taskParameters(list<task>& jobs, const int& rank, const int& 
         delete[] L_availableImplementations;
         delete[] L_reqPMNS;
         delete[] L_typeactPMN;
-        for (j = 0; j < 3; j++) {
+        for (j = 0; j < 3; j++)
+        {
           delete[] L_minmaxactPMN[j];
         }
         delete[] L_minmaxactPMN;
@@ -256,10 +278,14 @@ void communicator::taskParameters(list<task>& jobs, const int& rank, const int& 
       }
       it++;
     }
-  } else {
-    for (i = 0; i < establish; i++) {
+  }
+  else
+  {
+    for (i = 0; i < establish; i++)
+    {
       MPI_Recv(&who, 1, MPI_INT, 0, rank, Comm, &status);
-      if (who == rank) {
+      if (who == rank)
+      {
         MPI_Recv(&L_type, 1, MPI_INT, 0, rank, Comm, &status);
         MPI_Recv(&L_numberOfAvailableImplementations, 1, MPI_INT, 0, rank, Comm, &status);
         L_availableImplementations = new int[L_numberOfAvailableImplementations];
@@ -270,12 +296,14 @@ void communicator::taskParameters(list<task>& jobs, const int& rank, const int& 
         MPI_Recv(L_reqPMNS, 4, MPI_DOUBLE, 0, rank, Comm, &status);
         L_typeactPMN = new int[3];
         MPI_Recv(L_typeactPMN, 3, MPI_INT, 0, rank, Comm, &status);
-        L_minmaxactPMN = new double*[3];
+        L_minmaxactPMN = new double *[3];
 
-        for (j = 0; j < 3; j++) {
+        for (j = 0; j < 3; j++)
+        {
           L_minmaxactPMN[j] = new double[2];
         }
-        for (j = 0; j < 3; j++) {
+        for (j = 0; j < 3; j++)
+        {
           MPI_Recv(&L_minmaxactPMN[j][0], 2, MPI_DOUBLE, 0, rank, Comm, &status);
         }
         L_avAcc = new int[L_numberOfAvailableImplementations];
@@ -291,7 +319,8 @@ void communicator::taskParameters(list<task>& jobs, const int& rank, const int& 
         delete[] L_availableImplementations;
         delete[] L_reqPMNS;
         delete[] L_typeactPMN;
-        for (j = 0; j < 3; j++) {
+        for (j = 0; j < 3; j++)
+        {
           delete[] L_minmaxactPMN[j];
         }
         delete[] L_minmaxactPMN;
@@ -302,14 +331,17 @@ void communicator::taskParameters(list<task>& jobs, const int& rank, const int& 
   }
 }
 
-void communicator::cellStatistics(const gs* gates, const cell* clCell, const int& rank, const int& clusterSize,
-                                  const MPI_Comm& Comm)
+void communicator::cellStatistics(const gs *gates, const cell *clCell, const int &rank, const int &clusterSize,
+                                  const MPI_Comm &Comm)
 {
   int i, j;
   MPI_Status status;
-  if (rank == 0) {
-    for (i = 0; i < clusterSize - 1; i++) {
-      for (j = 0; j < gates[0].gsi()[0].cinp[i].numberOfTypes; j++) {
+  if (rank == 0)
+  {
+    for (i = 0; i < clusterSize - 1; i++)
+    {
+      for (j = 0; j < gates[0].gsi()[0].cinp[i].numberOfTypes; j++)
+      {
         MPI_Recv(&gates[0].getStats()[i][j].alloc, 1, MPI_INT, i + 1, i + 1, Comm, &status);
         MPI_Recv(&gates[0].getStats()[i][j].currentTimestep, 1, MPI_DOUBLE, i + 1, i + 1, Comm, &status);
         MPI_Recv(&gates[0].getStats()[i][j].processorsOverActiveServers, 1, MPI_INT, i + 1, i + 1, Comm, &status);
@@ -331,11 +363,11 @@ void communicator::cellStatistics(const gs* gates, const cell* clCell, const int
         MPI_Recv(&gates[0].getStats()[i][j].actualUtilizedProcessors, 1, MPI_DOUBLE, i + 1, i + 1, Comm, &status);
 
         gates[0].getStats()[i][j].utilizedProcessors =
-          gates[0].getStats()[i][j].totalProcessors - gates[0].getStats()[i][j].availableProcessors;
+            gates[0].getStats()[i][j].totalProcessors - gates[0].getStats()[i][j].availableProcessors;
         gates[0].getStats()[i][j].utilizedMemory =
-          gates[0].getStats()[i][j].totalMemory - gates[0].getStats()[i][j].availableMemory;
+            gates[0].getStats()[i][j].totalMemory - gates[0].getStats()[i][j].availableMemory;
         gates[0].getStats()[i][j].utilizedStorage =
-          gates[0].getStats()[i][j].totalStorage - gates[0].getStats()[i][j].availableStorage;
+            gates[0].getStats()[i][j].totalStorage - gates[0].getStats()[i][j].availableStorage;
 
         //				MPI_Recv(&gates[0].getStats()[i][j].utilizedProcessors,1,MPI_DOUBLE,i+1,i+1,Comm,&status);
         //				MPI_Recv(&gates[0].getStats()[i][j].utilizedMemory,1,MPI_DOUBLE,i+1,i+1,Comm,&status);
@@ -349,7 +381,7 @@ void communicator::cellStatistics(const gs* gates, const cell* clCell, const int
         //				MPI_Recv(&gates[0].getStats()[i][j].utilizedNetwork,1,MPI_DOUBLE,i+1,i+1,Comm,&status);
 
         gates[0].getStats()[i][j].utilizedNetwork =
-          gates[0].getStats()[i][j].totalNetwork - gates[0].getStats()[i][j].availableNetwork;
+            gates[0].getStats()[i][j].totalNetwork - gates[0].getStats()[i][j].availableNetwork;
 
         MPI_Recv(&gates[0].getStats()[i][j].totalPowerConsumption, 1, MPI_DOUBLE, i + 1, i + 1, Comm, &status);
         MPI_Recv(&gates[0].getStats()[i][j].totalAccelerators, 1, MPI_INT, i + 1, i + 1, Comm, &status);
@@ -358,7 +390,7 @@ void communicator::cellStatistics(const gs* gates, const cell* clCell, const int
         //				MPI_Recv(&gates[0].getStats()[i][j].utilizedAccelerators,1,MPI_INT,i+1,i+1,Comm,&status);
 
         gates[0].getStats()[i][j].utilizedAccelerators =
-          gates[0].getStats()[i][j].totalAccelerators - gates[0].getStats()[i][j].availableAccelerators;
+            gates[0].getStats()[i][j].totalAccelerators - gates[0].getStats()[i][j].availableAccelerators;
 
         MPI_Recv(&gates[0].getStats()[i][j].activeServers, 1, MPI_INT, i + 1, i + 1, Comm, &status);
         MPI_Recv(&gates[0].getStats()[i][j].runningVMs, 1, MPI_INT, i + 1, i + 1, Comm, &status);
@@ -366,8 +398,11 @@ void communicator::cellStatistics(const gs* gates, const cell* clCell, const int
         MPI_Recv(&gates[0].getStats()[i][j].acceptedTasks, 1, MPI_INT, i + 1, i + 1, Comm, &status);
       }
     }
-  } else {
-    for (i = 0; i < clCell[0].getNumberOfTypes(); i++) {
+  }
+  else
+  {
+    for (i = 0; i < clCell[0].getNumberOfTypes(); i++)
+    {
       MPI_Send(&clCell[0].getStats()[i].alloc, 1, MPI_INT, 0, rank, Comm);
       MPI_Send(&clCell[0].getStats()[i].currentTimestep, 1, MPI_DOUBLE, 0, rank, Comm);
       MPI_Send(&clCell[0].getStats()[i].processorsOverActiveServers, 1, MPI_INT, 0, rank, Comm);
