@@ -183,7 +183,7 @@ void mlBroker::deploy(resource** resources, netw* network, stat* stats, task& _t
   string jsonRequest = buildAllocationRequest(nullptr, _task, timestamp);
 
   if (jsonRequest.empty()) {
-    cout << "[ML Broker] Failed to build request, using fallback" << endl;
+    // cout << "[ML Broker] Failed to build request, using fallback" << endl;
     fallbackBroker->deploy(resources, network, stats, _task);
     return;
   }
@@ -191,7 +191,7 @@ void mlBroker::deploy(resource** resources, netw* network, stat* stats, task& _t
   string response = postJSON("/allocate_task", jsonRequest);
 
   if (response.empty()) {
-    cout << "[ML Broker] No response from ML service, using fallback" << endl;
+    // cout << "[ML Broker] No response from ML service, using fallback" << endl;
     fallbackBroker->deploy(resources, network, stats, _task);
     return;
   }
@@ -203,7 +203,7 @@ void mlBroker::deploy(resource** resources, netw* network, stat* stats, task& _t
   bool parseSuccess = parseAllocationResponse(response, cellId, hwTypeId, &serverAssignments, numVMs);
 
   if (!parseSuccess || numVMs != _task.getNumberOfVMs()) {
-    cout << "[ML Broker] Failed to parse ML response, using fallback" << endl;
+    // cout << "[ML Broker] Failed to parse ML response, using fallback" << endl;
     delete[] serverAssignments;
     fallbackBroker->deploy(resources, network, stats, _task);
     return;
@@ -215,7 +215,7 @@ void mlBroker::deploy(resource** resources, netw* network, stat* stats, task& _t
   delete[] serverAssignments;
 
   if (!deploySuccess) {
-    cout << "[ML Broker] ML allocation failed, using fallback" << endl;
+    // cout << "[ML Broker] ML allocation failed, using fallback" << endl;
     fallbackBroker->deploy(resources, network, stats, _task);
   }
 }
@@ -388,8 +388,8 @@ bool mlBroker::deployFromMLDecision(resource** resources, netw* network, stat* s
   _task.attachResources(serverAssignments);
   stats[type].acceptedTasks++;
 
-  cout << "[ML Broker] Successfully deployed task with " << numVMs
-       << " VMs to HW Type " << hwTypeId << endl;
+  // cout << "[ML Broker] Successfully deployed task with " << numVMs
+  //      << " VMs to HW Type " << hwTypeId << endl;
 
   return true;
 }

@@ -33,20 +33,12 @@ using std::flush;
 using std::max;
 using std::setprecision;
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
-  // test http client
-  std::cout << "Checking connection to external service..." << std::endl;
-  if (!checkHealth()) {
-    std::cerr << "Failed to connect to external service" << std::endl;
-    return 1;
-  }
-  std::cout << "Connection successful!!!" << std::endl;
-
-
   // Initialize MPI
   int rc = MPI_Init(&argc, &argv);
-  if (rc != MPI_SUCCESS) {
+  if (rc != MPI_SUCCESS)
+  {
     cout << "Error starting MPI program. Terminating..." << endl;
     MPI_Abort(MPI_COMM_WORLD, rc);
   }
@@ -65,9 +57,11 @@ int main(int argc, char** argv)
 
   // Print cluster info
   double startTime = 0.0;
-  if (rank == 0) {
+  if (rank == 0)
+  {
     startTime = MPI_Wtime();
-    cout << endl << "INITIALIZATION PHASE" << endl;
+    cout << endl
+         << "INITIALIZATION PHASE" << endl;
     cout << "------------------------------- " << endl;
     cout << "Cluster Size        : " << clusterSize << endl;
     cout << "Threads per machine : " << omp_thr << endl;
@@ -82,14 +76,15 @@ int main(int argc, char** argv)
   double endTime = 0.0, updateInterval = 0;
 
   // Pointer to siminputs
-  gs* gates = nullptr;
+  gs *gates = nullptr;
 
   // Cell
-  cell* clCell = nullptr;
+  cell *clCell = nullptr;
 
   communicator comm;
 
-  if (rank == 0) {
+  if (rank == 0)
+  {
     cout << "Gateway Service : " << rank << " Running on " << hostname << endl;
 
     gates = new gs[1];
@@ -101,10 +96,12 @@ int main(int argc, char** argv)
     endTime = gates[0].gsi()[0].maxTime;
     updateInterval = gates[0].gsi()[0].updateInterval;
     decisionMaking = gates[0].gsi()[0].decisionMaking;
-  } else {
+  }
+  else
+  {
     cout << "Cell            : " << rank << " Running on " << hostname << endl;
 
-    siminputs* si = new siminputs[1];
+    siminputs *si = new siminputs[1];
 
     // Receive program values from the master
     comm.simulationParameters(*si, rank, clusterSize, MPI_COMM_WORLD);
@@ -129,45 +126,63 @@ int main(int argc, char** argv)
   // Send statistics from the cells to the gateway
   comm.cellStatistics(gates, clCell, rank, clusterSize, MPI_COMM_WORLD);
 
-  if (rank == 0) {
+  if (rank == 0)
+  {
     // print stats to txt files
-    //gates[0].printStats("output/output", ios::out);
+    // gates[0].printStats("output/output", ios::out);
 
     cout << "Resource allocation mechanism: ";
-    if (decisionMaking == 0){
+    if (decisionMaking == 0)
+    {
       cout << "Traditional" << endl;
     }
-    else if (decisionMaking == 1){
+    else if (decisionMaking == 1)
+    {
       cout << "SOSM" << endl;
     }
-    else if (decisionMaking == 2){
+    else if (decisionMaking == 2)
+    {
       cout << "Improved SOSM" << endl;
     }
-    else if (decisionMaking == 3){
+    else if (decisionMaking == 3)
+    {
       cout << "ML-Based with Traditional Fallback" << endl;
+
+      // test http client
+      std::cout << "Checking connection to external service..." << std::endl;
+      if (!checkHealth())
+      {
+        std::cerr << "Failed to connect to external service" << std::endl;
+        return 1;
+      }
+      std::cout << "Connection successful!!!" << std::endl;
     }
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
 
   int allTasks = 0;
-  int* commCells = nullptr;
+  int *commCells = nullptr;
   // Current job list
   list<task> jobs;
 
   // For every time step
-  for (double time = 0.0; time < endTime; time += 1.0) {
+  for (double time = 0.0; time < endTime; time += 1.0)
+  {
 
-    if (time == 0 && rank == 0){
+    if (time == 0 && rank == 0)
+    {
       gates[0].printStatsToJsonDirect("output/output", ios::out, endTime, updateInterval, decisionMaking, allTasks, time);
     }
 
-    if (rank == 0) {
+    if (rank == 0)
+    {
       // Create one or more tasks based on AppData configuration
       taskCreationEngine(jobs, gates[0].gai()[0]);
       allTasks += jobs.size();
 
-      if (decisionMaking == 0) {
+      if (decisionMaking == 0)
+      {
         taskImplSelect(jobs);
       }
       // For each task, retrieve the list of candidate cells and select the most appropriate
@@ -177,12 +192,14 @@ int main(int argc, char** argv)
     // Send the task from the gateway to the selected cell
     comm.taskParameters(jobs, rank, clusterSize, commCells, MPI_COMM_WORLD);
 
-    if (rank != 0) {
+    if (rank != 0)
+    {
       // Task deployment: Traverse the components tree to locate the most suitable vRM
       clCell[0].deploy(jobs);
 
       // Calls broker::timestep to perform the simulation phase, update the state information and update cell statistics
-      if (clCell->galloc()) {
+      if (clCell->galloc())
+      {
         clCell[0].getBroker()->timestep(clCell);
         clCell[0].getBroker()->updateStateInfo(clCell, time);
         clCell[0].updateStats(time);
@@ -194,13 +211,15 @@ int main(int argc, char** argv)
     MPI_Barrier(MPI_COMM_WORLD);
 
     // On every defined interval
-    if (((int)time + 1) % ((int)updateInterval) == 0) {
+    if (((int)time + 1) % ((int)updateInterval) == 0)
+    {
       // Receive statistics from the cells
       comm.cellStatistics(gates, clCell, rank, clusterSize, MPI_COMM_WORLD);
 
-      if (rank == 0) {
+      if (rank == 0)
+      {
         // print stats to txt files (older versions)
-        //gates[0].printStats("output/output", ios::out | ios::app);
+        // gates[0].printStats("output/output", ios::out | ios::app);
         cout << std::fixed << setprecision(2) << "\r Simulation at: " << 100.0 * (time + 1) / (endTime) << " %"
              << flush;
         // print stats to json file
@@ -210,15 +229,22 @@ int main(int argc, char** argv)
   }
   comm.cellStatistics(gates, clCell, rank, clusterSize, MPI_COMM_WORLD);
 
-  if (rank == 0) {
-    // save model logs to file
-    postJSON("/save_logs", "");
+  if (rank == 0)
+  {
+    if (decisionMaking == 3)
+    {
+      // save model logs to file
+      postJSON("/save_logs", "");
+    }
     // Convert output file to json after reading the txt outputs (older versions)
-    //gates[0].printStatsJson("output/output", ios::out, endTime, updateInterval, decisionMaking, allTasks);
-    cout << endl << "Elapsed time: " << MPI_Wtime() - startTime << " sec" << endl;
+    // gates[0].printStatsJson("output/output", ios::out, endTime, updateInterval, decisionMaking, allTasks);
+    cout << endl
+         << "Elapsed time: " << MPI_Wtime() - startTime << " sec" << endl;
     cout << "Total number of submitted tasks: " << allTasks << endl;
     delete[] gates;
-  } else {
+  }
+  else
+  {
     delete[] clCell;
   }
   MPI_Finalize();
