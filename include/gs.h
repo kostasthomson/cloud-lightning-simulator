@@ -40,7 +40,7 @@ public:
     /// \param cellData The path to the CellData configuration file
     /// \param appData The path to the AppData configuration file
     /// \param brokerData The path to the BrokerData configuration file
-    gs(const std::string &cellData, const std::string &appData, const std::string &brokerData);
+    gs(const std::string &cellData, const std::string &appData, const std::string &brokerData, const std::string &mechanismOverride = "");
 
     gs(const gs &t);
 

@@ -1230,7 +1230,7 @@ siminputs& siminputs::operator=(const siminputs& t)
   return *this;
 }
 
-void siminputs::parse(const string& fname, const string& bname)
+void siminputs::parse(const string &fname, const string &bname, const string &mechanismOverride)
 {
   int i, j, k;
   // double dummy;
@@ -1242,7 +1242,12 @@ void siminputs::parse(const string& fname, const string& bname)
   is >> c;
   ib >> b;
 
-  string foo = b["Resource allocation mechanism"].as<string>(); //read resource allocation mechanism
+  string foo;
+  if (!mechanismOverride.empty()){
+    foo = mechanismOverride;
+  } else {
+    foo = b["Resource allocation mechanism"].as<string>(); //read resource allocation mechanism
+  }
   if(foo == "SOSM"){
     decisionMaking = 1;
   }
@@ -1496,7 +1501,11 @@ void siminputs::printfile(const string& outname, const ios::openmode& mode)
     file << "=========== Global Parameters ===========" << endl;
     file << "Maximum Simulation Time: " << maxTime << " seconds" << endl;
     if (decisionMaking) {
-      file << "Resource Allocation Mechanism: SOSM" << endl;
+      if (decisionMaking < 3){
+        file << "Resource Allocation Mechanism: SOSM" << endl;
+      } else {
+        file << "Resource Allocation Mechanism: ML" << endl;
+      } 
     } else {
       file << "Resource Allocation Mechanism: Traditional" << endl;
     }

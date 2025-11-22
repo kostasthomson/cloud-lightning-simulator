@@ -6,4 +6,4 @@ cells=`cat input/CellData.json | awk '/Number of Cells/{print $4}' | sed 's/[:,]
 mpitasks=$((cells+1))
 export MPI_TASKS=$mpitasks
 export OMP_NUM_THREADS=1
-mpirun -np $MPI_TASKS ./cl_sim -x OMP_NUM_THREADS=1
+mpirun -np $MPI_TASKS -x OMP_NUM_THREADS=1 ./cl_sim "$@"

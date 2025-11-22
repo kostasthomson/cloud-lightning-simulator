@@ -88,7 +88,15 @@ int main(int argc, char **argv)
     cout << "Gateway Service : " << rank << " Running on " << hostname << endl;
 
     gates = new gs[1];
-    gates[0] = gs("input/CellData.json", "input/AppData.json", "input/BrokerData.json");
+
+    // Check for optional command line argument for mechanism
+    std::string mechanismOverride = "";
+    if (argc > 1)
+    {
+      mechanismOverride = argv[1];
+    }
+
+    gates[0] = gs("input/CellData.json", "input/AppData.json", "input/BrokerData.json", mechanismOverride);
     gates[0].printfile("output/systeminfo", ios::out);
 
     comm.simulationParameters(gates[0].gsi()[0], rank, clusterSize, MPI_COMM_WORLD);

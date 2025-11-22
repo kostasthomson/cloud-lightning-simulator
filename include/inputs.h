@@ -160,7 +160,7 @@ public:
 
   siminputs();
   siminputs(const siminputs &t);
-  void parse(const string &fname, const string &bname);
+  void parse(const string &fname, const string &bname, const string &mechanismOverride = "");
   ~siminputs();
   siminputs &operator=(const siminputs &t);
   void print();

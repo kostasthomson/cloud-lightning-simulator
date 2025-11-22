@@ -7,18 +7,18 @@
 
 std::string getWindowsHostIP()
 {
-    // std::ifstream resolv("/etc/resolv.conf");
-    // std::string line;
-    // std::regex ns_regex("^nameserver ([0-9\\.]+)$");
+    std::ifstream resolv("/etc/resolv.conf");
+    std::string line;
+    std::regex ns_regex("^nameserver ([0-9\\.]+)$");
 
-    // while (std::getline(resolv, line))
-    // {
-    //     std::smatch match;
-    //     if (std::regex_match(line, match, ns_regex))
-    //     {
-    //         return match[1];
-    //     }
-    // }
+    while (std::getline(resolv, line))
+    {
+        std::smatch match;
+        if (std::regex_match(line, match, ns_regex))
+        {
+            return match[1];
+        }
+    }
     return "127.0.0.1";
 }
 
@@ -104,8 +104,11 @@ std::string postJSON(const std::string& endpoint, const std::string& jsonPayload
 
     if (http_code < 200 || http_code >= 300)
     {
-        std::cerr << "[HTTP Error] POST to " << endpoint << " returned code: "
-                  << http_code << std::endl;
+        int message_start = response.find("\"detail\": ") + 2;
+        int message_end = response.find("\"", message_start);
+        std::cerr
+            << "[HTTP Error] POST to " << endpoint << " returned code: "
+            << http_code << ". Message: " << response.substr(message_start, message_end) << std::endl;
         curl_slist_free_all(headers);
         curl_easy_cleanup(curl);
         return "";

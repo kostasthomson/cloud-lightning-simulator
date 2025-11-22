@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Configuration
+BROKER_FILE="input/BrokerData.json"
+SIMULATOR_SCRIPT="./cl_sim.out"
+OUTPUT_DIR="./output"
+SIM_BINARY_NAME="cl_sim"
+
+# 1. Extract Brokers
+BROKERS_RAW=$(grep '"_comment"' "$BROKER_FILE" | grep -o "'[^']*'" | tr -d "'")
+mapfile -t BROKER_ARRAY <<< "$BROKERS_RAW"
+
+echo "Found brokers: ${BROKERS_ARRAY[*]}"
+
+# 2. Iterate through brokers
+for BROKER in "${BROKER_ARRAY[@]}"; do
+    BROKER=$(echo "$BROKER" | xargs)
+    [ -z "$BROKER" ] && continue
+
+    echo "========================================"
+    echo "Processing Broker: [$BROKER]"
+
+    # 3. Run Simulator with Argument
+    # We pass the broker name directly as an argument!
+    echo "  -> Starting simulation..."
+    
+    # Assuming cl_sim.out passes arguments to the binary ($@)
+    # If cl_sim.out is a wrapper, ensure it has "$@" at the end of the mpirun command
+    bash "$SIMULATOR_SCRIPT" "$BROKER" < /dev/null
+
+    # ... (Process detection and File moving logic remains the same) ...
+    
+    echo "  -> Monitoring active tasks..."
+    while pgrep -x "$SIM_BINARY_NAME" > /dev/null; do
+        echo -n "."
+        sleep 2
+    done
+    echo ""
+
+    # Move files logic...
+    BROKER_DIR="$OUTPUT_DIR/$BROKER"
+    mkdir -p "$BROKER_DIR"
+    [ -f "$OUTPUT_DIR/outputCLSim.json" ] && mv "$OUTPUT_DIR/outputCLSim.json" "$BROKER_DIR/"
+    [ -f "$OUTPUT_DIR/systeminfo" ] && mv "$OUTPUT_DIR/systeminfo" "$BROKER_DIR/"
+
+done

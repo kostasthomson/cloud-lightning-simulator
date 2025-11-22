@@ -23,13 +23,13 @@ limitations under the License.
 using std::stringstream;
 
 gs::gs() : alloc(0), ai(nullptr), si(nullptr), stats(nullptr) {}
-gs::gs(const std::string &cellData, const std::string &appData, const std::string &brokerData)
+gs::gs(const std::string &cellData, const std::string &appData, const std::string &brokerData, const std::string &mechanismOverride)
 {
   alloc = 1;
   ai = new appinputs[1];
   si = new siminputs[1];
   ai->parse(appData);
-  si->parse(cellData, brokerData);
+  si->parse(cellData, brokerData, mechanismOverride);
   stats = new stat *[si->numOfCells];
   for (int i = 0; i < si->numOfCells; i++)
   {
