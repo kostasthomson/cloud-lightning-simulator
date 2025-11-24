@@ -19,66 +19,71 @@ limitations under the License.
 
 class task
 {
- private:
+private:
   int type;
   int numberOfAvailableImplementations;
-  int* availableImplementations;
+  int *availableImplementations;
   double requestedInstructions;
   int numberOfVMs;
-  double* reqPMNS;
-  int* typeactPMN;
-  double** minmaxactPMN;
-  int* avAcc;
-  double* rhoAcc;
+  double *reqPMNS;
+  int *typeactPMN;
+  double **minmaxactPMN;
+  int *avAcc;
+  double *rhoAcc;
   int alloc;
-  int* resourceIDs;
+  int *resourceIDs;
 
-  double* cUtilPMNr;
+  double *cUtilPMNr;
 
- public:
+  static unsigned long global_id_counter;
+  unsigned long id;
+
+public:
   task();
 
-  task(const task& t);
+  task(const task &t);
 
-  task(const int& L_type, const int& L_numberOfAvailableImplementations, const int* L_availableImplementations,
-       const double& L_requestedInstructions, const int& L_numberOfVMs, const double& L_reqP, const double& L_reqM,
-       const double& L_reqN, const double& L_reqS, const int& L_typeactP, const int& L_typeactM, const int& L_typeactN,
-       const double* L_minmaxactP, const double* L_minmaxactM, const double* L_minmaxactN, const int* L_avAcc,
-       const double* L_rhoAcc);
+  task(const int &L_type, const int &L_numberOfAvailableImplementations, const int *L_availableImplementations,
+       const double &L_requestedInstructions, const int &L_numberOfVMs, const double &L_reqP, const double &L_reqM,
+       const double &L_reqN, const double &L_reqS, const int &L_typeactP, const int &L_typeactM, const int &L_typeactN,
+       const double *L_minmaxactP, const double *L_minmaxactM, const double *L_minmaxactN, const int *L_avAcc,
+       const double *L_rhoAcc);
 
-  task& operator=(const task& t);
+  task &operator=(const task &t);
 
   ~task();
 
-  void attachResources(const int* IDs);
+  void attachResources(const int *IDs);
 
   void detachResources();
 
   void compcUtilPMNr();
 
-  void remapType(const int* type, const int& num);
+  void remapType(const int *type, const int &num);
 
-  void reduceImpl(const int* type);
+  void reduceImpl(const int *type);
 
   void print() const;
 
-  void reduceIns(const double& amount);
+  void reduceIns(const double &amount);
   int getType() const;
   int getNumberOfAvailableImplementations() const;
-  int* getAvailableImplementations() const;
+  int *getAvailableImplementations() const;
   double grequestedInstructions() const;
   int getNumberOfVMs() const;
-  double* greqPMNS() const;
-  int* getTypeactPMN() const;
-  double** gminmaxactPMN() const;
-  int* gavAcc() const;
-  double* grhoAcc() const;
-  int* gresourceIDs() const;
-  double* gcUtilPMNr() const;
+  double *greqPMNS() const;
+  int *getTypeactPMN() const;
+  double **gminmaxactPMN() const;
+  int *gavAcc() const;
+  double *grhoAcc() const;
+  int *gresourceIDs() const;
+  double *gcUtilPMNr() const;
   int galloc() const;
   double getactP();
   double getactM();
   double getactN();
+
+unsigned long getID() const;
 };
 
 #endif
