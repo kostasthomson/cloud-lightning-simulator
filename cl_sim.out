@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mkdir -p output/improved output/sosm output/traditional
+
 # Parsing the CellData.json file in order to find the number of cells
 cells=`cat input/CellData.json | awk '/Number of Cells/{print $4}' | sed 's/[:,]//g'`
 

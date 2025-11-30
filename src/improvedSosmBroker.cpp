@@ -870,15 +870,15 @@ void improvedSosmBroker::deploy(resource **resources, netw *network, stat *stats
   if (availableNetwork < _task.greqPMNS()[2])
   {
     stats[rem[0]].rejectedTasks++;
-    log_decision("output/Improved SOSM/improved_sosm_decisions.csv",
+    log_decision("output/improved/decisions.csv",
                  stats[0].currentTimestep,
                  _task.getID(),
                  _task.getNumberOfVMs(),
                  _task.greqPMNS()[0],
                  _task.greqPMNS()[1],
-                 -1,    // No HW type selected
+                 -1,   // No HW type selected
                  false, // Rejected
-                 0.0);  // 0 Energy
+                 0.0); // 0 Energy
     delete[] rem;
     delete[] rem2;
     return;
@@ -922,15 +922,15 @@ void improvedSosmBroker::deploy(resource **resources, netw *network, stat *stats
   {
     // Reject tasks if type is still -1
     stats[rem[0]].rejectedTasks++;
-    log_decision("output/Improved SOSM/improved_sosm_decisions.csv",
+    log_decision("output/improved/decisions.csv",
                  stats[0].currentTimestep,
                  _task.getID(),
                  _task.getNumberOfVMs(),
                  _task.greqPMNS()[0],
                  _task.greqPMNS()[1],
-                 -1,    // No HW type selected
+                 -1, // No HW type selected
                  false, // Rejected
-                 0.0);  // 0 Energy
+                 0.0); // 0 Energy
     return;
   }
   _task.reduceImpl(&rem2[type]);
@@ -951,14 +951,14 @@ void improvedSosmBroker::deploy(resource **resources, netw *network, stat *stats
 
   list<improvedpRouter>::iterator it = pRouters[type]->begin();
   it->deploy(resources, network, stats, _task);
-  log_decision("output/Improved SOSM/improved_sosm_decisions.csv",
+  log_decision("output/improved/decisions.csv",
                stats[0].currentTimestep,
                _task.getID(),
                _task.getNumberOfVMs(),
                _task.greqPMNS()[0],
                _task.greqPMNS()[1],
-               -1,                                 // No HW type selected
-               false,                              // Rejected
+               types[type],                               // HW type selected
+               true,                              // Rejected
                stats[type].totalPowerConsumption); // Energy
   delete[] rem;
   delete[] rem2;

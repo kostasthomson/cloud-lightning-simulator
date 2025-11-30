@@ -848,11 +848,15 @@ void sosmBroker::deploy(resource **resources, netw *network, stat *stats, task &
   if (availableNetwork < _task.greqPMNS()[2])
   {
     stats[rem[0]].rejectedTasks++;
-    log_decision("output/SOSM/sosm_decisions.csv", stats[0].currentTimestep, _task.getID(),
-                 _task.getNumberOfVMs(), _task.greqPMNS()[0], _task.greqPMNS()[1],
-                 -1,    // HW Type -1 (None selected)
+    log_decision("output/sosm/decisions.csv",
+                 stats[0].currentTimestep,
+                 _task.getID(),
+                 _task.getNumberOfVMs(),
+                 _task.greqPMNS()[0],
+                 _task.greqPMNS()[1],
+                 -1,   // HW Type -1 (None selected)
                  false, // Rejected
-                 0.0);  // 0 Energy
+                 0.0); // 0 Energy
     delete[] rem;
     delete[] rem2;
     return;
@@ -885,11 +889,15 @@ void sosmBroker::deploy(resource **resources, netw *network, stat *stats, task &
   {
     // Reject tasks if type is still -1
     stats[rem[0]].rejectedTasks++;
-    log_decision("output/SOSM/sosm_decisions.csv", stats[0].currentTimestep, _task.getID(),
-                 _task.getNumberOfVMs(), _task.greqPMNS()[0], _task.greqPMNS()[1],
-                 -1,    // HW Type -1 (None selected)
+    log_decision("output/sosm/decisions.csv",
+                 stats[0].currentTimestep,
+                 _task.getID(),
+                 _task.getNumberOfVMs(),
+                 _task.greqPMNS()[0],
+                 _task.greqPMNS()[1],
+                 -1, // HW Type -1 (None selected)
                  false, // Rejected
-                 0.0);  // 0 Energy
+                 0.0); // 0 Energy
     return;
   }
   _task.reduceImpl(&rem2[type]);
@@ -910,11 +918,15 @@ void sosmBroker::deploy(resource **resources, netw *network, stat *stats, task &
   list<pRouter>::iterator it = pRouters[type]->begin();
   it->deploy(resources, network, stats, _task);
 
-  log_decision("output/SOSM/sosm_decisions.csv", stats[0].currentTimestep, _task.getID(),
-               _task.getNumberOfVMs(), _task.greqPMNS()[0], _task.greqPMNS()[1],
-               -1,                                 // HW Type -1 (None selected)
-               false,                              // Rejected
-               stats[type].totalPowerConsumption); // 0 Energy
+  log_decision("output/sosm/decisions.csv",
+               stats[0].currentTimestep,
+               _task.getID(),
+               _task.getNumberOfVMs(),
+               _task.greqPMNS()[0],
+               _task.greqPMNS()[1],
+               types[type],                        // HW Type
+               true,                               // Rejected
+               stats[type].totalPowerConsumption); // Energy
   delete[] rem;
   delete[] rem2;
 }

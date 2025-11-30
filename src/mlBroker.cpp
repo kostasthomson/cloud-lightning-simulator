@@ -18,35 +18,37 @@ using std::string;
 using std::stringstream;
 
 mlBroker::mlBroker()
-  : baseBroker(),
-    fallbackBroker(nullptr),
-    availableProcesses(nullptr),
-    totalProcesses(nullptr),
-    availableMemory(nullptr),
-    totalMemory(nullptr),
-    availableAccelerators(nullptr),
-    totalAccelerators(nullptr),
-    availableStorage(nullptr),
-    totalStorage(nullptr)
+    : baseBroker(),
+      fallbackBroker(nullptr),
+      availableProcesses(nullptr),
+      totalProcesses(nullptr),
+      availableMemory(nullptr),
+      totalMemory(nullptr),
+      availableAccelerators(nullptr),
+      totalAccelerators(nullptr),
+      availableStorage(nullptr),
+      totalStorage(nullptr)
 {
 }
 
-mlBroker::mlBroker(const mlBroker& m)
-  : baseBroker(m)
+mlBroker::mlBroker(const mlBroker &m)
+    : baseBroker(m)
 {
-  if (m.galloc()) {
+  if (m.galloc())
+  {
     fallbackBroker = new traditionalBroker(*m.fallbackBroker);
 
-    availableProcesses = new double*[numberOfTypes];
-    totalProcesses = new double*[numberOfTypes];
-    availableMemory = new double*[numberOfTypes];
-    totalMemory = new double*[numberOfTypes];
-    availableAccelerators = new double*[numberOfTypes];
-    totalAccelerators = new double*[numberOfTypes];
-    availableStorage = new double*[numberOfTypes];
-    totalStorage = new double*[numberOfTypes];
+    availableProcesses = new double *[numberOfTypes];
+    totalProcesses = new double *[numberOfTypes];
+    availableMemory = new double *[numberOfTypes];
+    totalMemory = new double *[numberOfTypes];
+    availableAccelerators = new double *[numberOfTypes];
+    totalAccelerators = new double *[numberOfTypes];
+    availableStorage = new double *[numberOfTypes];
+    totalStorage = new double *[numberOfTypes];
 
-    for (int i = 0; i < numberOfTypes; i++) {
+    for (int i = 0; i < numberOfTypes; i++)
+    {
       availableProcesses[i] = new double[numberOfResourcesPerType[i]];
       totalProcesses[i] = new double[numberOfResourcesPerType[i]];
       availableMemory[i] = new double[numberOfResourcesPerType[i]];
@@ -59,13 +61,16 @@ mlBroker::mlBroker(const mlBroker& m)
   }
 }
 
-mlBroker& mlBroker::operator=(const mlBroker& m)
+mlBroker &mlBroker::operator=(const mlBroker &m)
 {
-  if (this != &m) {
+  if (this != &m)
+  {
     baseBroker::operator=(m);
 
-    if (fallbackBroker) delete fallbackBroker;
-    if (m.fallbackBroker) {
+    if (fallbackBroker)
+      delete fallbackBroker;
+    if (m.fallbackBroker)
+    {
       fallbackBroker = new traditionalBroker(*m.fallbackBroker);
     }
   }
@@ -74,10 +79,13 @@ mlBroker& mlBroker::operator=(const mlBroker& m)
 
 mlBroker::~mlBroker()
 {
-  if (alloc) {
-    if (fallbackBroker) delete fallbackBroker;
+  if (alloc)
+  {
+    if (fallbackBroker)
+      delete fallbackBroker;
 
-    for (int i = 0; i < numberOfTypes; i++) {
+    for (int i = 0; i < numberOfTypes; i++)
+    {
       delete[] availableProcesses[i];
       delete[] totalProcesses[i];
       delete[] availableMemory[i];
@@ -98,23 +106,24 @@ mlBroker::~mlBroker()
   }
 }
 
-void mlBroker::init(const cell* clCell, const siminputs* si)
+void mlBroker::init(const cell *clCell, const siminputs *si)
 {
   baseBroker::init(clCell);
 
   fallbackBroker = new traditionalBroker();
   fallbackBroker->init(clCell, si);
 
-  availableProcesses = new double*[numberOfTypes];
-  totalProcesses = new double*[numberOfTypes];
-  availableMemory = new double*[numberOfTypes];
-  totalMemory = new double*[numberOfTypes];
-  availableAccelerators = new double*[numberOfTypes];
-  totalAccelerators = new double*[numberOfTypes];
-  availableStorage = new double*[numberOfTypes];
-  totalStorage = new double*[numberOfTypes];
+  availableProcesses = new double *[numberOfTypes];
+  totalProcesses = new double *[numberOfTypes];
+  availableMemory = new double *[numberOfTypes];
+  totalMemory = new double *[numberOfTypes];
+  availableAccelerators = new double *[numberOfTypes];
+  totalAccelerators = new double *[numberOfTypes];
+  availableStorage = new double *[numberOfTypes];
+  totalStorage = new double *[numberOfTypes];
 
-  for (int i = 0; i < numberOfTypes; i++) {
+  for (int i = 0; i < numberOfTypes; i++)
+  {
     availableProcesses[i] = new double[numberOfResourcesPerType[i]];
     totalProcesses[i] = new double[numberOfResourcesPerType[i]];
     availableMemory[i] = new double[numberOfResourcesPerType[i]];
@@ -128,7 +137,8 @@ void mlBroker::init(const cell* clCell, const siminputs* si)
 
 void mlBroker::print() const
 {
-  if (alloc) {
+  if (alloc)
+  {
     cout << "     ML-Based Broker with Traditional Fallback" << endl;
   }
 }
@@ -160,15 +170,18 @@ void mlBroker::updateStateInfo(const cell *clCell, const double &tstep)
   }
 }
 
-void mlBroker::deploy(resource** resources, netw* network, stat* stats, task& _task)
+void mlBroker::deploy(resource **resources, netw *network, stat *stats, task &_task)
 {
-  double* reqPMNS = _task.greqPMNS();
+  double *reqPMNS = _task.greqPMNS();
   int L_ID = network[0].probe(reqPMNS[2]);
 
-  if (L_ID == -1) {
+  if (L_ID == -1)
+  {
     int type = 0;
-    for (int i = 0; i < numberOfTypes; i++) {
-      if (types[i] == _task.getAvailableImplementations()[0]) {
+    for (int i = 0; i < numberOfTypes; i++)
+    {
+      if (types[i] == _task.getAvailableImplementations()[0])
+      {
         type = i;
         break;
       }
@@ -182,28 +195,31 @@ void mlBroker::deploy(resource** resources, netw* network, stat* stats, task& _t
 
   string jsonRequest = buildAllocationRequest(nullptr, _task, timestamp);
 
-  if (jsonRequest.empty()) {
-    // cout << "[ML Broker] Failed to build request, using fallback" << endl;
+  if (jsonRequest.empty())
+  {
+    // cout << "[ML] Failed to build request, using fallback" << endl;
     fallbackBroker->deploy(resources, network, stats, _task);
     return;
   }
 
   string response = postJSON("/allocate_task", jsonRequest);
 
-  if (response.empty()) {
-    // cout << "[ML Broker] No response from ML service, using fallback" << endl;
+  if (response.empty())
+  {
+    // cout << "[ML] No response from ML service, using fallback" << endl;
     fallbackBroker->deploy(resources, network, stats, _task);
     return;
   }
 
   int cellId, hwTypeId;
-  int* serverAssignments = new int[_task.getNumberOfVMs()];
+  int *serverAssignments = new int[_task.getNumberOfVMs()];
   int numVMs = 0;
 
   bool parseSuccess = parseAllocationResponse(response, cellId, hwTypeId, &serverAssignments, numVMs);
 
-  if (!parseSuccess || numVMs != _task.getNumberOfVMs()) {
-    // cout << "[ML Broker] Failed to parse ML response, using fallback" << endl;
+  if (!parseSuccess || numVMs != _task.getNumberOfVMs())
+  {
+    // cout << "[ML] Failed to parse ML response, using fallback" << endl;
     delete[] serverAssignments;
     fallbackBroker->deploy(resources, network, stats, _task);
     return;
@@ -214,32 +230,37 @@ void mlBroker::deploy(resource** resources, netw* network, stat* stats, task& _t
 
   delete[] serverAssignments;
 
-  if (!deploySuccess) {
-    // cout << "[ML Broker] ML allocation failed, using fallback" << endl;
+  if (!deploySuccess)
+  {
+    // cout << "[ML] ML allocation failed, using fallback" << endl;
     fallbackBroker->deploy(resources, network, stats, _task);
   }
 }
 
-void mlBroker::timestep(const cell* clCell)
+void mlBroker::timestep(const cell *clCell)
 {
-  if (fallbackBroker) {
+  if (fallbackBroker)
+  {
     fallbackBroker->timestep(clCell);
   }
 }
 
-string mlBroker::buildAllocationRequest(const cell* clCell, const task& _task, double timestamp)
+string mlBroker::buildAllocationRequest(const cell *clCell, const task &_task, double timestamp)
 {
   stringstream json;
   json << "{\"timestamp\":" << timestamp << ",\"cells\":[{\"cell_id\":0,\"hw_types\":[";
 
-  for (int i = 0; i < numberOfTypes; i++) {
-    if (i > 0) json << ",";
+  for (int i = 0; i < numberOfTypes; i++)
+  {
+    if (i > 0)
+      json << ",";
 
     json << "{\"hw_type_id\":" << types[i]
          << ",\"hw_type_name\":\"Type" << types[i] << "\""
          << ",\"num_servers\":" << numberOfResourcesPerType[i];
 
-    if (numberOfResourcesPerType[i] > 0) {
+    if (numberOfResourcesPerType[i] > 0)
+    {
       json << ",\"num_cpus_per_server\":" << (int)totalProcesses[i][0]
            << ",\"memory_per_server\":" << totalMemory[i][0]
            << ",\"storage_per_server\":" << totalStorage[i][0]
@@ -247,7 +268,9 @@ string mlBroker::buildAllocationRequest(const cell* clCell, const task& _task, d
            << ",\"accelerators\":" << ((int)totalAccelerators[i][0] > 0 ? 1 : 0)
            << ",\"num_accelerators_per_server\":" << (int)totalAccelerators[i][0]
            << ",\"accelerator_compute_capability\":587505.34";
-    } else {
+    }
+    else
+    {
       json << ",\"num_cpus_per_server\":20,\"memory_per_server\":128.0"
            << ",\"storage_per_server\":1.0,\"compute_capability\":88000.8"
            << ",\"accelerators\":0,\"num_accelerators_per_server\":0"
@@ -260,10 +283,13 @@ string mlBroker::buildAllocationRequest(const cell* clCell, const task& _task, d
   }
 
   json << "],\"available_resources\":{";
-  for (int i = 0; i < numberOfTypes; i++) {
-    if (i > 0) json << ",";
+  for (int i = 0; i < numberOfTypes; i++)
+  {
+    if (i > 0)
+      json << ",";
     double totalCPU = 0, totalMem = 0, totalStor = 0, totalAcc = 0;
-    for (int j = 0; j < numberOfResourcesPerType[i]; j++) {
+    for (int j = 0; j < numberOfResourcesPerType[i]; j++)
+    {
       totalCPU += availableProcesses[i][j];
       totalMem += availableMemory[i][j];
       totalStor += availableStorage[i][j];
@@ -277,8 +303,10 @@ string mlBroker::buildAllocationRequest(const cell* clCell, const task& _task, d
   }
 
   json << "},\"current_utilization\":{";
-  for (int i = 0; i < numberOfTypes; i++) {
-    if (i > 0) json << ",";
+  for (int i = 0; i < numberOfTypes; i++)
+  {
+    if (i > 0)
+      json << ",";
     json << "\"" << types[i] << "\":{\"cpu\":0.5,\"memory\":0.5,\"network\":0.5}";
   }
   json << "}}],\"task\":{";
@@ -298,41 +326,50 @@ string mlBroker::buildAllocationRequest(const cell* clCell, const task& _task, d
   return json.str();
 }
 
-bool mlBroker::parseAllocationResponse(const string& response, int& cellId, int& hwTypeId,
-                                       int** serverAssignments, int& numVMs)
+bool mlBroker::parseAllocationResponse(const string &response, int &cellId, int &hwTypeId,
+                                       int **serverAssignments, int &numVMs)
 {
   size_t pos;
 
   pos = response.find("\"success\"");
-  if (pos == string::npos) return false;
+  if (pos == string::npos)
+    return false;
   pos = response.find("true", pos);
-  if (pos == string::npos) return false;
+  if (pos == string::npos)
+    return false;
 
   pos = response.find("\"num_vms_allocated\"");
-  if (pos == string::npos) return false;
+  if (pos == string::npos)
+    return false;
   pos = response.find(":", pos) + 1;
   numVMs = atoi(response.c_str() + pos);
 
   pos = response.find("\"vm_allocations\"");
-  if (pos == string::npos) return false;
+  if (pos == string::npos)
+    return false;
 
   size_t vmStart = pos;
-  for (int i = 0; i < numVMs; i++) {
+  for (int i = 0; i < numVMs; i++)
+  {
     vmStart = response.find("{", vmStart + 1);
-    if (vmStart == string::npos) return false;
+    if (vmStart == string::npos)
+      return false;
 
     pos = response.find("\"cell_id\"", vmStart);
-    if (pos == string::npos) return false;
+    if (pos == string::npos)
+      return false;
     pos = response.find(":", pos) + 1;
     cellId = atoi(response.c_str() + pos);
 
     pos = response.find("\"hw_type_id\"", vmStart);
-    if (pos == string::npos) return false;
+    if (pos == string::npos)
+      return false;
     pos = response.find(":", pos) + 1;
     hwTypeId = atoi(response.c_str() + pos);
 
     pos = response.find("\"server_index\"", vmStart);
-    if (pos == string::npos) return false;
+    if (pos == string::npos)
+      return false;
     pos = response.find(":", pos) + 1;
     (*serverAssignments)[i] = atoi(response.c_str() + pos);
   }
@@ -340,42 +377,49 @@ bool mlBroker::parseAllocationResponse(const string& response, int& cellId, int&
   return true;
 }
 
-bool mlBroker::deployFromMLDecision(resource** resources, netw* network, stat* stats, task& _task,
-                                   int cellId, int hwTypeId, int* serverAssignments, int numVMs)
+bool mlBroker::deployFromMLDecision(resource **resources, netw *network, stat *stats, task &_task,
+                                    int cellId, int hwTypeId, int *serverAssignments, int numVMs)
 {
   int type = -1;
-  for (int i = 0; i < numberOfTypes; i++) {
-    if (types[i] == hwTypeId) {
+  for (int i = 0; i < numberOfTypes; i++)
+  {
+    if (types[i] == hwTypeId)
+    {
       type = i;
       _task.remapType(&i, 1);
       break;
     }
   }
 
-  if (type == -1) {
+  if (type == -1)
+  {
     return false;
   }
 
-  double* reqPMNS = _task.greqPMNS();
+  double *reqPMNS = _task.greqPMNS();
   int avAcc = _task.gavAcc()[0];
 
-  for (int j = 0; j < numVMs; j++) {
+  for (int j = 0; j < numVMs; j++)
+  {
     int serverIdx = serverAssignments[j];
-    if (serverIdx < 0 || serverIdx >= numberOfResourcesPerType[type]) {
+    if (serverIdx < 0 || serverIdx >= numberOfResourcesPerType[type])
+    {
       return false;
     }
 
     if (availableProcesses[type][serverIdx] < reqPMNS[0] ||
         availableMemory[type][serverIdx] < reqPMNS[1] ||
         availableStorage[type][serverIdx] < reqPMNS[3] ||
-        availableAccelerators[type][serverIdx] < avAcc) {
+        availableAccelerators[type][serverIdx] < avAcc)
+    {
       return false;
     }
   }
 
   availableNetwork -= reqPMNS[2];
 
-  for (int j = 0; j < numVMs; j++) {
+  for (int j = 0; j < numVMs; j++)
+  {
     int serverIdx = serverAssignments[j];
     resources[type][serverIdx].deploy(_task);
     availableProcesses[type][serverIdx] -= reqPMNS[0];
@@ -388,7 +432,7 @@ bool mlBroker::deployFromMLDecision(resource** resources, netw* network, stat* s
   _task.attachResources(serverAssignments);
   stats[type].acceptedTasks++;
 
-  // cout << "[ML Broker] Successfully deployed task with " << numVMs
+  // cout << "[ML] Successfully deployed task with " << numVMs
   //      << " VMs to HW Type " << hwTypeId << endl;
 
   return true;

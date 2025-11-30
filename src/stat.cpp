@@ -388,7 +388,7 @@ void stat::printfileJson(const string &outfile, const string &inputfile, const i
   }
   else if (decisionMaking == 3)
   {
-    cl_output = jsoncons::ojson::object{{"Resource allocation mechanism", "ML Broker"}, {"Total number of submitted tasks", allTasks}, {"CLSim outputs", cl_list}};
+    cl_output = jsoncons::ojson::object{{"Resource allocation mechanism", "ML"}, {"Total number of submitted tasks", allTasks}, {"CLSim outputs", cl_list}};
   }
   if (a == numOfCells && j == numberOfTypes)
   {
@@ -467,7 +467,7 @@ void stat::printfileJsonDirect(const string &outfile, const ios::openmode &mode,
   }
   else if (decisionMaking == 3)
   {
-    cl_output = jsoncons::ojson::object{{"Resource allocation mechanism", "ML Broker"}, {"Total number of submitted tasks", allTasks}, {"CLSim outputs", cl_list}};
+    cl_output = jsoncons::ojson::object{{"Resource allocation mechanism", "ML"}, {"Total number of submitted tasks", allTasks}, {"CLSim outputs", cl_list}};
   }
   if (a == numOfCells && j == numberOfTypes)
   {

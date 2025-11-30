@@ -358,7 +358,7 @@ void traditionalBroker::deploy(resource **resources, netw *network, stat *stats,
   }
   if (type == -1)
   {
-    cout << "Broker::deploy catastrophic error: " << endl;
+    cout << "Broker::deploy catastrophic error: " << L_availImpl << endl;
     exit(0);
   }
 
@@ -476,13 +476,13 @@ void traditionalBroker::deploy(resource **resources, netw *network, stat *stats,
     stats[type].acceptedTasks++;
   }
 
-  log_decision("output/Traditional/traditional_decisions.csv",
+  log_decision("output/traditional/decisions.csv",
                stats[0].currentTimestep,           // Sync key with JSON logs
                _task.getID(),                      // Task ID
                L_numberOfVMs,                      // Number of VMs requested
                _task.greqPMNS()[0],                // CPU per VM
                _task.greqPMNS()[1],                // Memory per VM
-               type,                               // ACTION: The chosen HW type
+               type >= 0 ? types[type] : -1,       // ACTION: The chosen HW type
                (L_ID != -1),                       // OUTCOME: Accepted or Rejected
                stats[type].totalPowerConsumption); // Energy
 
