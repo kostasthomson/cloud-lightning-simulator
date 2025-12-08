@@ -38,9 +38,9 @@ for BROKER in "${BROKER_ARRAY[@]}"; do
     echo ""
 
     # Move files logic...
-    BROKER_DIR="$OUTPUT_DIR/$BROKER"
-    mkdir -p "$BROKER_DIR"
-    [ -f "$OUTPUT_DIR/outputCLSim.json" ] && mv "$OUTPUT_DIR/outputCLSim.json" "$BROKER_DIR/"
-    [ -f "$OUTPUT_DIR/systeminfo" ] && mv "$OUTPUT_DIR/systeminfo" "$BROKER_DIR/"
+    # BROKER_DIR="$OUTPUT_DIR/$BROKER"
+    # mkdir -p "$BROKER_DIR"
+    # [ -f "$OUTPUT_DIR/outputCLSim.json" ] && mv "$OUTPUT_DIR/outputCLSim.json" "$BROKER_DIR/"
+    # [ -f "$OUTPUT_DIR/systeminfo" ] && mv "$OUTPUT_DIR/systeminfo" "$BROKER_DIR/"
 
 done

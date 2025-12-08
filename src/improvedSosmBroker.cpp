@@ -29,7 +29,8 @@ limitations under the License.
 #include <algorithm> // for min
 #include <cstdlib>   // for atoi, getenv
 #include <iostream>
-#include <decisionLog.h>
+#include "decisionLogEnhanced.h"
+#include "energyTracker.h"
 
 using std::cout;
 using std::endl;
@@ -845,6 +846,55 @@ void improvedSosmBroker::updateStateInfo(const cell *clCell, const double &tstep
   }
 }
 
+void decisionLog(task &_task, stat *stats, int *rem, double **sPMSA, int *types, int type, bool accepted)
+{
+  // Capture cell state before allocation
+  double util_cpu_before = 0.0;
+  double util_mem_before = 0.0;
+  double avail_cpu_before = sPMSA[type][0];          // Available CPU
+  double avail_mem_before = sPMSA[type][2];          // Available memory
+  double avail_storage_before = sPMSA[type][4];      // Available storage
+  double avail_accelerators_before = sPMSA[type][6]; // Available accelerators
+
+  // Compute utilization
+  if (sPMSA[type][1] > 0)
+  { // Total CPU > 0
+    util_cpu_before = 1.0 - (sPMSA[type][0] / sPMSA[type][1]);
+  }
+  if (sPMSA[type][3] > 0)
+  { // Total memory > 0
+    util_mem_before = 1.0 - (sPMSA[type][2] / sPMSA[type][3]);
+  }
+
+  // Enhanced decision logging
+  log_decision_enhanced("output/sosm/decisions.csv",
+                        stats[0].currentTimestep,
+                        _task.getID(),
+                        _task.getNumberOfVMs(),
+                        _task.greqPMNS()[0],
+                        _task.greqPMNS()[1],
+                        0, // Cell ID
+                        rem[0] >= 0 ? types[rem[0]] : -1,
+                        accepted,
+                        util_cpu_before,
+                        util_mem_before,
+                        avail_cpu_before,
+                        avail_mem_before,
+                        avail_storage_before,
+                        avail_accelerators_before,
+                        0.0, // Energy (computed at task completion)
+                        0.0  // Processing time (computed at task completion)
+  );
+
+  // Set deployment time if accepted
+  if (accepted)
+  {
+    _task.setDeploymentTime(stats[0].currentTimestep);
+    _task.setAssignedCell(0);
+    _task.setAssignedHwType(rem[0]);
+  }
+}
+
 void improvedSosmBroker::deploy(resource **resources, netw *network, stat *stats, task &_task)
 {
   int *rem = new int[numberOfTypes];
@@ -870,15 +920,6 @@ void improvedSosmBroker::deploy(resource **resources, netw *network, stat *stats
   if (availableNetwork < _task.greqPMNS()[2])
   {
     stats[rem[0]].rejectedTasks++;
-    log_decision("output/improved/decisions.csv",
-                 stats[0].currentTimestep,
-                 _task.getID(),
-                 _task.getNumberOfVMs(),
-                 _task.greqPMNS()[0],
-                 _task.greqPMNS()[1],
-                 -1,   // No HW type selected
-                 false, // Rejected
-                 0.0); // 0 Energy
     delete[] rem;
     delete[] rem2;
     return;
@@ -922,15 +963,6 @@ void improvedSosmBroker::deploy(resource **resources, netw *network, stat *stats
   {
     // Reject tasks if type is still -1
     stats[rem[0]].rejectedTasks++;
-    log_decision("output/improved/decisions.csv",
-                 stats[0].currentTimestep,
-                 _task.getID(),
-                 _task.getNumberOfVMs(),
-                 _task.greqPMNS()[0],
-                 _task.greqPMNS()[1],
-                 -1, // No HW type selected
-                 false, // Rejected
-                 0.0); // 0 Energy
     return;
   }
   _task.reduceImpl(&rem2[type]);
@@ -951,15 +983,9 @@ void improvedSosmBroker::deploy(resource **resources, netw *network, stat *stats
 
   list<improvedpRouter>::iterator it = pRouters[type]->begin();
   it->deploy(resources, network, stats, _task);
-  log_decision("output/improved/decisions.csv",
-               stats[0].currentTimestep,
-               _task.getID(),
-               _task.getNumberOfVMs(),
-               _task.greqPMNS()[0],
-               _task.greqPMNS()[1],
-               types[type],                               // HW type selected
-               true,                              // Rejected
-               stats[type].totalPowerConsumption); // Energy
+
+  decisionLog(_task, stats, rem, sPMSA, types, type, true);
+
   delete[] rem;
   delete[] rem2;
 }

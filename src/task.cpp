@@ -39,11 +39,23 @@ task::task()
       cUtilPMNr(nullptr)
 {
   id = ++global_id_counter;
+  deploymentTime = 0.0;
+  completionTime = 0.0;
+  processingTime = 0.0;
+  energyConsumed = 0.0;
+  assignedCell = -1;
+  assignedHwType = -1;
 }
 
 task::task(const task &t)
 {
   id = ++global_id_counter;
+  deploymentTime = t.getDeploymentTime();
+  completionTime = t.getCompletionTime();
+  processingTime = t.getProcessingTime();
+  energyConsumed = t.getEnergyConsumed();
+  assignedCell = t.getAssignedCell();
+  assignedHwType = t.getAssignedHwType();
   int i, j;
   alloc = t.galloc();
   if (alloc)
@@ -110,6 +122,12 @@ task::task(const int &L_type, const int &L_numberOfAvailableImplementations, con
            const int *L_avAcc, const double *L_rhoAcc)
 {
   id = ++global_id_counter;
+  deploymentTime = 0.0;
+  completionTime = 0.0;
+  processingTime = 0.0;
+  energyConsumed = 0.0;
+  assignedCell = -1;
+  assignedHwType = -1;
   alloc = 1;
   type = L_type;
   numberOfAvailableImplementations = L_numberOfAvailableImplementations;
@@ -211,6 +229,12 @@ task &task::operator=(const task &t)
     alloc = t.galloc();
     if (alloc)
     {
+      deploymentTime = t.getDeploymentTime();
+      completionTime = t.getCompletionTime();
+      processingTime = t.getProcessingTime();
+      energyConsumed = t.getEnergyConsumed();
+      assignedCell = t.getAssignedCell();
+      assignedHwType = t.getAssignedHwType();
       type = t.getType();
       numberOfAvailableImplementations = t.getNumberOfAvailableImplementations();
       availableImplementations = new int[numberOfAvailableImplementations];
@@ -488,4 +512,73 @@ void task::print() const
 unsigned long task::getID() const
 {
   return id;
+}
+
+// Setters
+void task::setDeploymentTime(double time)
+{
+  deploymentTime = time;
+}
+
+void task::setCompletionTime(double time)
+{
+  completionTime = time;
+}
+
+void task::computeProcessingTime()
+{
+  if (completionTime >= deploymentTime)
+  {
+    processingTime = completionTime - deploymentTime;
+  }
+  else
+  {
+    processingTime = 0.0;
+  }
+}
+
+void task::setEnergyConsumed(double energy)
+{
+  energyConsumed = energy;
+}
+
+void task::setAssignedCell(int cellId)
+{
+  assignedCell = cellId;
+}
+
+void task::setAssignedHwType(int hwType)
+{
+  assignedHwType = hwType;
+}
+
+// Getters
+double task::getDeploymentTime() const
+{
+  return deploymentTime;
+}
+
+double task::getCompletionTime() const
+{
+  return completionTime;
+}
+
+double task::getProcessingTime() const
+{
+  return processingTime;
+}
+
+double task::getEnergyConsumed() const
+{
+  return energyConsumed;
+}
+
+int task::getAssignedCell() const
+{
+  return assignedCell;
+}
+
+int task::getAssignedHwType() const
+{
+  return assignedHwType;
 }

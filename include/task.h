@@ -38,6 +38,14 @@ private:
   static unsigned long global_id_counter;
   unsigned long id;
 
+  // Energy and timing tracking (added for energy-aware simulation)
+  double deploymentTime; // Timestamp when task started execution
+  double completionTime; // Timestamp when task completed
+  double processingTime; // Duration = completionTime - deploymentTime
+  double energyConsumed; // Actual energy consumed in kWh
+  int assignedCell;      // Cell ID where task was deployed
+  int assignedHwType;    // HW type where task was deployed
+
 public:
   task();
 
@@ -83,7 +91,22 @@ public:
   double getactM();
   double getactN();
 
-unsigned long getID() const;
+  unsigned long getID() const;
+
+  // Energy and timing methods
+  void setDeploymentTime(double time);
+  void setCompletionTime(double time);
+  void computeProcessingTime();
+  void setEnergyConsumed(double energy);
+  void setAssignedCell(int cellId);
+  void setAssignedHwType(int hwType);
+
+  double getDeploymentTime() const;
+  double getCompletionTime() const;
+  double getProcessingTime() const;
+  double getEnergyConsumed() const;
+  int getAssignedCell() const;
+  int getAssignedHwType() const;
 };
 
 #endif
