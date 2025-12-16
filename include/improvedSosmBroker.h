@@ -19,6 +19,7 @@ limitations under the License.
 
 #include <baseBroker.h>
 #include <list>
+#include "decisionLogEnhanced.h"
 
 class brinputs;
 class cell;
@@ -35,6 +36,7 @@ class improvedSosmBroker : public baseBroker
   int numberOfvRMs;
   int numberOfpSwitches;
   int numberOfpRouters;
+  int cellId;
 
   double pollIntervalCellM;
   double pollIntervalpRouter;
@@ -51,6 +53,8 @@ class improvedSosmBroker : public baseBroker
   list<improvedvRM>** vRMs;
   list<improvedpSwitch>** pSwitches;
   list<improvedpRouter>** pRouters;
+
+  DecisionLogger decisionLogger;
 
  public:
   improvedSosmBroker();

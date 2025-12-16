@@ -41,6 +41,7 @@ improvedSosmBroker::improvedSosmBroker()
       numberOfvRMs(0),
       numberOfpSwitches(0),
       numberOfpRouters(0),
+      cellId(0),
       pollIntervalCellM(0.0),
       pollIntervalpRouter(0.0),
       pollIntervalpSwitch(0.0),
@@ -64,6 +65,9 @@ improvedSosmBroker::improvedSosmBroker()
 void improvedSosmBroker::init(const cell *clCell, const siminputs *si)
 {
   baseBroker::init(clCell);
+
+  cellId = clCell->gID();
+  decisionLogger.init("output/improved", cellId);
 
   // Copy the interval time for polling from the BrokerData configuration file
   pollIntervalCellM = si->cinp->binp[0].pollIntervalCellM;
@@ -871,6 +875,9 @@ void improvedSosmBroker::deploy(resource **resources, netw *network, stat *stats
   if (availableNetwork < _task.greqPMNS()[2])
   {
     stats[rem[0]].rejectedTasks++;
+    logDecisionImprovedSOSM(decisionLogger, _task.getNumberOfVMs(),
+                            _task.greqPMNS()[0], _task.greqPMNS()[1],
+                            -1, false, sPMSA, rem[0], Ps, Pis);
     delete[] rem;
     delete[] rem2;
     return;
@@ -912,8 +919,12 @@ void improvedSosmBroker::deploy(resource **resources, netw *network, stat *stats
   }
   if (type == -1)
   {
-    // Reject tasks if type is still -1
     stats[rem[0]].rejectedTasks++;
+    logDecisionImprovedSOSM(decisionLogger, _task.getNumberOfVMs(),
+                            _task.greqPMNS()[0], _task.greqPMNS()[1],
+                            -1, false, sPMSA, rem[0], Ps, Pis);
+    delete[] rem;
+    delete[] rem2;
     return;
   }
   _task.reduceImpl(&rem2[type]);
@@ -934,6 +945,10 @@ void improvedSosmBroker::deploy(resource **resources, netw *network, stat *stats
 
   list<improvedpRouter>::iterator it = pRouters[type]->begin();
   it->deploy(resources, network, stats, _task);
+
+  logDecisionImprovedSOSM(decisionLogger, _task.getNumberOfVMs(),
+                          _task.greqPMNS()[0], _task.greqPMNS()[1],
+                          types[type], true, sPMSA, type, Ps, Pis);
 
   delete[] rem;
   delete[] rem2;

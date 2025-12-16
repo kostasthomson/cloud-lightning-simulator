@@ -2,10 +2,16 @@
 
 mkdir -p output/improved output/sosm output/traditional
 
-# Parsing the CellData.json file in order to find the number of cells
+rm -f output/improved/cell_*_decisions.csv
+rm -f output/sosm/cell_*_decisions.csv
+rm -f output/traditional/cell_*_decisions.csv
+
 cells=`cat input/CellData.json | awk '/Number of Cells/{print $4}' | sed 's/[:,]//g'`
 
 mpitasks=$((cells+1))
 export MPI_TASKS=$mpitasks
 export OMP_NUM_THREADS=1
 mpirun -np $MPI_TASKS -x OMP_NUM_THREADS=1 ./cl_sim "$@"
+
+echo ""
+echo "Decision logs saved to output/improved/cell_*_decisions.csv"
