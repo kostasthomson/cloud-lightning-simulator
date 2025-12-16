@@ -44,10 +44,7 @@ target_compile_options(cl_sim PUBLIC -O3 -std=c++11 -lm -Wall)
 # This allows to include files relative to the root of the src directory with a <> pair
 target_include_directories(cl_sim PUBLIC include/)
 
-target_link_libraries(cl_sim 
-  ${MPI_C_LIBRARIES} 
-  CURL::libcurl
-)
+target_link_libraries(cl_sim ${MPI_C_LIBRARIES} CURL::libcurl)
 
 # Added support for the include what you use tool
 find_program(iwyu_path NAMES include-what-you-use iwyu)

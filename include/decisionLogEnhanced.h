@@ -37,12 +37,9 @@
  */
 inline void log_decision_enhanced(
     const char *filename,
-    double timestamp,
-    unsigned long task_id,
     int num_vms,
     double cpu_req,
     double mem_req,
-    int chosen_cell,
     int chosen_hw_type,
     bool accepted,
     double util_cpu_before,
@@ -51,8 +48,7 @@ inline void log_decision_enhanced(
     double avail_mem_before,
     double avail_storage_before,
     double avail_accelerators_before,
-    double energy_kwh,
-    double processing_time_sec)
+    double energy_kwh)
 {
     std::ofstream file(filename, std::ios::app);
 
@@ -60,20 +56,16 @@ inline void log_decision_enhanced(
     file.seekp(0, std::ios::end);
     if (file.tellp() == 0)
     {
-        file << "timestamp,task_id,num_vms,cpu_req,mem_req,chosen_cell,chosen_hw_type,accepted,"
+        file << "num_vms,cpu_req,mem_req"
              << "util_cpu_before,util_mem_before,avail_cpu_before,avail_mem_before,"
-             << "avail_storage_before,avail_accelerators_before,energy_kwh,processing_time_sec\\n";
+             << "avail_storage_before,avail_accelerators_before,energy_kwh,chosen_hw_type,accepted"
+             << std::endl;
     }
 
     // Write decision record
-    file << timestamp << ","
-         << task_id << ","
-         << num_vms << ","
+    file << num_vms << ","
          << cpu_req << ","
          << mem_req << ","
-         << chosen_cell << ","
-         << chosen_hw_type << ","
-         << (accepted ? 1 : 0) << ","
          << util_cpu_before << ","
          << util_mem_before << ","
          << avail_cpu_before << ","
@@ -81,9 +73,55 @@ inline void log_decision_enhanced(
          << avail_storage_before << ","
          << avail_accelerators_before << ","
          << energy_kwh << ","
-         << processing_time_sec << "\\n";
+         << chosen_hw_type << ","
+         << (accepted ? 1 : 0) << std::endl;
 
     file.close();
+}
+
+inline void decisionLogSOSM(char *filename, task &_task, stat *stats, int *rem, double **sPMSA, int *types, int type, bool accepted)
+{
+    // Capture cell state before allocation
+    double util_cpu_before = 0.0;
+    double util_mem_before = 0.0;
+    double avail_cpu_before = sPMSA[type][0];          // Available CPU
+    double avail_mem_before = sPMSA[type][2];          // Available memory
+    double avail_storage_before = sPMSA[type][4];      // Available storage
+    double avail_accelerators_before = sPMSA[type][6]; // Available accelerators
+
+    // Compute utilization
+    if (sPMSA[type][1] > 0)
+    { // Total CPU > 0
+        util_cpu_before = 1.0 - (sPMSA[type][0] / sPMSA[type][1]);
+    }
+    if (sPMSA[type][3] > 0)
+    { // Total memory > 0
+        util_mem_before = 1.0 - (sPMSA[type][2] / sPMSA[type][3]);
+    }
+
+    // Enhanced decision logging
+    log_decision_enhanced(filename,
+                          _task.getNumberOfVMs(),
+                          _task.greqPMNS()[0],
+                          _task.greqPMNS()[1],
+                          rem[0] >= 0 ? types[rem[0]] : -1,
+                          accepted,
+                          util_cpu_before,
+                          util_mem_before,
+                          avail_cpu_before,
+                          avail_mem_before,
+                          avail_storage_before,
+                          avail_accelerators_before,
+                          0.0 // Energy (computed at task completion)
+    );
+
+    // Set deployment time if accepted
+    if (accepted)
+    {
+        _task.setDeploymentTime(stats[0].currentTimestep);
+        _task.setAssignedCell(0);
+        _task.setAssignedHwType(rem[0]);
+    }
 }
 
 #endif // DECISIONLOG_ENHANCED_H
