@@ -875,9 +875,29 @@ void improvedSosmBroker::deploy(resource **resources, netw *network, stat *stats
   if (availableNetwork < _task.greqPMNS()[2])
   {
     stats[rem[0]].rejectedTasks++;
+    int totalRunningVMs = 0;
+    double avgOvercommitCpu = 0.0, avgOvercommitMem = 0.0;
+    for (int j = 0; j < numberOfResourcesPerType[rem[0]]; j++)
+    {
+      totalRunningVMs += resources[rem[0]][j].getRunningVMs();
+      avgOvercommitCpu += resources[rem[0]][j].getOvercommitmentProcessors();
+      avgOvercommitMem += resources[rem[0]][j].getOvercommitmentMemory();
+    }
+    if (numberOfResourcesPerType[rem[0]] > 0)
+    {
+      avgOvercommitCpu /= numberOfResourcesPerType[rem[0]];
+      avgOvercommitMem /= numberOfResourcesPerType[rem[0]];
+    }
     logDecisionImprovedSOSM(decisionLogger, _task.getNumberOfVMs(),
                             _task.greqPMNS()[0], _task.greqPMNS()[1],
-                            -1, false, sPMSA, rem[0], Ps, Pis);
+                            _task.greqPMNS()[3], _task.greqPMNS()[2],
+                            _task.gavAcc()[0], _task.grhoAcc()[0],
+                            _task.grequestedInstructions(),
+                            -1, false, sPMSA, rem[0], Ps, Pis,
+                            Paccs, Piaccs, Cs, Caccs,
+                            availableNetwork, totalNetwork,
+                            totalRunningVMs, avgOvercommitCpu, avgOvercommitMem,
+                            network->getNumberOfTasks());
     delete[] rem;
     delete[] rem2;
     return;
@@ -920,9 +940,29 @@ void improvedSosmBroker::deploy(resource **resources, netw *network, stat *stats
   if (type == -1)
   {
     stats[rem[0]].rejectedTasks++;
+    int totalRunningVMs = 0;
+    double avgOvercommitCpu = 0.0, avgOvercommitMem = 0.0;
+    for (int j = 0; j < numberOfResourcesPerType[rem[0]]; j++)
+    {
+      totalRunningVMs += resources[rem[0]][j].getRunningVMs();
+      avgOvercommitCpu += resources[rem[0]][j].getOvercommitmentProcessors();
+      avgOvercommitMem += resources[rem[0]][j].getOvercommitmentMemory();
+    }
+    if (numberOfResourcesPerType[rem[0]] > 0)
+    {
+      avgOvercommitCpu /= numberOfResourcesPerType[rem[0]];
+      avgOvercommitMem /= numberOfResourcesPerType[rem[0]];
+    }
     logDecisionImprovedSOSM(decisionLogger, _task.getNumberOfVMs(),
                             _task.greqPMNS()[0], _task.greqPMNS()[1],
-                            -1, false, sPMSA, rem[0], Ps, Pis);
+                            _task.greqPMNS()[3], _task.greqPMNS()[2],
+                            _task.gavAcc()[0], _task.grhoAcc()[0],
+                            _task.grequestedInstructions(),
+                            -1, false, sPMSA, rem[0], Ps, Pis,
+                            Paccs, Piaccs, Cs, Caccs,
+                            availableNetwork, totalNetwork,
+                            totalRunningVMs, avgOvercommitCpu, avgOvercommitMem,
+                            network->getNumberOfTasks());
     delete[] rem;
     delete[] rem2;
     return;
@@ -946,9 +986,29 @@ void improvedSosmBroker::deploy(resource **resources, netw *network, stat *stats
   list<improvedpRouter>::iterator it = pRouters[type]->begin();
   it->deploy(resources, network, stats, _task);
 
+  int totalRunningVMs = 0;
+  double avgOvercommitCpu = 0.0, avgOvercommitMem = 0.0;
+  for (int j = 0; j < numberOfResourcesPerType[type]; j++)
+  {
+    totalRunningVMs += resources[type][j].getRunningVMs();
+    avgOvercommitCpu += resources[type][j].getOvercommitmentProcessors();
+    avgOvercommitMem += resources[type][j].getOvercommitmentMemory();
+  }
+  if (numberOfResourcesPerType[type] > 0)
+  {
+    avgOvercommitCpu /= numberOfResourcesPerType[type];
+    avgOvercommitMem /= numberOfResourcesPerType[type];
+  }
   logDecisionImprovedSOSM(decisionLogger, _task.getNumberOfVMs(),
                           _task.greqPMNS()[0], _task.greqPMNS()[1],
-                          types[type], true, sPMSA, type, Ps, Pis);
+                          _task.greqPMNS()[3], _task.greqPMNS()[2],
+                          _task.gavAcc()[0], _task.grhoAcc()[0],
+                          _task.grequestedInstructions(),
+                          types[type], true, sPMSA, type, Ps, Pis,
+                          Paccs, Piaccs, Cs, Caccs,
+                          availableNetwork, totalNetwork,
+                          totalRunningVMs, avgOvercommitCpu, avgOvercommitMem,
+                          network->getNumberOfTasks());
 
   delete[] rem;
   delete[] rem2;

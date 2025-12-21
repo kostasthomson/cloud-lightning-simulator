@@ -5,8 +5,16 @@
 #include <fstream>
 #include <regex>
 
+static std::string cachedHostIP = "";
+static bool triedWindowsHost = false;
+
 std::string getWindowsHostIP()
 {
+    if (!cachedHostIP.empty())
+    {
+        return cachedHostIP;
+    }
+
     std::ifstream resolv("/etc/resolv.conf");
     std::string line;
     std::regex ns_regex("^nameserver ([0-9\\.]+)$");
@@ -16,10 +24,21 @@ std::string getWindowsHostIP()
         std::smatch match;
         if (std::regex_match(line, match, ns_regex))
         {
-            return match[1];
+            cachedHostIP = match[1];
+            return cachedHostIP;
         }
     }
-    return "127.0.0.1";
+    cachedHostIP = "127.0.0.1";
+    return cachedHostIP;
+}
+
+void fallbackToLocalhost()
+{
+    if (cachedHostIP != "127.0.0.1")
+    {
+        std::cerr << "[HTTP] Windows host unreachable, falling back to localhost" << std::endl;
+        cachedHostIP = "127.0.0.1";
+    }
 }
 
 size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
@@ -38,16 +57,28 @@ bool checkHealth()
     }
 
     std::string response;
-    std::string url = "http://" + getWindowsHostIP() + ":8000/";
+    std::string hostIP = getWindowsHostIP();
+    std::string url = "http://" + hostIP + ":8000/";
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5L);
+    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 2L);
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
     std::cout << "Connecting to FastAPI at: " << url << std::endl;
 
     CURLcode res = curl_easy_perform(curl);
+
+    if (res != CURLE_OK && hostIP != "127.0.0.1")
+    {
+        fallbackToLocalhost();
+        response.clear();
+        url = "http://127.0.0.1:8000/";
+        std::cout << "Retrying with localhost: " << url << std::endl;
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        res = curl_easy_perform(curl);
+    }
 
     if (res != CURLE_OK)
     {
@@ -76,7 +107,8 @@ std::string postJSON(const std::string& endpoint, const std::string& jsonPayload
     }
 
     std::string response;
-    std::string url = "http://" + getWindowsHostIP() + ":8000" + endpoint;
+    std::string hostIP = getWindowsHostIP();
+    std::string url = "http://" + hostIP + ":8000" + endpoint;
 
     struct curl_slist *headers = NULL;
     headers = curl_slist_append(headers, "Content-Type: application/json");
@@ -86,9 +118,19 @@ std::string postJSON(const std::string& endpoint, const std::string& jsonPayload
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonPayload.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 30L);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5L);
+    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 2L);
 
     CURLcode res = curl_easy_perform(curl);
+
+    if (res != CURLE_OK && hostIP != "127.0.0.1")
+    {
+        fallbackToLocalhost();
+        response.clear();
+        url = "http://127.0.0.1:8000" + endpoint;
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        res = curl_easy_perform(curl);
+    }
 
     if (res != CURLE_OK)
     {

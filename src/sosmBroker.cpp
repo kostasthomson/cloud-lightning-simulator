@@ -41,6 +41,7 @@ sosmBroker::sosmBroker()
       numberOfvRMs(0),
       numberOfpSwitches(0),
       numberOfpRouters(0),
+      cellId(0),
       pollIntervalCellM(0.0),
       pollIntervalpRouter(0.0),
       pollIntervalpSwitch(0.0),
@@ -53,6 +54,9 @@ sosmBroker::sosmBroker()
       Cs(nullptr),
       Ps(nullptr),
       Pis(nullptr),
+      Caccs(nullptr),
+      Paccs(nullptr),
+      Piaccs(nullptr),
       Ws(nullptr),
       numberOfFunctions(0)
 {
@@ -61,6 +65,9 @@ sosmBroker::sosmBroker()
 void sosmBroker::init(const cell *clCell, const siminputs *si)
 {
   baseBroker::init(clCell);
+
+  cellId = clCell->gID();
+  decisionLogger.init("output/sosm", cellId);
 
   // Copy the interval time for polling from the BrokerData configuration file
   pollIntervalCellM = si->cinp->binp[0].pollIntervalCellM;
@@ -71,18 +78,24 @@ void sosmBroker::init(const cell *clCell, const siminputs *si)
   double *tempC = new double[numberOfTypes];
   double *tempP = new double[numberOfTypes];
   double *tempPi = new double[numberOfTypes];
+  double *tempCacc = new double[numberOfTypes];
+  double *tempPacc = new double[numberOfTypes];
+  double *tempPiacc = new double[numberOfTypes];
 
   // Calculate the values for C, P and Pi to be used for the assessment functions
   for (int i = 0; i < numberOfTypes; i++)
   {
     tempC[i] = clCell->getResources()[i][0].getComputeCapability() +
                clCell->getResources()[i][0].getAcceleratorComputeCapability();
+    tempCacc[i] = clCell->getResources()[i][0].getAcceleratorComputeCapability();
     double oz = 1.0;
     int active = clCell->getResources()[i][0].getActive();
     int totalAccelerators = clCell->getResources()[i][0].getTotalAccelerators();
     tempP[i] = clCell->getPowerConsumption()[i].consumption(oz, oz, active, totalAccelerators);
+    tempPacc[i] = clCell->getPowerConsumption()[i].gaccPmax();
     oz = 0.0;
     tempPi[i] = clCell->getPowerConsumption()[i].consumption(oz, oz, active, totalAccelerators);
+    tempPiacc[i] = clCell->getPowerConsumption()[i].gaccPmin();
   }
 
   int tminC = 0;
@@ -214,6 +227,12 @@ void sosmBroker::init(const cell *clCell, const siminputs *si)
   tempP = nullptr;
   Pis = tempPi;
   tempPi = nullptr;
+  Caccs = tempCacc;
+  tempCacc = nullptr;
+  Paccs = tempPacc;
+  tempPacc = nullptr;
+  Piaccs = tempPiacc;
+  tempPiacc = nullptr;
 }
 /*
 sosmBroker::sosmBroker(const int &L_numberOfTypes, const int *L_types, const int *L_numberOfResourcesPerType, resource
@@ -653,9 +672,15 @@ sosmBroker::~sosmBroker()
     delete[] Cs;
     delete[] Ps;
     delete[] Pis;
+    delete[] Caccs;
+    delete[] Paccs;
+    delete[] Piaccs;
     Cs = nullptr;
     Ps = nullptr;
     Pis = nullptr;
+    Caccs = nullptr;
+    Paccs = nullptr;
+    Piaccs = nullptr;
     delete[] Ws;
     Ws = nullptr;
     numberOfFunctions = 0;
@@ -846,14 +871,24 @@ void sosmBroker::deploy(resource **resources, netw *network, stat *stats, task &
     }
   }
 
-  if (availableNetwork < _task.greqPMNS()[2])
+  int L_numberOfVMs = _task.getNumberOfVMs();
+  double *reqPMNS = _task.greqPMNS();
+  int firstType = (count > 0) ? rem[0] : 0;
+
+  if (availableNetwork < reqPMNS[2])
   {
-    stats[rem[0]].rejectedTasks++;
+    logDecisionImprovedSOSM(decisionLogger, L_numberOfVMs, reqPMNS[0], reqPMNS[1],
+                            reqPMNS[3], reqPMNS[2],
+                            _task.gavAcc()[0], _task.grhoAcc()[0], _task.grequestedInstructions(),
+                            -1, false,
+                            sPMSA, firstType, Ps, Pis, Paccs, Piaccs, Cs, Caccs,
+                            availableNetwork, totalNetwork, 0, 0.0, 0.0, 0);
+    stats[firstType].rejectedTasks++;
     delete[] rem;
     delete[] rem2;
     return;
   }
-  availableNetwork -= _task.greqPMNS()[2];
+  availableNetwork -= reqPMNS[2];
 
   double maxSI = 0.0;
   int type = -1;
@@ -864,13 +899,13 @@ void sosmBroker::deploy(resource **resources, netw *network, stat *stats, task &
     list<pRouter>::iterator itt = pRouters[rem[i]]->begin();
     // Compare the current found maximum SI to the SI of each pRouter with a matching Hardware Type and double check
     // that the pRouter offers the requested PMNS resources
-    if (maxSI < SIs[rem[i]] && _task.getNumberOfVMs() * _task.greqPMNS()[0] <= sPMSA[rem[i]][0] &&
-        _task.getNumberOfVMs() * _task.greqPMNS()[1] <= sPMSA[rem[i]][2] &&
-        _task.getNumberOfVMs() * _task.greqPMNS()[3] <= sPMSA[rem[i]][4] &&
-        _task.getNumberOfVMs() * _task.gavAcc()[rem2[i]] <= sPMSA[rem[i]][6])
+    if (maxSI < SIs[rem[i]] && L_numberOfVMs * reqPMNS[0] <= sPMSA[rem[i]][0] &&
+        L_numberOfVMs * reqPMNS[1] <= sPMSA[rem[i]][2] &&
+        L_numberOfVMs * reqPMNS[3] <= sPMSA[rem[i]][4] &&
+        L_numberOfVMs * _task.gavAcc()[rem2[i]] <= sPMSA[rem[i]][6])
     {
-      if (itt->probe(_task.getNumberOfVMs() * _task.greqPMNS()[0], _task.getNumberOfVMs() * _task.greqPMNS()[1],
-                     _task.getNumberOfVMs() * _task.greqPMNS()[3], _task.getNumberOfVMs() * _task.gavAcc()[rem2[i]]) != -1)
+      if (itt->probe(L_numberOfVMs * reqPMNS[0], L_numberOfVMs * reqPMNS[1],
+                     L_numberOfVMs * reqPMNS[3], L_numberOfVMs * _task.gavAcc()[rem2[i]]) != -1)
       {
         maxSI = SIs[rem[i]];
         type = i;
@@ -879,27 +914,47 @@ void sosmBroker::deploy(resource **resources, netw *network, stat *stats, task &
   }
   if (type == -1)
   {
-    // Reject tasks if type is still -1
-    stats[rem[0]].rejectedTasks++;
+    logDecisionImprovedSOSM(decisionLogger, L_numberOfVMs, reqPMNS[0], reqPMNS[1],
+                            reqPMNS[3], reqPMNS[2],
+                            _task.gavAcc()[0], _task.grhoAcc()[0], _task.grequestedInstructions(),
+                            -1, false,
+                            sPMSA, firstType, Ps, Pis, Paccs, Piaccs, Cs, Caccs,
+                            availableNetwork, totalNetwork, 0, 0.0, 0.0, 0);
+    availableNetwork += reqPMNS[2];
+    stats[firstType].rejectedTasks++;
+    delete[] rem;
+    delete[] rem2;
     return;
   }
+
+  int accIdx = rem2[type];
+  int chosenHwType = types[rem[type]];
+  int chosenTypeIdx = rem[type];
+
   _task.reduceImpl(&rem2[type]);
   _task.remapType(&rem[type], 1);
   type = rem[type];
-  sPMSA[type][0] -= _task.getNumberOfVMs() * _task.greqPMNS()[0];
-  sPMSA[type][2] -= _task.getNumberOfVMs() * _task.greqPMNS()[1];
-  sPMSA[type][4] -= _task.getNumberOfVMs() * _task.greqPMNS()[3];
-  sPMSA[type][6] -= _task.getNumberOfVMs() * _task.gavAcc()[0];
+  sPMSA[type][0] -= L_numberOfVMs * reqPMNS[0];
+  sPMSA[type][2] -= L_numberOfVMs * reqPMNS[1];
+  sPMSA[type][4] -= L_numberOfVMs * reqPMNS[3];
+  sPMSA[type][6] -= L_numberOfVMs * _task.gavAcc()[0];
 
   // Update SI for the chosen pRouter
   for (int i = 0; i < 4; i++)
   {
-    SIs[type] += Ws[i] * deassessmentFunctions(-_task.getNumberOfVMs() * _task.greqPMNS()[0],
-                                               -_task.getNumberOfVMs() * _task.greqPMNS()[1], i, type);
+    SIs[type] += Ws[i] * deassessmentFunctions(-L_numberOfVMs * reqPMNS[0],
+                                               -L_numberOfVMs * reqPMNS[1], i, type);
   }
 
   list<pRouter>::iterator it = pRouters[type]->begin();
   it->deploy(resources, network, stats, _task);
+
+  logDecisionImprovedSOSM(decisionLogger, L_numberOfVMs, reqPMNS[0], reqPMNS[1],
+                          reqPMNS[3], reqPMNS[2],
+                          _task.gavAcc()[0], _task.grhoAcc()[accIdx], _task.grequestedInstructions(),
+                          chosenHwType, true,
+                          sPMSA, chosenTypeIdx, Ps, Pis, Paccs, Piaccs, Cs, Caccs,
+                          availableNetwork, totalNetwork, 0, 0.0, 0.0, 0);
 
   delete[] rem;
   delete[] rem2;

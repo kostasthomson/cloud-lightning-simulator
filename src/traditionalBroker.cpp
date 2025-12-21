@@ -36,7 +36,14 @@ using std::min;
 
 traditionalBroker::traditionalBroker()
     : baseBroker(),
+      cellId(0),
       pollInterval(0.0),
+      Ps(nullptr),
+      Pis(nullptr),
+      Cs(nullptr),
+      Paccs(nullptr),
+      Piaccs(nullptr),
+      Caccs(nullptr),
       availableProcesses(nullptr),
       totalProcesses(nullptr),
       availableMemory(nullptr),
@@ -263,6 +270,19 @@ traditionalBroker::~traditionalBroker()
         numberOfTypes = 0;
         (*queue).clear();
         delete[] queue;
+
+        delete[] Ps;
+        delete[] Pis;
+        delete[] Cs;
+        delete[] Paccs;
+        delete[] Piaccs;
+        delete[] Caccs;
+        Ps = nullptr;
+        Pis = nullptr;
+        Cs = nullptr;
+        Paccs = nullptr;
+        Piaccs = nullptr;
+        Caccs = nullptr;
     }
 }
 
@@ -270,7 +290,32 @@ void traditionalBroker::init(const cell *clCell, const siminputs *si)
 {
     baseBroker::init(clCell);
 
+    cellId = clCell->gID();
+    decisionLogger.init("output/traditional", cellId);
+
     pollInterval = si->cinp->binp[0].pollIntervalCellM;
+
+    Ps = new double[numberOfTypes];
+    Pis = new double[numberOfTypes];
+    Cs = new double[numberOfTypes];
+    Paccs = new double[numberOfTypes];
+    Piaccs = new double[numberOfTypes];
+    Caccs = new double[numberOfTypes];
+
+    for (int i = 0; i < numberOfTypes; i++)
+    {
+        Cs[i] = clCell->getResources()[i][0].getComputeCapability() /
+                clCell->getResources()[i][0].getTotalProcessors();
+        Caccs[i] = clCell->getResources()[i][0].getAcceleratorComputeCapability();
+        double oz = 1.0;
+        Ps[i] = clCell->getPowerConsumption()[i].modelCPU(oz) /
+                clCell->getResources()[i][0].getTotalProcessors();
+        Paccs[i] = clCell->getPowerConsumption()[i].gaccPmax();
+        oz = 0.0;
+        Pis[i] = clCell->getPowerConsumption()[i].modelCPU(oz) /
+                 clCell->getResources()[i][0].getTotalProcessors();
+        Piaccs[i] = clCell->getPowerConsumption()[i].gaccPmin();
+    }
 
     availableProcesses = new double *[numberOfTypes];
     totalProcesses = new double *[numberOfTypes];
@@ -364,17 +409,57 @@ void traditionalBroker::deploy(resource **resources, netw *network, stat *stats,
         exit(0);
     }
 
-    // Capture cell state BEFORE allocation (moved here to capture correct state)
-    double util_cpu_before = 0.0;
-    double util_mem_before = 0.0;
-    double avail_cpu_before = 0.0;
-    double avail_mem_before = 0.0;
-    double avail_storage_before = 0.0;
-    double avail_accelerators_before = 0.0;
+    double avail_cpu = 0.0, total_cpu = 0.0;
+    double avail_mem = 0.0, total_mem = 0.0;
+    double avail_storage = 0.0, total_storage = 0.0;
+    double avail_acc = 0.0, total_acc = 0.0;
+    int running_vms = 0;
+    double overcommit_cpu = 0.0, overcommit_mem = 0.0;
+    for (j = 0; j < numberOfResourcesPerType[type]; j++)
+    {
+        avail_cpu += availableProcesses[type][j];
+        total_cpu += totalProcesses[type][j];
+        avail_mem += availableMemory[type][j];
+        total_mem += totalMemory[type][j];
+        avail_storage += availableStorage[type][j];
+        total_storage += totalStorage[type][j];
+        avail_acc += availableAccelerators[type][j];
+        total_acc += totalAccelerators[type][j];
+        running_vms += resources[type][j].getRunningVMs();
+    }
+
+    double util_cpu = (total_cpu > 0) ? 1.0 - (avail_cpu / total_cpu) : 0.0;
+    double util_mem = (total_mem > 0) ? 1.0 - (avail_mem / total_mem) : 0.0;
+    double util_network = (totalNetwork > 0) ? 1.0 - (availableNetwork / totalNetwork) : 0.0;
+    int num_tasks = (int)queue->size();
+
+    double rho_acc = 0.0;
+    if (_task.getNumberOfAvailableImplementations() > 0)
+    {
+        int accIdx = 0;
+        for (int k = 0; k < _task.getNumberOfAvailableImplementations(); k++)
+        {
+            if (_task.getAvailableImplementations()[k] == types[type])
+            {
+                accIdx = k;
+                break;
+            }
+        }
+        rho_acc = _task.grhoAcc()[accIdx];
+    }
 
     L_ID = network[0].probe(reqPMNS[2]);
     if (L_ID == -1)
     {
+        decisionLogger.log(L_numberOfVMs, reqPMNS[0], reqPMNS[1], reqPMNS[3], reqPMNS[2],
+                           avAcc, rho_acc, _task.grequestedInstructions(),
+                           -1, false,
+                           util_cpu, util_mem, avail_cpu, avail_mem, avail_storage, avail_acc,
+                           total_cpu, total_mem, total_storage, total_acc,
+                           availableNetwork, totalNetwork, util_network,
+                           Pis[type], Ps[type], Piaccs[type], Paccs[type],
+                           Cs[type], Caccs[type],
+                           running_vms, overcommit_cpu, overcommit_mem, num_tasks, 0.0);
         stats[type].rejectedTasks++;
         return;
     }
@@ -444,11 +529,19 @@ void traditionalBroker::deploy(resource **resources, netw *network, stat *stats,
             availableAccelerators[type][IDs[j]] += avAcc;
         }
         availableNetwork += reqPMNS[2];
+        decisionLogger.log(L_numberOfVMs, reqPMNS[0], reqPMNS[1], reqPMNS[3], reqPMNS[2],
+                           avAcc, rho_acc, _task.grequestedInstructions(),
+                           -1, false,
+                           util_cpu, util_mem, avail_cpu, avail_mem, avail_storage, avail_acc,
+                           total_cpu, total_mem, total_storage, total_acc,
+                           availableNetwork, totalNetwork, util_network,
+                           Pis[type], Ps[type], Piaccs[type], Paccs[type],
+                           Cs[type], Caccs[type],
+                           running_vms, overcommit_cpu, overcommit_mem, num_tasks, 0.0);
         stats[type].rejectedTasks++;
     }
     else
     {
-        // Deploy task
         for (j = 0; j < L_numberOfVMs; j++)
         {
             resources[type][IDs[j]].deploy(_task);
@@ -458,6 +551,18 @@ void traditionalBroker::deploy(resource **resources, netw *network, stat *stats,
         _task.attachResources(IDs);
         enque(_task);
         stats[type].acceptedTasks++;
+
+        double estimatedDuration = 10.0;
+        double energy_kwh = computeEstimatedEnergy(reqPMNS[0], L_numberOfVMs, estimatedDuration, Ps, Pis, type);
+        decisionLogger.log(L_numberOfVMs, reqPMNS[0], reqPMNS[1], reqPMNS[3], reqPMNS[2],
+                           avAcc, rho_acc, _task.grequestedInstructions(),
+                           types[type], true,
+                           util_cpu, util_mem, avail_cpu, avail_mem, avail_storage, avail_acc,
+                           total_cpu, total_mem, total_storage, total_acc,
+                           availableNetwork, totalNetwork, util_network,
+                           Pis[type], Ps[type], Piaccs[type], Paccs[type],
+                           Cs[type], Caccs[type],
+                           running_vms, overcommit_cpu, overcommit_mem, num_tasks, energy_kwh);
     }
 
     delete[] IDs;

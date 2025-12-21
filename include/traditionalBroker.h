@@ -18,6 +18,7 @@ limitations under the License.
 #define TRADITIONALBROKER_H
 #include <baseBroker.h>
 #include <list>
+#include "decisionLogEnhanced.h"
 
 class cell;
 class siminputs;
@@ -27,7 +28,16 @@ using std::list;
 class traditionalBroker : public baseBroker
 {
 private:
+  int cellId;
   double pollInterval;
+  DecisionLogger decisionLogger;
+
+  double *Ps;
+  double *Pis;
+  double *Cs;
+  double *Paccs;
+  double *Piaccs;
+  double *Caccs;
 
   double **availableProcesses;
   double **totalProcesses;

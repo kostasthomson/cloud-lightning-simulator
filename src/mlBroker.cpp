@@ -307,7 +307,20 @@ string mlBroker::buildAllocationRequest(const cell *clCell, const task &_task, d
   {
     if (i > 0)
       json << ",";
-    json << "\"" << types[i] << "\":{\"cpu\":0.5,\"memory\":0.5,\"network\":0.5}";
+    double totalCPU = 0, totalMem = 0, availCPU = 0, availMem = 0;
+    for (int j = 0; j < numberOfResourcesPerType[i]; j++)
+    {
+      totalCPU += totalProcesses[i][j];
+      totalMem += totalMemory[i][j];
+      availCPU += availableProcesses[i][j];
+      availMem += availableMemory[i][j];
+    }
+    double utilCPU = (totalCPU > 0) ? (1.0 - availCPU / totalCPU) : 0.0;
+    double utilMem = (totalMem > 0) ? (1.0 - availMem / totalMem) : 0.0;
+    double utilNet = (totalNetwork > 0) ? (1.0 - availableNetwork / totalNetwork) : 0.0;
+    json << "\"" << types[i] << "\":{\"cpu\":" << utilCPU
+         << ",\"memory\":" << utilMem
+         << ",\"network\":" << utilNet << "}";
   }
   json << "}}],\"task\":{";
 
