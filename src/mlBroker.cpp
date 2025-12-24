@@ -197,8 +197,8 @@ void mlBroker::deploy(resource **resources, netw *network, stat *stats, task &_t
 
   if (jsonRequest.empty())
   {
-    // cout << "[ML] Failed to build request, using fallback" << endl;
-    fallbackBroker->deploy(resources, network, stats, _task);
+    cout << "[ML] Failed to build request, using fallback" << endl;
+    // fallbackBroker->deploy(resources, network, stats, _task);
     return;
   }
 
@@ -206,8 +206,8 @@ void mlBroker::deploy(resource **resources, netw *network, stat *stats, task &_t
 
   if (response.empty())
   {
-    // cout << "[ML] No response from ML service, using fallback" << endl;
-    fallbackBroker->deploy(resources, network, stats, _task);
+    cout << "[ML] No response from ML service, using fallback" << endl;
+    // fallbackBroker->deploy(resources, network, stats, _task);
     return;
   }
 
@@ -219,9 +219,9 @@ void mlBroker::deploy(resource **resources, netw *network, stat *stats, task &_t
 
   if (!parseSuccess || numVMs != _task.getNumberOfVMs())
   {
-    // cout << "[ML] Failed to parse ML response, using fallback" << endl;
+    cout << "[ML] Failed to parse ML response, using fallback" << endl;
     delete[] serverAssignments;
-    fallbackBroker->deploy(resources, network, stats, _task);
+    // fallbackBroker->deploy(resources, network, stats, _task);
     return;
   }
 
@@ -232,8 +232,8 @@ void mlBroker::deploy(resource **resources, netw *network, stat *stats, task &_t
 
   if (!deploySuccess)
   {
-    // cout << "[ML] ML allocation failed, using fallback" << endl;
-    fallbackBroker->deploy(resources, network, stats, _task);
+    cout << "[ML] ML allocation failed, using fallback" << endl;
+    // fallbackBroker->deploy(resources, network, stats, _task);
   }
 }
 
